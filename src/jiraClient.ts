@@ -27,6 +27,7 @@ export class JiraClient {
         }
         return url.toString()
     }
+
     private buildHeaders(): HeadersInit {
         const requestHeaders: HeadersInit = new Headers()
         if (this._settings.authenticationType === EAuthenticationTypes.BASIC) {
@@ -36,6 +37,7 @@ export class JiraClient {
         }
         return requestHeaders
     }
+
     private async sendRequest(url: string, options: RequestInit): Promise<any> {
         let response: Response
         try {
@@ -49,7 +51,7 @@ export class JiraClient {
         }
 
         if (response.status === 200) {
-            // console.info('response', response)
+            console.info('response', response)
             try {
                 return response.json()
             } catch (e) {

@@ -17,14 +17,15 @@ export class ObjectsCache {
         this._cache = {}
     }
 
-    addCachedObject(key: string, object: any) {
+    add(key: string, object: any) {
         this._cache[key] = {
             updateTime: Date.now(),
             data: object,
         }
+        return object
     }
 
-    getCachedObject(key: string) {
+    get(key: string) {
         if (key in this._cache && this._cache[key].updateTime + ms(this._settings.cacheTime) > Date.now()) {
             return this._cache[key].data
         }

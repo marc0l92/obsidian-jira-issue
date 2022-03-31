@@ -12,11 +12,12 @@ export default class JiraIssuePlugin extends Plugin {
 
     async onload() {
         this.settings = new JiraIssueSettingsTab(this.app, this)
+        await this.settings.loadSettings()
         this.addSettingTab(this.settings)
         this.cache = new ObjectsCache(this.settings.getData())
         this.client = new JiraClient(this.settings.getData())
-        this.processor = new JiraIssueProcessor(this.settings.getData())
-        this.registerMarkdownCodeBlockProcessor('jira', this.processor.fence)
+        this.processor = new JiraIssueProcessor(this.settings.getData(), this.client, this.cache)
+        this.registerMarkdownCodeBlockProcessor('jira-issue', this.processor.issueFence.bind(this.processor))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',

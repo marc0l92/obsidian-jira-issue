@@ -12,6 +12,8 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
+interface IStatusColorCache { [key: string]: string }
+
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes
@@ -23,11 +25,11 @@ export interface IJiraIssueSettings {
     cacheTime: string
     defaultSearchResultsLimit: number // TODO
     searchTemplate: string // TODO
-    statusColorCache: { [key: string]: string }
+    statusColorCache: IStatusColorCache
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
-    host: 'https://jira.secondlife.com',
+    host: 'https://issues.apache.org/jira',
     authenticationType: EAuthenticationTypes.OPEN,
     apiBasePath: '/rest/api/latest',
     requestsTimeout: 5000,
@@ -40,13 +42,11 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
-    private _data: IJiraIssueSettings
+    private _data: IJiraIssueSettings = DEFAULT_SETTINGS
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
         this._plugin = plugin
-        this.loadSettings()
-        this._data.statusColorCache = DEFAULT_SETTINGS.statusColorCache
     }
 
     getData(): IJiraIssueSettings {
@@ -55,6 +55,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     async loadSettings() {
         this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
+        this._data.statusColorCache = DEFAULT_SETTINGS.statusColorCache
     }
 
     async saveSettings() {
