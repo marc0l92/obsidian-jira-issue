@@ -1,11 +1,13 @@
 import { MarkdownPostProcessorContext } from "obsidian";
-import { JiraIssueSettings } from "./settings";
+import { IJiraIssueSettings } from "./settings";
+
+const loadingMessage = ``
 
 export class JiraIssueProcessor {
-    settings: JiraIssueSettings
+    private _settings: IJiraIssueSettings
 
-    constructor(settings: JiraIssueSettings) {
-        this.settings = settings
+    constructor(settings: IJiraIssueSettings) {
+        this._settings = settings
     }
 
     async fence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {

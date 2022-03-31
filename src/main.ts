@@ -1,24 +1,26 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian'
+import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
+import { ObjectsCache } from './objectsCache'
 import { JiraIssueProcessor } from './processor'
-import { JiraIssueSettings } from './settings'
+import { JiraIssueSettingsTab } from './settings'
 
 export default class JiraIssuePlugin extends Plugin {
-    settings: JiraIssueSettings
+    settings: JiraIssueSettingsTab
     processor: JiraIssueProcessor
+    cache: ObjectsCache
 
     async onload() {
-        this.settings = new JiraIssueSettings(this.app, this)
+        this.settings = new JiraIssueSettingsTab(this.app, this)
         this.addSettingTab(this.settings)
-        this.processor = new JiraIssueProcessor(this.settings)
+        this.cache = new ObjectsCache(this.settings.getData())
+        this.processor = new JiraIssueProcessor(this.settings.getData())
         this.registerMarkdownCodeBlockProcessor('jira', this.processor.fence)
-
-        // new Notice('This is a notice!');
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
             name: 'Clear cache',
             callback: () => {
-                // TODO: Clear cache
+                this.cache.clear()
+                new Notice('JiraIssue: Cache cleaned')
             }
         })
         this.addCommand({

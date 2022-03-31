@@ -7,7 +7,7 @@ const AUTHENTICATION_TYPES = {
     BEARER_TOKEN: 'Bearer Token',
 }
 
-interface ISettings {
+export interface IJiraIssueSettings {
     host: string
     authenticationType: string
     username?: string
@@ -19,7 +19,7 @@ interface ISettings {
     searchTemplate: string // TODO
 }
 
-const DEFAULT_SETTINGS: ISettings = {
+const DEFAULT_SETTINGS: IJiraIssueSettings = {
     host: 'https://jira.secondlife.com',
     authenticationType: Object.keys(AUTHENTICATION_TYPES)[0],
     apiBasePath: '/rest/api/latest',
@@ -29,22 +29,26 @@ const DEFAULT_SETTINGS: ISettings = {
     searchTemplate: 'kut<>rapsd',
 }
 
-export class JiraIssueSettings extends PluginSettingTab {
-    plugin: JiraIssuePlugin
-    settingsData: ISettings
+export class JiraIssueSettingsTab extends PluginSettingTab {
+    private _plugin: JiraIssuePlugin
+    private _data: IJiraIssueSettings
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
-        this.plugin = plugin
+        this._plugin = plugin
         this.loadSettings()
     }
 
+    getData(): IJiraIssueSettings {
+        return this._data
+    }
+
     async loadSettings() {
-        this.settingsData = Object.assign({}, DEFAULT_SETTINGS, await this.plugin.loadData())
+        this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
     }
 
     async saveSettings() {
-        await this.plugin.saveData(this.settingsData)
+        await this._plugin.saveData(this._data)
     }
 
     display(): void {
@@ -57,9 +61,9 @@ export class JiraIssueSettings extends PluginSettingTab {
             .setDesc('Hostname of your company Jira server.')
             .addText(text => text
                 .setPlaceholder('Example: ' + DEFAULT_SETTINGS.host)
-                .setValue(this.settingsData.host)
+                .setValue(this._data.host)
                 .onChange(async (value) => {
-                    this.settingsData.host = value
+                    this._data.host = value
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
@@ -67,9 +71,9 @@ export class JiraIssueSettings extends PluginSettingTab {
             .setDesc('Select how the plugin should authenticate in your Jira server.')
             .addDropdown(dropdown => dropdown
                 .addOptions(AUTHENTICATION_TYPES)
-                .setValue(this.settingsData.authenticationType)
+                .setValue(this._data.authenticationType)
                 .onChange(async (value) => {
-                    this.settingsData.authenticationType = value
+                    this._data.authenticationType = value
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
@@ -77,9 +81,9 @@ export class JiraIssueSettings extends PluginSettingTab {
             .setDesc('Username to access your Jira account using HTTP basic authentication.')
             .addText(text => text
                 // .setPlaceholder('')
-                .setValue(this.settingsData.username)
+                .setValue(this._data.username)
                 .onChange(async (value) => {
-                    this.settingsData.username = value
+                    this._data.username = value
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
@@ -89,7 +93,7 @@ export class JiraIssueSettings extends PluginSettingTab {
                 // .setPlaceholder('')
                 .setValue(DEFAULT_SETTINGS.password)
                 .onChange(async (value) => {
-                    this.settingsData.password = value
+                    this._data.password = value
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
@@ -97,9 +101,9 @@ export class JiraIssueSettings extends PluginSettingTab {
             .setDesc('Token to access your Jira account using OAuth2 Bearer token authentication.')
             .addText(text => text
                 // .setPlaceholder('')
-                .setValue(this.settingsData.bareToken)
+                .setValue(this._data.bareToken)
                 .onChange(async (value) => {
-                    this.settingsData.bareToken = value
+                    this._data.bareToken = value
                     await this.saveSettings()
                 }))
 
@@ -108,11 +112,11 @@ export class JiraIssueSettings extends PluginSettingTab {
         new Setting(containerEl)
             .setName('Cache time')
             .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
-            .addMomentFormat(text => text
+            .addText(text => text
                 .setPlaceholder('Example: 15m, 24h, 5s')
-                .setValue(this.settingsData.cacheTime)
+                .setValue(this._data.cacheTime)
                 .onChange(async (value) => {
-                    this.settingsData.cacheTime = value
+                    this._data.cacheTime = value
                     await this.saveSettings()
                 }))
 
