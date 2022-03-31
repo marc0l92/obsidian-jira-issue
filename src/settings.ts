@@ -1,32 +1,41 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
 import JiraIssuePlugin from './main'
 
-const AUTHENTICATION_TYPES = {
-    OPEN: 'Open',
-    BASIC_AUTHENTICATION: 'Basic Authentication',
-    BEARER_TOKEN: 'Bearer Token',
+export enum EAuthenticationTypes {
+    OPEN = 'OPEN',
+    BASIC = 'BASIC',
+    BEARER_TOKEN = 'BEARER_TOKEN',
+}
+const AUTHENTICATION_TYPE_DESCRIPTION = {
+    [EAuthenticationTypes.OPEN]: 'Open',
+    [EAuthenticationTypes.BASIC]: 'Basic Authentication',
+    [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
 export interface IJiraIssueSettings {
     host: string
-    authenticationType: string
+    authenticationType: EAuthenticationTypes
     username?: string
     password?: string
     bareToken?: string
     apiBasePath: string // TODO
+    requestsTimeout: number // TODO
     cacheTime: string
     defaultSearchResultsLimit: number // TODO
     searchTemplate: string // TODO
+    statusColorCache: { [key: string]: string }
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
     host: 'https://jira.secondlife.com',
-    authenticationType: Object.keys(AUTHENTICATION_TYPES)[0],
+    authenticationType: EAuthenticationTypes.OPEN,
     apiBasePath: '/rest/api/latest',
+    requestsTimeout: 5000,
     password: '********',
     cacheTime: '15m',
     defaultSearchResultsLimit: 10,
     searchTemplate: 'kut<>rapsd',
+    statusColorCache: {},
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
@@ -37,6 +46,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         super(app, plugin)
         this._plugin = plugin
         this.loadSettings()
+        this._data.statusColorCache = DEFAULT_SETTINGS.statusColorCache
     }
 
     getData(): IJiraIssueSettings {
@@ -70,10 +80,10 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setName('Authentication type')
             .setDesc('Select how the plugin should authenticate in your Jira server.')
             .addDropdown(dropdown => dropdown
-                .addOptions(AUTHENTICATION_TYPES)
+                .addOptions(AUTHENTICATION_TYPE_DESCRIPTION)
                 .setValue(this._data.authenticationType)
                 .onChange(async (value) => {
-                    this._data.authenticationType = value
+                    this._data.authenticationType = value as EAuthenticationTypes
                     await this.saveSettings()
                 }))
         new Setting(containerEl)

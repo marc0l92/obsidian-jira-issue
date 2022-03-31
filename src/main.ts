@@ -1,4 +1,5 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
+import { JiraClient } from './jiraClient'
 import { ObjectsCache } from './objectsCache'
 import { JiraIssueProcessor } from './processor'
 import { JiraIssueSettingsTab } from './settings'
@@ -7,11 +8,13 @@ export default class JiraIssuePlugin extends Plugin {
     settings: JiraIssueSettingsTab
     processor: JiraIssueProcessor
     cache: ObjectsCache
+    client: JiraClient
 
     async onload() {
         this.settings = new JiraIssueSettingsTab(this.app, this)
         this.addSettingTab(this.settings)
         this.cache = new ObjectsCache(this.settings.getData())
+        this.client = new JiraClient(this.settings.getData())
         this.processor = new JiraIssueProcessor(this.settings.getData())
         this.registerMarkdownCodeBlockProcessor('jira', this.processor.fence)
 
