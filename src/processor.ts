@@ -35,7 +35,7 @@ export class JiraIssueProcessor {
                     const newIssue = await this._client.getIssue(issueKey)
                     issue = this._cache.add(issueKey, newIssue)
                 }
-                // el.innerHTML = this.renderIssue(issue)
+                el.innerHTML = this.renderIssue(issue)
             }
         }
     }
@@ -50,7 +50,7 @@ export class JiraIssueProcessor {
                 <div class="jira-issue-body">
                     <div class="jira-issue-description">${issue.fields.description}</div>
                     <div class="jira-issue-status">Status: ${issue.fields.status.name}</div>
-                    <div class="jira-issue-assignee">Assignee: ${issue.fields.assignee.displayName}</div>
+                    <div class="jira-issue-assignee">Assignee: ${issue.fields.assignee ? issue.fields.assignee.displayName : 'Not assigned'}</div>
                     <div class="jira-issue-reporter">Reporter: ${issue.fields.reporter.displayName}</div>
                     <div class="jira-issue-created">Created: ${new Date(issue.fields.created).toLocaleString()}</div>
                     <div class="jira-issue-updated">Updated: ${new Date(issue.fields.updated).toLocaleString()}</div>

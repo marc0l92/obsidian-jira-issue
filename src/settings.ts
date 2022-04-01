@@ -12,8 +12,6 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
-interface IStatusColorCache { [key: string]: string }
-
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes
@@ -25,7 +23,7 @@ export interface IJiraIssueSettings {
     cacheTime: string
     defaultSearchResultsLimit: number // TODO
     searchTemplate: string // TODO
-    statusColorCache: IStatusColorCache
+    statusColorCache: Record<string, string>
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
