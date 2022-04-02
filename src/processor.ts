@@ -90,11 +90,11 @@ export class JiraIssueProcessor {
         return `
             <div class="tags has-addons">
                 <span class="tag is-light">
-                    <img src="${issue.fields.issuetype.iconUrl}" alt="${issue.fields.issuetype.name}" />
+                    <img src="${issue.fields.issuetype.iconUrl}" alt="${issue.fields.issuetype.name}" class="fit-content" />
                 </span>
-                <a class="tag is-link is-light" href="${this.issueUrl(issue.key)}">${issue.key}</a>
-                <span class="tag is-light">${issue.fields.summary}</span>
-                <span class="tag ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
+                <a class="tag is-link is-light no-wrap" href="${this.issueUrl(issue.key)}">${issue.key}</a>
+                <span class="tag is-light issue-summary">${issue.fields.summary}</span>
+                <span class="tag no-wrap ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
             </div>
         `
     }

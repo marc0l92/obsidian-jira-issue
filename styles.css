@@ -11,6 +11,17 @@
     cursor: pointer;
     text-decoration: none;
 }
+.jira-issue-container img.fit-content {
+    max-width: fit-content;
+    width: fit-content;
+}
+.jira-issue-container .no-wrap {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.jira-issue-container .issue-summary {
+    flex-grow: 1;
+}
 
 .jira-issue-container a.tag:hover {
     text-decoration: underline;
@@ -47,9 +58,9 @@
 
 /* Tags */
 .jira-issue-container .tags {
-    align-items: center;
+    align-items: stretch;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-start;
 }
 
@@ -62,24 +73,21 @@
     margin-right: 0;
 }
 
-.jira-issue-container .tag:not(body).is-light {
+.jira-issue-container .tag.is-light {
     background-color: #f5f5f5;
     color: rgba(0, 0, 0, .7);
 }
 
-.jira-issue-container .tag:not(body) {
+.jira-issue-container .tag {
     align-items: center;
     background-color: #f5f5f5;
     border-radius: 4px;
     color: #4a4a4a;
     display: inline-flex;
     font-size: .75em;
-    height: 2em;
-    justify-content: center;
+    justify-content: flex-start;
     line-height: 1.5;
-    padding-left: 0.75em;
-    padding-right: 0.75em;
-    white-space: nowrap;
+    padding: 0.2rem 0.75rem;
 }
 
 .jira-issue-container .tags {
@@ -95,7 +103,7 @@
     border-bottom-left-radius: 0;
 }
 
-.tag:not(body).is-delete {
+.tag.is-delete {
     margin-left: 1px;
     padding: 0;
     position: relative;
@@ -103,15 +111,15 @@
 }
 
 /* Tags is-delete */
-.tag:not(body).is-delete::before {
+.tag.is-delete::before {
     height: 1px;
     width: 50%;
 }
-.tag:not(body).is-delete::after {
+.tag.is-delete::after {
     height: 50%;
     width: 1px;
 }
-.tag:not(body).is-delete::after, .tag:not(body).is-delete::before {
+.tag.is-delete::after, .tag.is-delete::before {
     background-color: currentColor;
     content: "";
     display: block;
@@ -123,42 +131,42 @@
 }
 
 /* Tags is-link */
-.jira-issue-container .tag:not(body).is-link.is-light {
+.jira-issue-container .tag.is-link.is-light {
     background-color: #eff1fa;
     color: #3850b7;
 }
 
 /* Tags is-info */
-.jira-issue-container .tag:not(body).is-info {
+.jira-issue-container .tag.is-info {
     background-color: #3e8ed0;
     color: #fff;
 }
 
 /* Tags is-success */
-.jira-issue-container .tag:not(body).is-success {
+.jira-issue-container .tag.is-success {
     background-color: #48c78e;
     color: #fff;
 }
 
 /* Tags is-warning */
-.tag:not(body).is-warning {
+.tag.is-warning {
     background-color: #ffe08a;
     color: rgba(0,0,0,.7);
 }
 
 /* Tags is-danger */
-.jira-issue-container .tag:not(body).is-danger {
+.jira-issue-container .tag.is-danger {
     background-color: #f14668;
     color: #fff;
 }
 
-.tag:not(body).is-danger.is-light {
+.tag.is-danger.is-light {
     background-color: #feecf0;
     color: #cc0f35;
 }
 
 /* Tags is-dark */
-.tag:not(body).is-dark {
+.tag.is-dark {
     background-color: #363636;
     color: #fff;
 }
