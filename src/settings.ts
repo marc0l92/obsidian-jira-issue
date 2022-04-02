@@ -18,9 +18,9 @@ export interface IJiraIssueSettings {
     username?: string
     password?: string
     bareToken?: string
-    apiBasePath: string // TODO
+    apiBasePath: string // TODO Add setting
     cacheTime: string
-    // defaultSearchResultsLimit: number // TODO
+    // defaultSearchResultsLimit: number // TODO Add setting
     statusColorCache: Record<string, string>
 }
 

@@ -81,12 +81,14 @@ export class JiraIssueProcessor {
     private renderNoItems(): string {
         return `
             <div class="tags has-addons">
-                <span class="tag is-light">No valid issues found</span>
+                <span class="tag is-danger is-light">JiraIssue</span>
+                <span class="tag is-danger">No valid issues found</span>
             </div>
         `
     }
 
     private renderIssue(issue: any) {
+        // TODO: fix links
         return `
             <div class="tags has-addons">
                 <span class="tag is-light">

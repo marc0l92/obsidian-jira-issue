@@ -48,7 +48,7 @@ export class JiraClient {
         return response.json
     }
 
-    async getIssue(issue: string): Promise<any> {
+    async getIssue(issue: string): Promise<any> { // TODO: define interface for issue
         return await this.sendRequest(
             {
                 url: this.buildUrl(`/issue/${issue}`),
@@ -58,7 +58,7 @@ export class JiraClient {
         )
     }
 
-    async getSearchResults(query: string, max: number): Promise<any> {
+    async getSearchResults(query: string, max: number): Promise<any> { // TODO: define interface for search results
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: "0",

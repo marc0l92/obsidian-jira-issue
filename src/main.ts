@@ -34,9 +34,7 @@ export default class JiraIssuePlugin extends Plugin {
             id: 'obsidian-jira-issue-template-fence',
             name: 'Insert fence template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                // TODO: Insert fence template
-                console.log(editor)
-                // editor.setValue('```jira\n\n```')
+                editor.replaceRange('```jira-issue\n\n```', editor.getCursor());
             }
         })
 
