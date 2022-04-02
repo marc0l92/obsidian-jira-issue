@@ -41,6 +41,10 @@ export default class JiraIssuePlugin extends Plugin {
     }
 
     onunload() {
+        this._settings = null
+        this._cache = null
+        this._client = null
+        this._processor = null
     }
 }
 

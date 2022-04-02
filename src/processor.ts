@@ -24,9 +24,7 @@ export class JiraIssueProcessor {
     }
 
     async issueFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
-        // console.log({ source, el, ctx })
-        // console.log(this._settings)
-        const renderedItems: Record<string, string> = {}
+        const renderedItems: Record<string, HTMLElement> = {}
         for (const line of source.split('\n')) {
             const matches = line.match(ISSUE_REGEX)
             if (matches) {
@@ -52,11 +50,11 @@ export class JiraIssueProcessor {
         this.updateRenderedIssues(el, renderedItems)
     }
 
-    private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, string>) {
+    private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, HTMLElement>) {
         if (!Object.isEmpty(renderedItems)) {
-            el.innerHTML = this.renderContainer(Object.values(renderedItems).join('\n'))
+            el.replaceChildren(this.renderContainer(Object.values(renderedItems)))
         } else {
-            el.innerHTML = this.renderContainer(this.renderNoItems())
+            el.replaceChildren(this.renderContainer([this.renderNoItems()]))
         }
     }
 
@@ -64,49 +62,48 @@ export class JiraIssueProcessor {
         return (new URL(`${this._settings.host}/browse/${issueKey}`)).toString()
     }
 
-    private renderContainer(body: string): string {
-        return `<div class="jira-issue-container">${body}</div>`
+    private renderContainer(children: HTMLElement[]): HTMLElement {
+        const container = createDiv({ cls: 'jira-issue-container' })
+        for (const child of children) {
+            container.appendChild(child)
+        }
+        return container
     }
 
-    private renderLoadingItem(item: string, itemUrl: string): string {
-        return `
-            <div class="ji-tags has-addons">
-                <span class="ji-tag is-light"><span class="spinner"></span></span>
-                <a class="ji-tag is-link is-light" href="${itemUrl}">${item}</a>
-                <span class="ji-tag is-light">Loading ...</span>
-            </div>
-        `
+    private renderLoadingItem(item: string, itemUrl: string): HTMLElement {
+        const container = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'spinner', parent: createSpan({ cls: 'ji-tag is-light', parent: container }) })
+        createEl('a', { cls: 'ji-tag is-link is-light', href: itemUrl, text: item, parent: container })
+        createSpan({ cls: 'ji-tag is-light', text: 'Loading ...', parent: container })
+        return container
     }
 
-    private renderNoItems(): string {
-        return `
-            <div class="ji-tags has-addons">
-                <span class="ji-tag is-danger is-light">JiraIssue</span>
-                <span class="ji-tag is-danger">No valid issues found</span>
-            </div>
-        `
+    private renderNoItems(): HTMLElement {
+        const container = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-danger is-light', text: 'JiraIssue', parent: container })
+        createSpan({ cls: 'ji-tag is-danger', text: 'No valid issues found', parent: container })
+        return container
     }
 
-    private renderIssue(issue: any) {
-        return `
-            <div class="ji-tags has-addons">
-                <span class="ji-tag is-light">
-                    <img src="${issue.fields.issuetype.iconUrl}" alt="${issue.fields.issuetype.name}" class="fit-content" />
-                </span>
-                <a class="ji-tag is-link is-light no-wrap" href="${this.issueUrl(issue.key)}">${issue.key}</a>
-                <span class="ji-tag is-light issue-summary">${issue.fields.summary}</span>
-                <span class="ji-tag no-wrap ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
-            </div>
-        `
+    private renderIssue(issue: any): HTMLElement {
+        const container = createDiv('ji-tags has-addons')
+        createEl('img', {
+            cls: 'fit-content',
+            attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+            parent: createSpan({ cls: 'ji-tag is-light', parent: container })
+        })
+        createEl('a', { cls: 'ji-tag is-link is-light no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: container })
+        createSpan({ cls: 'ji-tag is-light issue-summary', text: issue.fields.summary, parent: container })
+        const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+        createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, parent: container })
+        return container
     }
 
-    private renderIssueError(issueKey: string, message: string) {
-        return `
-            <div class="ji-tags has-addons">
-                <span class="ji-tag is-delete is-danger"></span>
-                <a class="ji-tag is-danger is-light" href="${this.issueUrl(issueKey)}">${issueKey}</a>
-                <span class="ji-tag is-danger">${message}</span>
-            </div>
-        `
+    private renderIssueError(issueKey: string, message: string): HTMLElement {
+        const container = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-delete is-danger', parent: container })
+        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.issueUrl(issueKey), text: issueKey, parent: container })
+        createSpan({ cls: 'ji-tag is-danger', text: message, parent: container })
+        return container
     }
 }
