@@ -44,7 +44,7 @@ export class JiraClient {
             }
         }
 
-        return response.json()
+        return response.json
         // TODO: text not jira server
         // TODO: test 404 response
     }

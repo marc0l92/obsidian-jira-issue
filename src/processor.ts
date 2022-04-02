@@ -1,13 +1,9 @@
-import { MarkdownPostProcessorContext } from "obsidian";
-import { JiraClient } from "./jiraClient";
-import { ObjectsCache } from "./objectsCache";
-import { IJiraIssueSettings } from "./settings";
+import { MarkdownPostProcessorContext } from "obsidian"
+import { JiraClient } from "./jiraClient"
+import { ObjectsCache } from "./objectsCache"
+import { IJiraIssueSettings } from "./settings"
 
-const loadingMessage = `
-<div class="jira-issue-container">
-    <span>JiraIssue: Getting issue details...</span><span class="spinner"></span>
-</div>
-`
+const ISSUE_REGEX = /[A-Z]+-[0-9]+/
 
 export class JiraIssueProcessor {
     private _settings: IJiraIssueSettings
@@ -21,41 +17,88 @@ export class JiraIssueProcessor {
     }
 
     async issueFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
-        console.log({ source, el, ctx })
-        console.log(this._settings)
-        el.innerHTML = loadingMessage
+        // console.log({ source, el, ctx })
+        // console.log(this._settings)
+        const renderedItems: Record<string, string> = {}
         for (const line of source.split('\n')) {
-            const matches = line.match(/[A-Z]+-[0-9]+/)
+            const matches = line.match(ISSUE_REGEX)
             if (matches) {
                 const issueKey = matches[0]
                 console.log(`Issue found: ${issueKey}`)
                 let issue = this._cache.get(issueKey)
                 if (!issue) {
                     console.log(`Issue not available in the cache`)
-                    const newIssue = await this._client.getIssue(issueKey)
-                    issue = this._cache.add(issueKey, newIssue)
+                    renderedItems[issueKey] = this.renderLoadingItem(issueKey, this.issueUrl(issueKey))
+                    this._client.getIssue(issueKey).then(newIssue => {
+                        issue = this._cache.add(issueKey, newIssue)
+                        renderedItems[issueKey] = this.renderIssue(issue)
+                        this.updateRenderedIssues(el, renderedItems)
+                    }).catch(err => {
+                        renderedItems[issueKey] = this.renderIssueError(issueKey, err)
+                        this.updateRenderedIssues(el, renderedItems)
+                    })
+                } else {
+                    renderedItems[issueKey] = this.renderIssue(issue)
                 }
-                el.innerHTML = this.renderIssue(issue)
             }
         }
+        this.updateRenderedIssues(el, renderedItems)
+    }
+
+    private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, string>) {
+        if (!Object.isEmpty(renderedItems)) {
+            el.innerHTML = this.renderContainer(Object.values(renderedItems).join('\n'))
+        } else {
+            el.innerHTML = this.renderContainer(this.renderNoItems())
+        }
+    }
+
+    private issueUrl(issueKey: string): string {
+        return (new URL(`${this._settings.host}/browse/${issueKey}`)).toString()
+    }
+
+    private renderContainer(body: string): string {
+        return `<div class="jira-issue-container">${body}</div>`
+    }
+
+    private renderLoadingItem(item: string, itemUrl: string): string {
+        return `
+            <div class="tags has-addons">
+                <span class="tag is-light"><span class="spinner"></span></span>
+                <a class="tag is-link is-light" href="${itemUrl}">${item}</a>
+                <span class="tag is-light">Loading ...</span>
+            </div>
+        `
+    }
+
+    private renderNoItems(): string {
+        return `
+            <div class="tags has-addons">
+                <span class="tag is-light">No valid issues found</span>
+            </div>
+        `
     }
 
     private renderIssue(issue: any) {
         return `
-            <div class="jira-issue-container">
-                <div class="jira-issue-header">
-                    <span class="jira-issue-key">${issue.key}</span>
-                    <span class="jira-issue-summary">${issue.fields.summary}</span>
-                </div>
-                <div class="jira-issue-body">
-                    <div class="jira-issue-description">${issue.fields.description}</div>
-                    <div class="jira-issue-status">Status: ${issue.fields.status.name}</div>
-                    <div class="jira-issue-assignee">Assignee: ${issue.fields.assignee ? issue.fields.assignee.displayName : 'Not assigned'}</div>
-                    <div class="jira-issue-reporter">Reporter: ${issue.fields.reporter.displayName}</div>
-                    <div class="jira-issue-created">Created: ${new Date(issue.fields.created).toLocaleString()}</div>
-                    <div class="jira-issue-updated">Updated: ${new Date(issue.fields.updated).toLocaleString()}</div>
-                </div>
+            <div class="tags has-addons">
+                <span class="tag is-light">
+                    <img src="${issue.fields.issuetype.iconUrl}" alt="${issue.fields.issuetype.name}" />
+                </span>
+                <a class="tag is-link is-light" href="${this.issueUrl(issue.key)}">${issue.key}</a>
+                <span class="tag is-light">${issue.fields.summary}</span>
+                <span class="tag is-info">${issue.fields.status.name}</span>
             </div>
-            `
+        `
+    }
+
+    private renderIssueError(issueKey: string, message: string) {
+        return `
+            <div class="tags has-addons">
+                <span class="tag is-delete is-danger"></span>
+                <a class="tag is-danger is-light" href="${this.issueUrl(issueKey)}">${issueKey}</a>
+                <span class="tag is-danger">${message}</span>
+            </div>
+        `
     }
 }
