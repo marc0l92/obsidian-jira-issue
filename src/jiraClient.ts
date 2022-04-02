@@ -45,8 +45,7 @@ export class JiraClient {
         }
 
         return response.json
-        // TODO: text not jira server
-        // TODO: test 404 response
+        // TODO: test not jira server with http response
     }
 
     async getIssue(issue: string): Promise<any> {

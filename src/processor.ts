@@ -4,6 +4,13 @@ import { ObjectsCache } from "./objectsCache"
 import { IJiraIssueSettings } from "./settings"
 
 const ISSUE_REGEX = /[A-Z]+-[0-9]+/
+const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
+    'green': 'is-success',
+    'yellow': 'is-warning',
+    'red': 'is-danger',
+    'blue': 'is-info',
+    'gray': 'is-light',
+}
 
 export class JiraIssueProcessor {
     private _settings: IJiraIssueSettings
@@ -87,7 +94,7 @@ export class JiraIssueProcessor {
                 </span>
                 <a class="tag is-link is-light" href="${this.issueUrl(issue.key)}">${issue.key}</a>
                 <span class="tag is-light">${issue.fields.summary}</span>
-                <span class="tag is-info">${issue.fields.status.name}</span>
+                <span class="tag ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
             </div>
         `
     }
