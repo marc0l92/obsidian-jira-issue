@@ -19,10 +19,8 @@ export interface IJiraIssueSettings {
     password?: string
     bareToken?: string
     apiBasePath: string // TODO
-    requestsTimeout: number // TODO
     cacheTime: string
-    defaultSearchResultsLimit: number // TODO
-    searchTemplate: string // TODO
+    // defaultSearchResultsLimit: number // TODO
     statusColorCache: Record<string, string>
 }
 
@@ -30,17 +28,16 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     host: 'https://issues.apache.org/jira',
     authenticationType: EAuthenticationTypes.OPEN,
     apiBasePath: '/rest/api/latest',
-    requestsTimeout: 5000,
     password: '********',
     cacheTime: '15m',
-    defaultSearchResultsLimit: 10,
-    searchTemplate: 'kut<>rapsd',
+    // defaultSearchResultsLimit: 10,
     statusColorCache: {},
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
     private _data: IJiraIssueSettings = DEFAULT_SETTINGS
+    private _onChangeListener: (() => void) | null = null
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
@@ -58,6 +55,13 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     async saveSettings() {
         await this._plugin.saveData(this._data)
+        if (this._onChangeListener) {
+            this._onChangeListener()
+        }
+    }
+
+    onChange(listener: () => void) {
+        this._onChangeListener = listener
     }
 
     display(): void {

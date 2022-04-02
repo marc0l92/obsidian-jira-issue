@@ -37,7 +37,8 @@ export class JiraClient {
         console.info('response', response)
 
         if (response.status !== 200) {
-            if (response.json && response.json.errorMessages) {
+            console.log(response.headers)
+            if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
                 throw response.json.errorMessages.join('\n')
             } else {
                 throw 'HTTP status ' + response.status
@@ -45,7 +46,6 @@ export class JiraClient {
         }
 
         return response.json
-        // TODO: test not jira server with http response
     }
 
     async getIssue(issue: string): Promise<any> {

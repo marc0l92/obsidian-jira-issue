@@ -5,25 +5,28 @@ import { JiraIssueProcessor } from './processor'
 import { JiraIssueSettingsTab } from './settings'
 
 export default class JiraIssuePlugin extends Plugin {
-    settings: JiraIssueSettingsTab
-    processor: JiraIssueProcessor
-    cache: ObjectsCache
-    client: JiraClient
+    _settings: JiraIssueSettingsTab
+    _processor: JiraIssueProcessor
+    _cache: ObjectsCache
+    _client: JiraClient
 
     async onload() {
-        this.settings = new JiraIssueSettingsTab(this.app, this)
-        await this.settings.loadSettings()
-        this.addSettingTab(this.settings)
-        this.cache = new ObjectsCache(this.settings.getData())
-        this.client = new JiraClient(this.settings.getData())
-        this.processor = new JiraIssueProcessor(this.settings.getData(), this.client, this.cache)
-        this.registerMarkdownCodeBlockProcessor('jira-issue', this.processor.issueFence.bind(this.processor))
+        this._settings = new JiraIssueSettingsTab(this.app, this)
+        await this._settings.loadSettings()
+        this.addSettingTab(this._settings)
+        this._cache = new ObjectsCache(this._settings.getData())
+        this._settings.onChange(() => {
+            this._cache.clear()
+        })
+        this._client = new JiraClient(this._settings.getData())
+        this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
+        this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
             name: 'Clear cache',
             callback: () => {
-                this.cache.clear()
+                this._cache.clear()
                 new Notice('JiraIssue: Cache cleaned')
             }
         })
