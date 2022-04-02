@@ -70,43 +70,42 @@ export class JiraIssueProcessor {
 
     private renderLoadingItem(item: string, itemUrl: string): string {
         return `
-            <div class="tags has-addons">
-                <span class="tag is-light"><span class="spinner"></span></span>
-                <a class="tag is-link is-light" href="${itemUrl}">${item}</a>
-                <span class="tag is-light">Loading ...</span>
+            <div class="ji-tags has-addons">
+                <span class="ji-tag is-light"><span class="spinner"></span></span>
+                <a class="ji-tag is-link is-light" href="${itemUrl}">${item}</a>
+                <span class="ji-tag is-light">Loading ...</span>
             </div>
         `
     }
 
     private renderNoItems(): string {
         return `
-            <div class="tags has-addons">
-                <span class="tag is-danger is-light">JiraIssue</span>
-                <span class="tag is-danger">No valid issues found</span>
+            <div class="ji-tags has-addons">
+                <span class="ji-tag is-danger is-light">JiraIssue</span>
+                <span class="ji-tag is-danger">No valid issues found</span>
             </div>
         `
     }
 
     private renderIssue(issue: any) {
-        // TODO: fix links
         return `
-            <div class="tags has-addons">
-                <span class="tag is-light">
+            <div class="ji-tags has-addons">
+                <span class="ji-tag is-light">
                     <img src="${issue.fields.issuetype.iconUrl}" alt="${issue.fields.issuetype.name}" class="fit-content" />
                 </span>
-                <a class="tag is-link is-light no-wrap" href="${this.issueUrl(issue.key)}">${issue.key}</a>
-                <span class="tag is-light issue-summary">${issue.fields.summary}</span>
-                <span class="tag no-wrap ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
+                <a class="ji-tag is-link is-light no-wrap" href="${this.issueUrl(issue.key)}">${issue.key}</a>
+                <span class="ji-tag is-light issue-summary">${issue.fields.summary}</span>
+                <span class="ji-tag no-wrap ${JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName]}">${issue.fields.status.name}</span>
             </div>
         `
     }
 
     private renderIssueError(issueKey: string, message: string) {
         return `
-            <div class="tags has-addons">
-                <span class="tag is-delete is-danger"></span>
-                <a class="tag is-danger is-light" href="${this.issueUrl(issueKey)}">${issueKey}</a>
-                <span class="tag is-danger">${message}</span>
+            <div class="ji-tags has-addons">
+                <span class="ji-tag is-delete is-danger"></span>
+                <a class="ji-tag is-danger is-light" href="${this.issueUrl(issueKey)}">${issueKey}</a>
+                <span class="ji-tag is-danger">${message}</span>
             </div>
         `
     }
