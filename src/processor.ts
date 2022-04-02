@@ -5,11 +5,11 @@ import { IJiraIssueSettings } from "./settings"
 
 const ISSUE_REGEX = /[A-Z]+-[0-9]+/
 const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
-    'green': 'is-success',
+    'blue-gray': 'is-info',
     'yellow': 'is-warning',
+    'green': 'is-success',
     'red': 'is-danger',
-    'blue': 'is-info',
-    'gray': 'is-light',
+    'medium-gray': 'is-dark',
 }
 
 export class JiraIssueProcessor {

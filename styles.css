@@ -73,7 +73,7 @@
     border-radius: 4px;
     color: #4a4a4a;
     display: inline-flex;
-    font-size: .75rem;
+    font-size: .75em;
     height: 2em;
     justify-content: center;
     line-height: 1.5;
@@ -83,7 +83,7 @@
 }
 
 .jira-issue-container .tags {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5em;
 }
 .jira-issue-container .tags:last-child {
     margin-bottom: 0;
@@ -155,4 +155,10 @@
 .tag:not(body).is-danger.is-light {
     background-color: #feecf0;
     color: #cc0f35;
+}
+
+/* Tags is-dark */
+.tag:not(body).is-dark {
+    background-color: #363636;
+    color: #fff;
 }
