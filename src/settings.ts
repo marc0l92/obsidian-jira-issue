@@ -12,6 +12,15 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
+export enum ESearchResultsRenderingTypes {
+    TABLE = 'TABLE',
+    LIST = 'LIST',
+}
+const SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION = {
+    [ESearchResultsRenderingTypes.TABLE]: 'Table',
+    [ESearchResultsRenderingTypes.LIST]: 'List',
+}
+
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes
@@ -22,6 +31,7 @@ export interface IJiraIssueSettings {
     cacheTime: string
     // defaultSearchResultsLimit: number // TODO Add setting
     statusColorCache: Record<string, string>
+    searchResultsRenderingType: ESearchResultsRenderingTypes
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
@@ -32,6 +42,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     cacheTime: '15m',
     // defaultSearchResultsLimit: 10,
     statusColorCache: {},
+    searchResultsRenderingType: ESearchResultsRenderingTypes.TABLE,
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
@@ -134,7 +145,17 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
 
 
-        // containerEl.createEl('h2', { text: 'Rendering' })
+        containerEl.createEl('h2', { text: 'Rendering' })
+        new Setting(containerEl)
+            .setName('Search rendering type')
+            .setDesc('Select how the results of a jira-search should be rendered.')
+            .addDropdown(dropdown => dropdown
+                .addOptions(SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION)
+                .setValue(this._data.searchResultsRenderingType)
+                .onChange(async (value) => {
+                    this._data.searchResultsRenderingType = value as ESearchResultsRenderingTypes
+                    await this.saveSettings()
+                }))
         // new Setting(containerEl)
         //     .setName('Cache time')
         //     .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')

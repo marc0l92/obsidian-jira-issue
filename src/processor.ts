@@ -1,8 +1,8 @@
 import { MarkdownPostProcessorContext } from "obsidian"
-import { createProxy } from "./interfaces"
+import { createProxy, IJiraIssue, IJiraSearchResults } from "./interfaces"
 import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
-import { IJiraIssueSettings } from "./settings"
+import { ESearchResultsRenderingTypes, IJiraIssueSettings } from "./settings"
 
 const COMMENT_REGEX = /^\s*#/
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
@@ -58,7 +58,7 @@ export class JiraIssueProcessor {
         if (!searchResults) {
             console.log(`Search results not available in the cache`)
             this.renderLoadingItem('View in browser', this.searchUrl(source))
-            this._client.getSearchResults(source, 3).then(newSearchResults => {
+            this._client.getSearchResults(source, 10).then(newSearchResults => { // TODO: configure max results
                 searchResults = this._cache.add(source, newSearchResults)
                 this.renderSearchResults(el, searchResults)
             }).catch(err => {
@@ -84,11 +84,19 @@ export class JiraIssueProcessor {
         return null
     }
 
-    private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, HTMLElement>) {
+    private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, HTMLElement>): void {
         if (!Object.isEmpty(renderedItems)) {
             el.replaceChildren(this.renderContainer(Object.values(renderedItems)))
         } else {
             el.replaceChildren(this.renderContainer([this.renderNoItems()]))
+        }
+    }
+
+    private renderSearchResults(el: HTMLElement, searchResults: IJiraSearchResults): void {
+        if (this._settings.searchResultsRenderingType === ESearchResultsRenderingTypes.LIST) {
+            this.renderSearchResultsList(el, searchResults)
+        } else {
+            this.renderSearchResultsTable(el, searchResults)
         }
     }
 
@@ -124,17 +132,18 @@ export class JiraIssueProcessor {
         return tagsRow
     }
 
-    private renderIssue(issue: any): HTMLElement {
+    private renderIssue(issue: IJiraIssue): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         createEl('img', {
             cls: 'fit-content',
             attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+            title: issue.fields.issuetype.name,
             parent: createSpan({ cls: 'ji-tag is-light', parent: tagsRow })
         })
         createEl('a', { cls: 'ji-tag is-link is-light no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
         createSpan({ cls: 'ji-tag is-light issue-summary', text: issue.fields.summary, parent: tagsRow })
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
-        createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, parent: tagsRow })
+        createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
         return tagsRow
     }
 
@@ -146,7 +155,7 @@ export class JiraIssueProcessor {
         return tagsRow
     }
 
-    private renderSearchResults(el: HTMLElement, searchResults: any): void {
+    private renderSearchResultsTable(el: HTMLElement, searchResults: IJiraSearchResults): void {
         const table = createEl('table', { cls: 'table is-bordered is-striped is-narrow is-hoverable is-fullwidth' })
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
         createEl('th', { text: 'Key', parent: header })
@@ -161,30 +170,40 @@ export class JiraIssueProcessor {
         createEl('th', { text: 'Due Date', parent: header })
         const footer = createEl('tr', { parent: createEl('tfoot', { parent: table }) })
         createEl('th', { text: 'TotalResults', attr: { colspan: '9' }, parent: footer })
-        createEl('td', { text: searchResults.total, parent: footer })
+        createEl('td', { text: searchResults.total.toString(), parent: footer })
         const tbody = createEl('tbody', { parent: table })
-        for (const issue of searchResults.issues) {
-            const issueProxy = createProxy(issue)
+        for (let issue of searchResults.issues) {
+            issue = createProxy(issue)
             const row = createEl('tr', { parent: tbody })
-            createEl('td', { text: issueProxy.key, parent: row })
-            createEl('td', { text: issueProxy.fields.summary, parent: row })
+            createEl('a', { href: this.issueUrl(issue.key), text: issue.key, parent: createEl('td', { parent: row }) })
+            createEl('td', { text: issue.fields.summary, parent: row })
             createEl('img', {
-                attr: { src: issueProxy.fields.issuetype.iconUrl, alt: issueProxy.fields.issuetype.name },
+                attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+                title: issue.fields.issuetype.name,
                 parent: createEl('td', { parent: row })
             })
-            createEl('td', { text: issueProxy.fields.created, parent: row })
-            createEl('td', { text: issueProxy.fields.updated, parent: row })
-            createEl('td', { text: issueProxy.fields.reporter.displayName, parent: row })
-            createEl('td', { text: issueProxy.fields.assignee.displayName, parent: row })
+            createEl('td', { text: issue.fields.created, parent: row })
+            createEl('td', { text: issue.fields.updated, parent: row })
+            createEl('td', { text: issue.fields.reporter.displayName, parent: row })
+            createEl('td', { text: issue.fields.assignee.displayName, parent: row })
             createEl('img', {
-                attr: { src: issueProxy.fields.priority.iconUrl, alt: issueProxy.fields.priority.name },
+                attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
+                title: issue.fields.priority.name,
                 parent: createEl('td', { parent: row })
             })
-            const statusColor = JIRA_STATUS_COLOR_MAP[issueProxy.fields.status.statusCategory.colorName] || 'is-light'
-            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issueProxy.fields.status.name, parent: createEl('td', { parent: row }) })
-            createEl('td', { text: issueProxy.fields.duedate, parent: row })
+            const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+            createEl('td', { text: issue.fields.duedate, parent: row })
         }
         el.replaceChildren(this.renderContainer([table]))
+    }
+
+    private renderSearchResultsList(el: HTMLElement, searchResults: IJiraSearchResults): void {
+        const list: HTMLElement[] = []
+        for (const issue of searchResults.issues) {
+            list.push(this.renderIssue(issue))
+        }
+        el.replaceChildren(this.renderContainer(list))
     }
 
     private renderSearchError(el: HTMLElement, searchQuery: string, message: string): void {
