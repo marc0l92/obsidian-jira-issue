@@ -3,7 +3,7 @@ import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
 import { IJiraIssueSettings } from "./settings"
 
-const ISSUE_REGEX = /[A-Z]+-[0-9]+/
+const ISSUE_REGEX = /[A-Z0-9]+-[0-9]+/i
 const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'blue-gray': 'is-info',
     'yellow': 'is-warning',
