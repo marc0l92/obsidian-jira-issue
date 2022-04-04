@@ -3,7 +3,9 @@ import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
 import { IJiraIssueSettings } from "./settings"
 
-const ISSUE_REGEX = /[A-Z0-9]+-[0-9]+/i
+const COMMENT_REGEX = /^\s*#/
+const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
+const ISSUE_LINK_REGEX = /\/([A-Z0-9]+-[0-9]+)\s*$/i
 const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'blue-gray': 'is-info',
     'yellow': 'is-warning',
@@ -26,9 +28,8 @@ export class JiraIssueProcessor {
     async issueFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         const renderedItems: Record<string, HTMLElement> = {}
         for (const line of source.split('\n')) {
-            const matches = line.match(ISSUE_REGEX)
-            if (matches) {
-                const issueKey = matches[0]
+            const issueKey = this.getIssueKey(line)
+            if (issueKey) {
                 console.log(`Issue found: ${issueKey}`)
                 let issue = this._cache.get(issueKey)
                 if (!issue) {
@@ -48,6 +49,21 @@ export class JiraIssueProcessor {
             }
         }
         this.updateRenderedIssues(el, renderedItems)
+    }
+
+    private getIssueKey(line: string): string | null {
+        if (COMMENT_REGEX.test(line)) {
+            return null
+        }
+        const matches = line.match(ISSUE_REGEX)
+        if (matches) {
+            return matches[1]
+        }
+        const matchesLink = line.match(ISSUE_LINK_REGEX)
+        if (matchesLink) {
+            return matchesLink[1]
+        }
+        return null
     }
 
     private updateRenderedIssues(el: HTMLElement, renderedItems: Record<string, HTMLElement>) {

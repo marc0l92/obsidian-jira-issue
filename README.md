@@ -25,6 +25,8 @@ Use the fence syntax to track issues:
     ```jira-issue
     AAA-111
     AAA-222
+    https://my.jira-server.com/browse/BBB-333
+    # This is a comment
     ```
 
 ## Commands
