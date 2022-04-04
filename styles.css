@@ -4,6 +4,7 @@
     position: relative;
     line-height: 1rem;
     flex-direction: column;
+    margin-bottom: 10px;
 }
 
 /* Generic */
