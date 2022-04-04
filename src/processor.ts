@@ -1,4 +1,5 @@
 import { MarkdownPostProcessorContext } from "obsidian"
+import { createProxy } from "./interfaces"
 import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
 import { IJiraIssueSettings } from "./settings"
@@ -51,6 +52,23 @@ export class JiraIssueProcessor {
         this.updateRenderedIssues(el, renderedItems)
     }
 
+    async searchFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+        console.log(`Search query: ${source}`)
+        let searchResults = this._cache.get(source)
+        if (!searchResults) {
+            console.log(`Search results not available in the cache`)
+            this.renderLoadingItem('View in browser', this.searchUrl(source))
+            this._client.getSearchResults(source, 3).then(newSearchResults => {
+                searchResults = this._cache.add(source, newSearchResults)
+                this.renderSearchResults(el, searchResults)
+            }).catch(err => {
+                this.renderSearchError(el, source, err)
+            })
+        } else {
+            this.renderSearchResults(el, searchResults)
+        }
+    }
+
     private getIssueKey(line: string): string | null {
         if (COMMENT_REGEX.test(line)) {
             return null
@@ -78,6 +96,11 @@ export class JiraIssueProcessor {
         return (new URL(`${this._settings.host}/browse/${issueKey}`)).toString()
     }
 
+    private searchUrl(searchQuery: string): string {
+        // TODO: find real url for search
+        return (new URL(`${this._settings.host}/issues?jql${searchQuery}`)).toString()
+    }
+
     private renderContainer(children: HTMLElement[]): HTMLElement {
         const container = createDiv({ cls: 'jira-issue-container' })
         for (const child of children) {
@@ -87,39 +110,88 @@ export class JiraIssueProcessor {
     }
 
     private renderLoadingItem(item: string, itemUrl: string): HTMLElement {
-        const container = createDiv('ji-tags has-addons')
-        createSpan({ cls: 'spinner', parent: createSpan({ cls: 'ji-tag is-light', parent: container }) })
-        createEl('a', { cls: 'ji-tag is-link is-light', href: itemUrl, text: item, parent: container })
-        createSpan({ cls: 'ji-tag is-light', text: 'Loading ...', parent: container })
-        return container
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'spinner', parent: createSpan({ cls: 'ji-tag is-light', parent: tagsRow }) })
+        createEl('a', { cls: 'ji-tag is-link is-light', href: itemUrl, text: item, parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-light', text: 'Loading ...', parent: tagsRow })
+        return tagsRow
     }
 
     private renderNoItems(): HTMLElement {
-        const container = createDiv('ji-tags has-addons')
-        createSpan({ cls: 'ji-tag is-danger is-light', text: 'JiraIssue', parent: container })
-        createSpan({ cls: 'ji-tag is-danger', text: 'No valid issues found', parent: container })
-        return container
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-danger is-light', text: 'JiraIssue', parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-danger', text: 'No valid issues found', parent: tagsRow })
+        return tagsRow
     }
 
     private renderIssue(issue: any): HTMLElement {
-        const container = createDiv('ji-tags has-addons')
+        const tagsRow = createDiv('ji-tags has-addons')
         createEl('img', {
             cls: 'fit-content',
             attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-            parent: createSpan({ cls: 'ji-tag is-light', parent: container })
+            parent: createSpan({ cls: 'ji-tag is-light', parent: tagsRow })
         })
-        createEl('a', { cls: 'ji-tag is-link is-light no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: container })
-        createSpan({ cls: 'ji-tag is-light issue-summary', text: issue.fields.summary, parent: container })
+        createEl('a', { cls: 'ji-tag is-link is-light no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-light issue-summary', text: issue.fields.summary, parent: tagsRow })
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
-        createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, parent: container })
-        return container
+        createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, parent: tagsRow })
+        return tagsRow
     }
 
     private renderIssueError(issueKey: string, message: string): HTMLElement {
-        const container = createDiv('ji-tags has-addons')
-        createSpan({ cls: 'ji-tag is-delete is-danger', parent: container })
-        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.issueUrl(issueKey), text: issueKey, parent: container })
-        createSpan({ cls: 'ji-tag is-danger', text: message, parent: container })
-        return container
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
+        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.issueUrl(issueKey), text: issueKey, parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
+        return tagsRow
+    }
+
+    private renderSearchResults(el: HTMLElement, searchResults: any): void {
+        const table = createEl('table', { cls: 'table is-bordered is-striped is-narrow is-hoverable is-fullwidth' })
+        const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
+        createEl('th', { text: 'Key', parent: header })
+        createEl('th', { text: 'Summary', parent: header })
+        createEl('abbr', { text: 'T', title: 'Type', parent: createEl('th', { parent: header }) })
+        createEl('th', { text: 'Created', parent: header })
+        createEl('th', { text: 'Updated', parent: header })
+        createEl('th', { text: 'Reporter', parent: header })
+        createEl('th', { text: 'Assignee', parent: header })
+        createEl('abbr', { text: 'P', title: 'Priority', parent: createEl('th', { parent: header }) })
+        createEl('th', { text: 'Status', parent: header })
+        createEl('th', { text: 'Due Date', parent: header })
+        const footer = createEl('tr', { parent: createEl('tfoot', { parent: table }) })
+        createEl('th', { text: 'TotalResults', attr: { colspan: '9' }, parent: footer })
+        createEl('td', { text: searchResults.total, parent: footer })
+        const tbody = createEl('tbody', { parent: table })
+        for (const issue of searchResults.issues) {
+            const issueProxy = createProxy(issue)
+            const row = createEl('tr', { parent: tbody })
+            createEl('td', { text: issueProxy.key, parent: row })
+            createEl('td', { text: issueProxy.fields.summary, parent: row })
+            createEl('img', {
+                attr: { src: issueProxy.fields.issuetype.iconUrl, alt: issueProxy.fields.issuetype.name },
+                parent: createEl('td', { parent: row })
+            })
+            createEl('td', { text: issueProxy.fields.created, parent: row })
+            createEl('td', { text: issueProxy.fields.updated, parent: row })
+            createEl('td', { text: issueProxy.fields.reporter.displayName, parent: row })
+            createEl('td', { text: issueProxy.fields.assignee.displayName, parent: row })
+            createEl('img', {
+                attr: { src: issueProxy.fields.priority.iconUrl, alt: issueProxy.fields.priority.name },
+                parent: createEl('td', { parent: row })
+            })
+            const statusColor = JIRA_STATUS_COLOR_MAP[issueProxy.fields.status.statusCategory.colorName] || 'is-light'
+            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issueProxy.fields.status.name, parent: createEl('td', { parent: row }) })
+            createEl('td', { text: issueProxy.fields.duedate, parent: row })
+        }
+        el.replaceChildren(this.renderContainer([table]))
+    }
+
+    private renderSearchError(el: HTMLElement, searchQuery: string, message: string): void {
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
+        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.searchUrl(searchQuery), text: "Search error", parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
+        el.replaceChildren(this.renderContainer([tagsRow]))
     }
 }

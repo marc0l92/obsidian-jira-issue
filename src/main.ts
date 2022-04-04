@@ -21,6 +21,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._client = new JiraClient(this._settings.getData())
         this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
+        this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchFence.bind(this._processor))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
@@ -32,9 +33,16 @@ export default class JiraIssuePlugin extends Plugin {
         })
         this.addCommand({
             id: 'obsidian-jira-issue-template-fence',
-            name: 'Insert fence template',
+            name: 'Insert issue template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 editor.replaceRange('```jira-issue\n\n```', editor.getCursor());
+            }
+        })
+        this.addCommand({
+            id: 'obsidian-jira-search-template-fence',
+            name: 'Insert search template',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                editor.replaceRange('```jira-search\n\n```', editor.getCursor());
             }
         })
 

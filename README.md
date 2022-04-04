@@ -37,3 +37,7 @@ Use the fence syntax to track issues:
 ## Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
 
+# TODO
+
+- [ ] Add support for JQL query
+- [ ] Add support for inline issues
