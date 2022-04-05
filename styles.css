@@ -204,9 +204,6 @@
     background-color: transparent;
 }
 
-
-
-
 .jira-issue-container .table.is-bordered tr:last-child td, .table.is-bordered tr:last-child th {
     border-bottom-width: 1px;
 }
