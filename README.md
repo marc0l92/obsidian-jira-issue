@@ -2,7 +2,8 @@
 
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.
 
-![example](./doc/example.png)
+![issues](./doc/issues.png)
+![searchResults](./doc/searchResults.png)
 
 ## Usage
 
@@ -20,13 +21,19 @@ This plugin stores your credential in clear in the configuration file of this pl
 
 ### Markdown syntax
 
-Use the fence syntax to track issues:
+Use the `jira-issue` fence to track issues:
 
     ```jira-issue
     AAA-111
     AAA-222
     https://my.jira-server.com/browse/BBB-333
     # This is a comment
+    ```
+
+Use the `jira-search` fence to perform JQL queries:
+
+    ```jira-search
+    resolution = Unresolved AND assignee = currentUser() AND status = 'In Progress' order by priority DESC
     ```
 
 ## Commands
@@ -39,5 +46,5 @@ From the obsidian app go in `Settings > Third-party plugins > Community Plugins 
 
 # TODO
 
-- [ ] Add support for JQL query
+- [ ] Allow custom column in jira-search table
 - [ ] Add support for inline issues
