@@ -1,7 +1,7 @@
 {
     "id": "obsidian-jira-issue",
     "name": "JiraIssue",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "minAppVersion": "0.12.0",
     "description": "",
     "author": "marc0l92",
