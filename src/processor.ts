@@ -39,10 +39,10 @@ export class JiraIssueProcessor {
         for (const line of source.split('\n')) {
             const issueKey = this.getIssueKey(line)
             if (issueKey) {
-                console.log(`Issue found: ${issueKey}`)
+                // console.log(`Issue found: ${issueKey}`)
                 let issue = this._cache.get(issueKey)
                 if (!issue) {
-                    console.log(`Issue not available in the cache`)
+                    // console.log(`Issue not available in the cache`)
                     renderedItems[issueKey] = this.renderLoadingItem(issueKey, this.issueUrl(issueKey))
                     this._client.getIssue(issueKey).then(newIssue => {
                         issue = this._cache.add(issueKey, newIssue)
@@ -61,10 +61,10 @@ export class JiraIssueProcessor {
     }
 
     async searchFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
-        console.log(`Search query: ${source}`)
+        // console.log(`Search query: ${source}`)
         let searchResults = this._cache.get(source)
         if (!searchResults) {
-            console.log(`Search results not available in the cache`)
+            // console.log(`Search results not available in the cache`)
             this.renderLoadingItem('View in browser', this.searchUrl(source))
             this._client.getSearchResults(source, this._settings.searchResultsLimit).then(newSearchResults => {
                 searchResults = this._cache.add(source, newSearchResults)
@@ -75,6 +75,10 @@ export class JiraIssueProcessor {
         } else {
             this.renderSearchResults(el, searchResults)
         }
+    }
+
+    async issueInline(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
+        console.log({ el, ctx })
     }
 
     private getIssueKey(line: string): string | null {
@@ -200,7 +204,7 @@ export class JiraIssueProcessor {
             createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
             // createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
         }
-        const statistics = createSpan( { cls:'statistics', text: `Total results: ${searchResults.total.toString()}` })
+        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()}` })
         el.replaceChildren(this.renderContainer([table, statistics]))
     }
 

@@ -25,6 +25,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
         this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchFence.bind(this._processor))
+        // this.registerMarkdownPostProcessor(this._processor.issueInline.bind(this._processor))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
