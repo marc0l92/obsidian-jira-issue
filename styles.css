@@ -13,12 +13,17 @@
     text-decoration: none;
 }
 .jira-issue-container img.fit-content {
+    height: 16px;
+    width: 16px;
+}
+.jira-issue-container img.fit-content {
     max-width: fit-content;
     width: fit-content;
 }
 .jira-issue-container .no-wrap {
     flex-grow: 0;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 .jira-issue-container .issue-summary {
     flex-grow: 1;
@@ -55,6 +60,12 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* statistics */
+.jira-issue-container .statistics {
+    margin-top: 3px;
+    font-size: x-small;
 }
 
 /* ji-tags */
@@ -181,6 +192,7 @@
 .jira-issue-container .table {
     background-color: #fff;
     color: #363636;
+    font-size: small;
 }
 .jira-issue-container .table.is-fullwidth {
     width: 100%;
@@ -216,6 +228,7 @@
 }
 .jira-issue-container .table th {
     color: #363636;
+    white-space: nowrap;
 }
 .jira-issue-container .table td, .table th {
     border: 1px solid #dbdbdb;
@@ -234,4 +247,22 @@
 }
 .jira-issue-container td, th {
     padding: 0;
+}
+
+.jira-issue-container .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+    background-color: #fafafa;
+}
+
+.jira-issue-container .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover:nth-child(even) {
+    background-color: #f5f5f5;
+}
+.jira-issue-container .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover {
+    background-color: #fafafa;
+}
+
+.jira-issue-container .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+    background-color: #fafafa;
+}
+.jira-issue-container .table.is-hoverable tbody tr:not(.is-selected):hover {
+    background-color: #fafafa;
 }

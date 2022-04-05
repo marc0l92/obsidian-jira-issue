@@ -15,6 +15,14 @@ const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'medium-gray': 'is-dark',
 }
 
+function dateToStr(fullDate: string): string {
+    if (fullDate) {
+        const d = new Date(fullDate)
+        return d.toLocaleDateString()
+    }
+    return fullDate
+}
+
 export class JiraIssueProcessor {
     private _settings: IJiraIssueSettings
     private _client: JiraClient
@@ -167,23 +175,20 @@ export class JiraIssueProcessor {
         createEl('th', { text: 'Assignee', parent: header })
         createEl('abbr', { text: 'P', title: 'Priority', parent: createEl('th', { parent: header }) })
         createEl('th', { text: 'Status', parent: header })
-        createEl('th', { text: 'Due Date', parent: header })
-        const footer = createEl('tr', { parent: createEl('tfoot', { parent: table }) })
-        createEl('th', { text: 'Total results', attr: { colspan: '8' }, parent: footer })
-        createEl('td', { text: searchResults.total.toString(), attr: { colspan: '2' }, parent: footer })
+        // createEl('th', { text: 'Due Date', parent: header })
         const tbody = createEl('tbody', { parent: table })
         for (let issue of searchResults.issues) {
             issue = createProxy(issue)
             const row = createEl('tr', { parent: tbody })
-            createEl('a', { href: this.issueUrl(issue.key), text: issue.key, parent: createEl('td', { parent: row }) })
+            createEl('a', { cls: 'no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: createEl('td', { parent: row }) })
             createEl('td', { text: issue.fields.summary, parent: row })
             createEl('img', {
                 attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
                 title: issue.fields.issuetype.name,
                 parent: createEl('td', { parent: row })
             })
-            createEl('td', { text: issue.fields.created, parent: row })
-            createEl('td', { text: issue.fields.updated, parent: row })
+            createEl('td', { text: dateToStr(issue.fields.created), parent: row })
+            createEl('td', { text: dateToStr(issue.fields.updated), parent: row })
             createEl('td', { text: issue.fields.reporter.displayName, parent: row })
             createEl('td', { text: issue.fields.assignee.displayName, parent: row })
             createEl('img', {
@@ -193,9 +198,10 @@ export class JiraIssueProcessor {
             })
             const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
             createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
-            createEl('td', { text: issue.fields.duedate, parent: row })
+            // createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
         }
-        el.replaceChildren(this.renderContainer([table]))
+        const statistics = createSpan( { cls:'statistics', text: `Total results: ${searchResults.total.toString()}` })
+        el.replaceChildren(this.renderContainer([table, statistics]))
     }
 
     private renderSearchResultsList(el: HTMLElement, searchResults: IJiraSearchResults): void {
