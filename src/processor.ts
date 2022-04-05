@@ -169,8 +169,8 @@ export class JiraIssueProcessor {
         createEl('th', { text: 'Status', parent: header })
         createEl('th', { text: 'Due Date', parent: header })
         const footer = createEl('tr', { parent: createEl('tfoot', { parent: table }) })
-        createEl('th', { text: 'TotalResults', attr: { colspan: '9' }, parent: footer })
-        createEl('td', { text: searchResults.total.toString(), parent: footer })
+        createEl('th', { text: 'Total results', attr: { colspan: '8' }, parent: footer })
+        createEl('td', { text: searchResults.total.toString(), attr: { colspan: '2' }, parent: footer })
         const tbody = createEl('tbody', { parent: table })
         for (let issue of searchResults.issues) {
             issue = createProxy(issue)
