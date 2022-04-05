@@ -4,6 +4,9 @@ import { ObjectsCache } from './objectsCache'
 import { JiraIssueProcessor } from './processor'
 import { JiraIssueSettingsTab } from './settings'
 
+// TODO: jira issue inline
+// TODO: jira-search custom columns
+
 export default class JiraIssuePlugin extends Plugin {
     _settings: JiraIssueSettingsTab
     _processor: JiraIssueProcessor

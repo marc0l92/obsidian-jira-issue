@@ -66,7 +66,7 @@ export class JiraIssueProcessor {
         if (!searchResults) {
             console.log(`Search results not available in the cache`)
             this.renderLoadingItem('View in browser', this.searchUrl(source))
-            this._client.getSearchResults(source, 10).then(newSearchResults => { // TODO: configure max results
+            this._client.getSearchResults(source, this._settings.searchResultsLimit).then(newSearchResults => {
                 searchResults = this._cache.add(source, newSearchResults)
                 this.renderSearchResults(el, searchResults)
             }).catch(err => {

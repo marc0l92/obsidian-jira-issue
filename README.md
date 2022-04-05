@@ -43,8 +43,3 @@ Use the `jira-search` fence to perform JQL queries:
 
 ## Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
-
-# TODO
-
-- [ ] Allow custom column in jira-search table
-- [ ] Add support for inline issues

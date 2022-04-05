@@ -1,4 +1,5 @@
 import { requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
+import { IJiraIssue, IJiraSearchResults } from './interfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "./settings"
 
 export class JiraClient {
@@ -48,7 +49,7 @@ export class JiraClient {
         return response.json
     }
 
-    async getIssue(issue: string): Promise<any> { // TODO: define interface for issue
+    async getIssue(issue: string): Promise<IJiraIssue> {
         return await this.sendRequest(
             {
                 url: this.buildUrl(`/issue/${issue}`),
@@ -58,7 +59,7 @@ export class JiraClient {
         )
     }
 
-    async getSearchResults(query: string, max: number): Promise<any> { // TODO: define interface for search results
+    async getSearchResults(query: string, max: number): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: "0",

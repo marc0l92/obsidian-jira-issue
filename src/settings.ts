@@ -27,9 +27,9 @@ export interface IJiraIssueSettings {
     username?: string
     password?: string
     bareToken?: string
-    apiBasePath: string // TODO Add setting
+    apiBasePath: string
     cacheTime: string
-    // defaultSearchResultsLimit: number // TODO Add setting
+    searchResultsLimit: number
     statusColorCache: Record<string, string>
     searchResultsRenderingType: ESearchResultsRenderingTypes
 }
@@ -40,7 +40,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     apiBasePath: '/rest/api/latest',
     password: '********',
     cacheTime: '15m',
-    // defaultSearchResultsLimit: 10,
+    searchResultsLimit: 10,
     statusColorCache: {},
     searchResultsRenderingType: ESearchResultsRenderingTypes.TABLE,
 }
@@ -156,16 +156,17 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     this._data.searchResultsRenderingType = value as ESearchResultsRenderingTypes
                     await this.saveSettings()
                 }))
-        // new Setting(containerEl)
-        //     .setName('Cache time')
-        //     .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
-        //     .addText(text => text
-        //         .setPlaceholder('Example: 15m, 24h, 5s')
-        //         .setValue(this.settingsData.cacheTime)
-        //         .onChange(async (value) => {
-        //             this.settingsData.cacheTime = value
-        //             await this.saveSettings()
-        //         }))
+        new Setting(containerEl)
+            .setName('Search results limit')
+            .setDesc('Maximum number of search results to retrieve from a JQL query performed with jira-search.')
+            .addText(text => text
+                // .setPlaceholder('Insert a number')
+                .setValue(this._data.searchResultsLimit.toString())
+                .onChange(async (value) => {
+                    this._data.searchResultsLimit = parseInt(value) || DEFAULT_SETTINGS.searchResultsLimit
+                    await this.saveSettings()
+                }))
+
 
     }
 }
