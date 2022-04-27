@@ -31,7 +31,8 @@ export interface IJiraIssueSettings {
     cacheTime: string
     searchResultsLimit: number
     statusColorCache: Record<string, string>
-    searchResultsRenderingType: ESearchResultsRenderingTypes
+    searchResultsRenderingType: ESearchResultsRenderingTypes,
+    darkMode: boolean,
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
@@ -43,6 +44,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     searchResultsLimit: 10,
     statusColorCache: {},
     searchResultsRenderingType: ESearchResultsRenderingTypes.TABLE,
+    darkMode: false,
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
@@ -164,6 +166,16 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setValue(this._data.searchResultsLimit.toString())
                 .onChange(async (value) => {
                     this._data.searchResultsLimit = parseInt(value) || DEFAULT_SETTINGS.searchResultsLimit
+                    await this.saveSettings()
+                }))
+        new Setting(containerEl)
+            .setName('Dark mode')
+            // .setDesc('')
+            .addToggle(text => text
+                // .setPlaceholder('Insert a number')
+                .setValue(this._data.darkMode)
+                .onChange(async (value) => {
+                    this._data.darkMode = value
                     await this.saveSettings()
                 }))
 

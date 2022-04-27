@@ -148,6 +148,10 @@
     background-color: #eff1fa;
     color: #3850b7;
 }
+.jira-issue-container .ji-tag.is-link.is-dark {
+    background-color: #485fc7;
+    color: #fff;
+}
 
 /* ji-tags is-info */
 .jira-issue-container .ji-tag.is-info {

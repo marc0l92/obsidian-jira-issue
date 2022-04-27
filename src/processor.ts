@@ -121,6 +121,10 @@ export class JiraIssueProcessor {
         return (new URL(`${this._settings.host}/issues?jql${searchQuery}`)).toString()
     }
 
+    private getTheme(): string {
+        return this._settings.darkMode ? 'is-dark' : 'is-light'
+    }
+
     private renderContainer(children: HTMLElement[]): HTMLElement {
         const container = createDiv({ cls: 'jira-issue-container' })
         for (const child of children) {
@@ -131,9 +135,9 @@ export class JiraIssueProcessor {
 
     private renderLoadingItem(item: string, itemUrl: string): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
-        createSpan({ cls: 'spinner', parent: createSpan({ cls: 'ji-tag is-light', parent: tagsRow }) })
-        createEl('a', { cls: 'ji-tag is-link is-light', href: itemUrl, text: item, parent: tagsRow })
-        createSpan({ cls: 'ji-tag is-light', text: 'Loading ...', parent: tagsRow })
+        createSpan({ cls: 'spinner', parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow }) })
+        createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, href: itemUrl, text: item, parent: tagsRow })
+        createSpan({ cls: `ji-tag ${this.getTheme()}`, text: 'Loading ...', parent: tagsRow })
         return tagsRow
     }
 
@@ -150,10 +154,10 @@ export class JiraIssueProcessor {
             cls: 'fit-content',
             attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
             title: issue.fields.issuetype.name,
-            parent: createSpan({ cls: 'ji-tag is-light', parent: tagsRow })
+            parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow })
         })
-        createEl('a', { cls: 'ji-tag is-link is-light no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
-        createSpan({ cls: 'ji-tag is-light issue-summary', text: issue.fields.summary, parent: tagsRow })
+        createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
+        createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
         return tagsRow
@@ -219,7 +223,7 @@ export class JiraIssueProcessor {
     private renderSearchError(el: HTMLElement, searchQuery: string, message: string): void {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
-        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.searchUrl(searchQuery), text: "Search error", parent: tagsRow })
+        createEl('a', { cls: `ji-tag is-danger ${this.getTheme()}`, href: this.searchUrl(searchQuery), text: "Search error", parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         el.replaceChildren(this.renderContainer([tagsRow]))
     }
