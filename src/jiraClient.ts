@@ -30,12 +30,13 @@ export class JiraClient {
     private async sendRequest(options: RequestUrlParam): Promise<any> {
         let response: RequestUrlResponse
         try {
+            // console.info('request', options)
             response = await requestUrl(options)
         } catch (e) {
             console.error('JiraClient::response', e)
             throw 'Request error'
         }
-        console.info('response', response)
+        // console.info('response', response)
 
         if (response.status !== 200) {
             // console.log(response.headers)
@@ -63,7 +64,7 @@ export class JiraClient {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: "0",
-            maxResults: max.toString(),
+            maxResults: max > 0 ? max.toString() : '',
         })
         return await this.sendRequest(
             {

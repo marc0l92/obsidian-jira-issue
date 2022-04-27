@@ -37,6 +37,12 @@ Use the `jira-search` fence to perform JQL queries:
     resolution = Unresolved AND assignee = currentUser() AND status = 'In Progress' order by priority DESC
     ```
 
+Use the `jira-count` fence to perform JQL queries and display the number of results:
+
+    ```jira-count
+    project = REF AND status changed to (Done, "Won't Fix", Archived, "Can't Reproduce", "PM Validated") after -14d
+    ```
+
 ## Commands
 
 - Insert fence template: insert at the cursor position, the jira-issue fence block.

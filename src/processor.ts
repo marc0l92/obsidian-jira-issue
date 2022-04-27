@@ -40,7 +40,7 @@ export class JiraIssueProcessor {
             const issueKey = this.getIssueKey(line)
             if (issueKey) {
                 // console.log(`Issue found: ${issueKey}`)
-                let issue = this._cache.get(issueKey)
+                let issue: IJiraIssue = this._cache.get(issueKey)
                 if (!issue) {
                     // console.log(`Issue not available in the cache`)
                     renderedItems[issueKey] = this.renderLoadingItem(issueKey, this.issueUrl(issueKey))
@@ -60,9 +60,9 @@ export class JiraIssueProcessor {
         this.updateRenderedIssues(el, renderedItems)
     }
 
-    async searchFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+    async searchResultsFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         // console.log(`Search query: ${source}`)
-        let searchResults = this._cache.get(source)
+        let searchResults: IJiraSearchResults = this._cache.get(source)
         if (!searchResults) {
             // console.log(`Search results not available in the cache`)
             this.renderLoadingItem('View in browser', this.searchUrl(source))
@@ -74,6 +74,23 @@ export class JiraIssueProcessor {
             })
         } else {
             this.renderSearchResults(el, searchResults)
+        }
+    }
+
+    async searchCountFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+        // console.log(`Search query: ${source}`)
+        let searchResults: IJiraSearchResults = this._cache.get(source)
+        if (!searchResults) {
+            // console.log(`Search results not available in the cache`)
+            this.renderLoadingItem('View in browser', this.searchUrl(source))
+            this._client.getSearchResults(source, -1).then(newSearchResults => {
+                searchResults = this._cache.add(source, newSearchResults)
+                this.renderSearchCount(el, searchResults.total, source)
+            }).catch(err => {
+                this.renderSearchError(el, source, err)
+            })
+        } else {
+            this.renderSearchCount(el, searchResults.total, source)
         }
     }
 
@@ -110,6 +127,13 @@ export class JiraIssueProcessor {
         } else {
             this.renderSearchResultsTable(el, searchResults)
         }
+    }
+
+    private renderSearchCount(el: HTMLElement, searchResultsCount: number, query: string): void {
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: `ji-tag is-link ${this.getTheme()}`, text: `Count`, title: query, parent: tagsRow })
+        createSpan({ cls: `ji-tag ${this.getTheme()}`, text: searchResultsCount.toString(), title: query, parent: tagsRow })
+        el.replaceChildren(this.renderContainer([tagsRow]))
     }
 
     private issueUrl(issueKey: string): string {

@@ -24,7 +24,8 @@ export default class JiraIssuePlugin extends Plugin {
         this._client = new JiraClient(this._settings.getData())
         this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
-        this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchFence.bind(this._processor))
+        this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchResultsFence.bind(this._processor))
+        this.registerMarkdownCodeBlockProcessor('jira-count', this._processor.searchCountFence.bind(this._processor))
         // this.registerMarkdownPostProcessor(this._processor.issueInline.bind(this._processor))
 
         this.addCommand({
@@ -47,6 +48,13 @@ export default class JiraIssuePlugin extends Plugin {
             name: 'Insert search template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 editor.replaceRange('```jira-search\n\n```', editor.getCursor());
+            }
+        })
+        this.addCommand({
+            id: 'obsidian-jira-count-template-fence',
+            name: 'Insert count template',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                editor.replaceRange('```jira-count\n\n```', editor.getCursor());
             }
         })
 

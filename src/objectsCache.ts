@@ -17,7 +17,7 @@ export class ObjectsCache {
         this._cache = {}
     }
 
-    add(key: string, object: any) {
+    add<T>(key: string, object: T): T {
         this._cache[key] = {
             updateTime: Date.now(),
             data: object,
