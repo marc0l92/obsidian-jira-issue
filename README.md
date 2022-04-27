@@ -15,9 +15,10 @@ There are three authentication methods:
 
 - Open: used for server without authentication.
 - [Basic](https://datatracker.ietf.org/doc/html/rfc7617): username and password are used to login in your server.
+  - Note for Jira Cloud instances this will be your email address and an API token.  API tokens can be generated in Jira Cloud from `Account Settings > Security > Create and manage API tokens`
 - [Bearer](https://datatracker.ietf.org/doc/html/rfc6750): a token is used to login in your server.
 
-This plugin stores your credential in clear in the configuration file of this plugin.
+This plugin stores your credentials in clear in the configuration file of this plugin.
 
 ### Markdown syntax
 
