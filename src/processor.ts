@@ -14,6 +14,7 @@ const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'red': 'is-danger',
     'medium-gray': 'is-dark',
 }
+const SUMMARY_COMPACT_MAX_LENGTH = 20
 
 function dateToStr(fullDate: string): string {
     if (fullDate) {
@@ -234,7 +235,11 @@ export class JiraIssueProcessor {
                         break
                     case ESearchColumnsTypes.SUMMARY:
                         if (column.compact) {
-                            createEl('td', { text: issue.fields.summary.substring(0, 20), title: issue.fields.summary, parent: row })
+                            let summaryCompact = issue.fields.summary.substring(0, SUMMARY_COMPACT_MAX_LENGTH)
+                            if (issue.fields.summary.length > SUMMARY_COMPACT_MAX_LENGTH) {
+                                summaryCompact += '…'
+                            }
+                            createEl('td', { text: summaryCompact, title: issue.fields.summary, parent: row })
                         } else {
                             createEl('td', { text: issue.fields.summary, parent: row })
                         }
