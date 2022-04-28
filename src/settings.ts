@@ -144,37 +144,43 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .onChange(async value => {
                     this._data.authenticationType = value as EAuthenticationTypes
                     await this.saveSettings()
+                    // Force refresh
+                    this.display()
                 }))
-        new Setting(containerEl)
-            .setName('Username')
-            .setDesc('Username to access your Jira account using HTTP basic authentication.')
-            .addText(text => text
-                // .setPlaceholder('')
-                .setValue(this._data.username)
-                .onChange(async value => {
-                    this._data.username = value
-                    await this.saveSettings()
-                }))
-        new Setting(containerEl)
-            .setName('Password')
-            .setDesc('Password to access your Jira account using HTTP basic authentication.')
-            .addText(text => text
-                // .setPlaceholder('')
-                .setValue(DEFAULT_SETTINGS.password)
-                .onChange(async value => {
-                    this._data.password = value
-                    await this.saveSettings()
-                }))
-        new Setting(containerEl)
-            .setName('Bearer token')
-            .setDesc('Token to access your Jira account using OAuth2 Bearer token authentication.')
-            .addText(text => text
-                // .setPlaceholder('')
-                .setValue(this._data.bareToken)
-                .onChange(async value => {
-                    this._data.bareToken = value
-                    await this.saveSettings()
-                }))
+        if (this._data.authenticationType === EAuthenticationTypes.BASIC) {
+            new Setting(containerEl)
+                .setName('Username')
+                .setDesc('Username to access your Jira account using HTTP basic authentication.')
+                .addText(text => text
+                    // .setPlaceholder('')
+                    .setValue(this._data.username)
+                    .onChange(async value => {
+                        this._data.username = value
+                        await this.saveSettings()
+                    }))
+            new Setting(containerEl)
+                .setName('Password')
+                .setDesc('Password to access your Jira account using HTTP basic authentication.')
+                .addText(text => text
+                    // .setPlaceholder('')
+                    .setValue(DEFAULT_SETTINGS.password)
+                    .onChange(async value => {
+                        this._data.password = value
+                        await this.saveSettings()
+                    }))
+        }
+        if (this._data.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
+            new Setting(containerEl)
+                .setName('Bearer token')
+                .setDesc('Token to access your Jira account using OAuth2 Bearer token authentication.')
+                .addText(text => text
+                    // .setPlaceholder('')
+                    .setValue(this._data.bareToken)
+                    .onChange(async value => {
+                        this._data.bareToken = value
+                        await this.saveSettings()
+                    }))
+        }
 
 
         containerEl.createEl('h2', { text: 'Cache' })
