@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext } from "obsidian"
 import { createProxy, IJiraIssue, IJiraSearchResults } from "./interfaces"
 import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
-import { ESearchResultsRenderingTypes, IJiraIssueSettings } from "./settings"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from "./settings"
 
 const COMMENT_REGEX = /^\s*#/
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
@@ -197,43 +197,116 @@ export class JiraIssueProcessor {
 
     private renderSearchResultsTable(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
         const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${this.getTheme()}` })
+        this.renderSearchResultsTableHeader(table)
+        this.renderSearchResultsTableBody(table, searchResults)
+        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(query)}` })
+        el.replaceChildren(this.renderContainer([table, statistics]))
+    }
+
+    private renderSearchResultsTableHeader(table: HTMLElement): void {
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
-        createEl('th', { text: 'Key', parent: header })
-        createEl('th', { text: 'Summary', parent: header })
-        createEl('abbr', { text: 'T', title: 'Type', parent: createEl('th', { parent: header }) })
-        createEl('th', { text: 'Created', parent: header })
-        createEl('th', { text: 'Updated', parent: header })
-        createEl('th', { text: 'Reporter', parent: header })
-        createEl('th', { text: 'Assignee', parent: header })
-        createEl('abbr', { text: 'P', title: 'Priority', parent: createEl('th', { parent: header }) })
-        createEl('th', { text: 'Status', parent: header })
-        // createEl('th', { text: 'Due Date', parent: header })
+        for (const column of this._settings.searchColumns) {
+            // const name = column.type !== ESearchColumnsTypes.CUSTOM ? SEARCH_COLUMNS_DESCRIPTION[column.type] : column.customField
+            const name = SEARCH_COLUMNS_DESCRIPTION[column.type]
+            if (column.compact) {
+                createEl('abbr', { text: name[0].toUpperCase(), title: name, parent: createEl('th', { parent: header }) })
+            } else {
+                createEl('th', { text: name, parent: header })
+            }
+        }
+    }
+
+    private renderSearchResultsTableBody(table: HTMLElement, searchResults: IJiraSearchResults): void {
         const tbody = createEl('tbody', { parent: table })
         for (let issue of searchResults.issues) {
             issue = createProxy(issue)
             const row = createEl('tr', { parent: tbody })
-            createEl('a', { cls: 'no-wrap', href: this.issueUrl(issue.key), text: issue.key, parent: createEl('td', { parent: row }) })
-            createEl('td', { text: issue.fields.summary, parent: row })
-            createEl('img', {
-                attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-                title: issue.fields.issuetype.name,
-                parent: createEl('td', { parent: row })
-            })
-            createEl('td', { text: dateToStr(issue.fields.created), parent: row })
-            createEl('td', { text: dateToStr(issue.fields.updated), parent: row })
-            createEl('td', { text: issue.fields.reporter.displayName, parent: row })
-            createEl('td', { text: issue.fields.assignee.displayName, parent: row })
-            createEl('img', {
-                attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
-                title: issue.fields.priority.name,
-                parent: createEl('td', { parent: row })
-            })
-            const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
-            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+            for (const column of this._settings.searchColumns) {
+                switch (column.type) {
+                    case ESearchColumnsTypes.KEY:
+                        createEl('a', {
+                            cls: 'no-wrap',
+                            href: this.issueUrl(issue.key),
+                            text: column.compact ? '🔗' : issue.key,
+                            title: column.compact ? issue.key : '',
+                            parent: createEl('td', { parent: row })
+                        })
+                        break
+                    case ESearchColumnsTypes.SUMMARY:
+                        if (column.compact) {
+                            createEl('td', { text: issue.fields.summary.substring(0, 20), title: issue.fields.summary, parent: row })
+                        } else {
+                            createEl('td', { text: issue.fields.summary, parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.TYPE:
+                        const typeCell = createEl('td', { parent: row })
+                        createEl('img', {
+                            attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+                            title: column.compact ? issue.fields.issuetype.name : '',
+                            cls: 'letter-height',
+                            parent: typeCell
+                        })
+                        if (!column.compact) {
+                            createSpan({ text: ' ' + issue.fields.issuetype.name, parent: typeCell })
+                        }
+                        break
+                    case ESearchColumnsTypes.CREATED:
+                        if (column.compact) {
+                            createEl('td', { text: '🕑', title: dateToStr(issue.fields.created), parent: row })
+                        } else {
+                            createEl('td', { text: dateToStr(issue.fields.created), parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.UPDATED:
+                        if (column.compact) {
+                            createEl('td', { text: '🕑', title: dateToStr(issue.fields.updated), parent: row })
+                        } else {
+                            createEl('td', { text: dateToStr(issue.fields.updated), parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.REPORTER:
+                        const reporterName = issue.fields.reporter.displayName || ''
+                        if (column.compact) {
+                            createEl('td', { text: reporterName.split(' ').last(), title: reporterName, parent: row })
+                        } else {
+                            createEl('td', { text: reporterName, parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.ASSIGNEE:
+                        const assigneeName = issue.fields.assignee.displayName || ''
+                        if (column.compact) {
+                            createEl('td', { text: assigneeName.split(' ').last(), title: assigneeName, parent: row })
+                        } else {
+                            createEl('td', { text: assigneeName, parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.PRIORITY:
+                        const priorityCell = createEl('td', { parent: row })
+                        createEl('img', {
+                            attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
+                            title: column.compact ? issue.fields.priority.name : '',
+                            cls: 'letter-height',
+                            parent: priorityCell
+                        })
+                        if (!column.compact) {
+                            createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
+                        }
+                        break
+                    case ESearchColumnsTypes.STATUS:
+                        const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+                        if (column.compact) {
+                            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, parent: createEl('td', { parent: row }) })
+                        } else {
+                            createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+                        }
+                        break
+                    // case ESearchColumnsTypes.CUSTOM:
+                    //     break
+                }
+            }
             // createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
         }
-        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(query)}` })
-        el.replaceChildren(this.renderContainer([table, statistics]))
     }
 
     private renderSearchResultsList(el: HTMLElement, searchResults: IJiraSearchResults): void {

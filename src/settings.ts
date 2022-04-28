@@ -31,9 +31,9 @@ export enum ESearchColumnsTypes {
     ASSIGNEE = 'ASSIGNEE',
     PRIORITY = 'PRIORITY',
     STATUS = 'STATUS',
-    CUSTOM = 'CUSTOM',
+    // CUSTOM = 'CUSTOM',
 }
-const SEARCH_COLUMNS_DESCRIPTION = {
+export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.KEY]: 'Key',
     [ESearchColumnsTypes.SUMMARY]: 'Summary',
     [ESearchColumnsTypes.TYPE]: 'Type',
@@ -43,7 +43,7 @@ const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.ASSIGNEE]: 'Assignee',
     [ESearchColumnsTypes.PRIORITY]: 'Priority',
     [ESearchColumnsTypes.STATUS]: 'Status',
-    [ESearchColumnsTypes.CUSTOM]: 'Custom',
+    // [ESearchColumnsTypes.CUSTOM]: 'Custom',
 }
 
 interface ISearchColumn {
@@ -241,16 +241,16 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     }).selectEl.addClass('flex-grow-1')
                 )
 
-            if (column.type === ESearchColumnsTypes.CUSTOM) {
-                setting.addText(text => text
-                    .setPlaceholder('Custom field name')
-                    .setValue(column.customField)
-                    .onChange(async value => {
-                        this._data.searchColumns[index].customField = value
-                        await this.saveSettings()
-                    }).inputEl.addClass('custom-field-text')
-                )
-            }
+            // if (column.type === ESearchColumnsTypes.CUSTOM) {
+            //     setting.addText(text => text
+            //         .setPlaceholder('Custom field name')
+            //         .setValue(column.customField)
+            //         .onChange(async value => {
+            //             this._data.searchColumns[index].customField = value
+            //             await this.saveSettings()
+            //         }).inputEl.addClass('custom-field-text')
+            //     )
+            // }
             setting.addExtraButton(button => button
                 .setIcon(this._data.searchColumns[index].compact ? 'compress-glyph' : 'enlarge-glyph')
                 .setTooltip(this._data.searchColumns[index].compact ? 'Compact' : 'Full width')
