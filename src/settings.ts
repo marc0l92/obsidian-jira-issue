@@ -268,6 +268,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
             setting.addExtraButton(button => button
                 .setIcon('up-chevron-glyph')
+                .setTooltip('Move up')
                 .setDisabled(index === 0)
                 .onClick(async () => {
                     const tmp = this._data.searchColumns[index]
@@ -279,6 +280,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
             setting.addExtraButton(button => button
                 .setIcon('down-chevron-glyph')
+                .setTooltip('Move down')
                 .setDisabled(index === this._data.searchColumns.length - 1)
                 .onClick(async () => {
                     const tmp = this._data.searchColumns[index]
@@ -289,7 +291,8 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     this.display()
                 }))
             setting.addExtraButton(button => button
-                .setIcon('cross')
+                .setIcon('trash')
+                .setTooltip('Delete')
                 .onClick(async () => {
                     this._data.searchColumns.splice(index, 1)
                     await this.saveSettings()
@@ -298,11 +301,22 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
             setting.infoEl.remove()
         })
-        new Setting(containerEl).addButton(button => button
+        const searchColumnsButtons = new Setting(containerEl)
+        searchColumnsButtons.addButton(button => button
             .setButtonText("Add Column")
             .setCta()
             .onClick(async value => {
                 this._data.searchColumns.push({ type: ESearchColumnsTypes.STATUS, compact: false })
+                await this.saveSettings()
+                // Force refresh
+                this.display()
+            })
+        )
+        searchColumnsButtons.addButton(button => button
+            .setButtonText("Reset columns")
+            .setWarning()
+            .onClick(async value => {
+                this._data.searchColumns = DEFAULT_SETTINGS.searchColumns
                 await this.saveSettings()
                 // Force refresh
                 this.display()
