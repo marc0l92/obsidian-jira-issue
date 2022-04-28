@@ -330,3 +330,8 @@ th {
 .letter-height {
     height: 1em;
 }
+
+.avatar-image {
+    width: 16px;
+    height: 16px;
+}

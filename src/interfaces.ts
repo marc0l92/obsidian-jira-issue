@@ -32,6 +32,12 @@ interface IJiraUser {
     active: boolean
     displayName: string
     self: string
+    avatarUrls: {
+        '16x16': string
+        '24x24': string
+        '32x32': string
+        '48x48': string
+    }
 }
 
 export interface IJiraSearchResults {

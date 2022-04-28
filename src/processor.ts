@@ -267,16 +267,26 @@ export class JiraIssueProcessor {
                         break
                     case ESearchColumnsTypes.REPORTER:
                         const reporterName = issue.fields.reporter.displayName || ''
-                        if (column.compact) {
-                            createEl('td', { text: reporterName.split(' ').last(), title: reporterName, parent: row })
+                        if (column.compact && reporterName) {
+                            createEl('img', {
+                                attr: { src: issue.fields.reporter.avatarUrls['16x16'], alt: reporterName },
+                                title: reporterName,
+                                cls: 'avatar-image',
+                                parent: createEl('td', { parent: row })
+                            })
                         } else {
                             createEl('td', { text: reporterName, parent: row })
                         }
                         break
                     case ESearchColumnsTypes.ASSIGNEE:
                         const assigneeName = issue.fields.assignee.displayName || ''
-                        if (column.compact) {
-                            createEl('td', { text: assigneeName.split(' ').last(), title: assigneeName, parent: row })
+                        if (column.compact && assigneeName) {
+                            createEl('img', {
+                                attr: { src: issue.fields.assignee.avatarUrls['16x16'], alt: assigneeName },
+                                title: assigneeName,
+                                cls: 'avatar-image',
+                                parent: createEl('td', { parent: row })
+                            })
                         } else {
                             createEl('td', { text: assigneeName, parent: row })
                         }
