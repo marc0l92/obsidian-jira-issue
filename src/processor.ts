@@ -68,12 +68,12 @@ export class JiraIssueProcessor {
             this.renderLoadingItem('View in browser', this.searchUrl(source))
             this._client.getSearchResults(source, this._settings.searchResultsLimit).then(newSearchResults => {
                 searchResults = this._cache.add(source, newSearchResults)
-                this.renderSearchResults(el, searchResults)
+                this.renderSearchResults(el, source, searchResults)
             }).catch(err => {
                 this.renderSearchError(el, source, err)
             })
         } else {
-            this.renderSearchResults(el, searchResults)
+            this.renderSearchResults(el, source, searchResults)
         }
     }
 
@@ -121,11 +121,11 @@ export class JiraIssueProcessor {
         }
     }
 
-    private renderSearchResults(el: HTMLElement, searchResults: IJiraSearchResults): void {
+    private renderSearchResults(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
         if (this._settings.searchResultsRenderingType === ESearchResultsRenderingTypes.LIST) {
             this.renderSearchResultsList(el, searchResults)
         } else {
-            this.renderSearchResultsTable(el, searchResults)
+            this.renderSearchResultsTable(el, query, searchResults)
         }
     }
 
@@ -195,7 +195,7 @@ export class JiraIssueProcessor {
         return tagsRow
     }
 
-    private renderSearchResultsTable(el: HTMLElement, searchResults: IJiraSearchResults): void {
+    private renderSearchResultsTable(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
         const table = createEl('table', { cls: 'table is-bordered is-striped is-narrow is-hoverable is-fullwidth' })
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
         createEl('th', { text: 'Key', parent: header })
@@ -232,7 +232,7 @@ export class JiraIssueProcessor {
             createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
             // createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
         }
-        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()}` })
+        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(query)}` })
         el.replaceChildren(this.renderContainer([table, statistics]))
     }
 

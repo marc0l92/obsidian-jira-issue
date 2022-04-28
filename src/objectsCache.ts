@@ -1,5 +1,6 @@
 import { IJiraIssueSettings } from "./settings"
 const ms = require('ms')
+const moment = require('moment')
 
 interface Cache {
     [key: string]: {
@@ -28,6 +29,13 @@ export class ObjectsCache {
     get(key: string) {
         if (key in this._cache && this._cache[key].updateTime + ms(this._settings.cacheTime) > Date.now()) {
             return this._cache[key].data
+        }
+        return null
+    }
+
+    getTime(key: string) {
+        if (key in this._cache) {
+            return moment(this._cache[key].updateTime).format('llll')
         }
         return null
     }

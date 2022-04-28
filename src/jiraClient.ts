@@ -36,7 +36,7 @@ export class JiraClient {
             console.error('JiraClient::response', e)
             throw 'Request error'
         }
-        // console.info('response', response)
+        console.info('response', response)
 
         if (response.status !== 200) {
             // console.log(response.headers)
