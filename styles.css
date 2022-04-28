@@ -208,45 +208,54 @@
     background-color: transparent;
 }
 
-.jira-issue-container .table.is-bordered tr:last-child td, .table.is-bordered tr:last-child th {
+.jira-issue-container .table.is-bordered tr:last-child td,
+.jira-issue-container .table.is-bordered tr:last-child th {
     border-bottom-width: 1px;
 }
-.jira-issue-container .table.is-narrow td, .table.is-narrow th {
+.jira-issue-container .table.is-narrow td,
+.jira-issue-container .table.is-narrow th {
     padding: 0.25em 0.5em;
 }
-.jira-issue-container .table.is-bordered td, .table.is-bordered th {
+.jira-issue-container .table.is-bordered td,
+.jira-issue-container .table.is-bordered th {
     border-width: 1px;
 }
 .jira-issue-container .table th:not([align]) {
     text-align: inherit;
 }
-.jira-issue-container .table thead td, .table thead th {
+.jira-issue-container .table thead td,
+.jira-issue-container .table thead th {
     border-width: 0 0 2px;
     color: #363636;
 }
-.jira-issue-container table td:not([align]), table th:not([align]) {
+.jira-issue-container table td:not([align]),
+.jira-issue-container table th:not([align]) {
     text-align: inherit;
 }
 .jira-issue-container .table th {
     color: #363636;
     white-space: nowrap;
 }
-.jira-issue-container .table td, .table th {
+.jira-issue-container .table td,
+.jira-issue-container .table th {
     border: 1px solid #dbdbdb;
     border-width: 0 0 1px;
     padding: 0.5em 0.75em;
     vertical-align: top;
 }
-.jira-issue-container td:not([align]), th:not([align]) {
+.jira-issue-container td:not([align]),
+th:not([align]) {
     text-align: inherit;
 }
 .jira-issue-container table th {
     color: #363636;
 }
-.jira-issue-container table td, table th {
+.jira-issue-container table td,
+table th {
     vertical-align: top;
 }
-.jira-issue-container td, th {
+.jira-issue-container td,
+th {
     padding: 0;
 }
 
@@ -266,4 +275,43 @@
 }
 .jira-issue-container .table.is-hoverable tbody tr:not(.is-selected):hover {
     background-color: #fafafa;
+}
+
+.jira-issue-container .table.is-dark {
+    background-color: #000000;
+    color: #dadada;
+}
+
+.jira-issue-container .table.is-dark thead td,
+.jira-issue-container .table.is-dark thead th {
+    color: #dadada;
+}
+
+.jira-issue-container .table.is-dark td,
+.jira-issue-container .table.is-dark th {
+    border: 1px solid #333333;
+}
+
+.jira-issue-container table.is-dark th {
+    color: #dadada;
+}
+
+.jira-issue-container .table.is-striped.is-dark tbody tr:not(.is-selected):nth-child(even) {
+    background-color: #141414;
+}
+
+.jira-issue-container .table.is-hoverable.is-striped.is-dark tbody tr:not(.is-selected):hover:nth-child(even) {
+    background-color: #242424;
+}
+
+.jira-issue-container .table.is-hoverable.is-striped.is-dark tbody tr:not(.is-selected):hover {
+    background-color: #242424;
+}
+
+.jira-issue-container .table.is-striped.is-dark tbody tr:not(.is-selected):nth-child(even) {
+    background-color: #141414;
+}
+
+.jira-issue-container .table.is-hoverable.is-dark tbody tr:not(.is-selected):hover {
+    background-color: #141414;
 }

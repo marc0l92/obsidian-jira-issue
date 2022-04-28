@@ -196,7 +196,7 @@ export class JiraIssueProcessor {
     }
 
     private renderSearchResultsTable(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
-        const table = createEl('table', { cls: 'table is-bordered is-striped is-narrow is-hoverable is-fullwidth' })
+        const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${this.getTheme()}` })
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
         createEl('th', { text: 'Key', parent: header })
         createEl('th', { text: 'Summary', parent: header })
