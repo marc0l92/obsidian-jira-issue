@@ -21,6 +21,37 @@ const SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION = {
     [ESearchResultsRenderingTypes.LIST]: 'List',
 }
 
+export enum ESearchColumnsTypes {
+    KEY = 'KEY',
+    SUMMARY = 'SUMMARY',
+    TYPE = 'TYPE',
+    CREATED = 'CREATED',
+    UPDATED = 'UPDATED',
+    REPORTER = 'REPORTER',
+    ASSIGNEE = 'ASSIGNEE',
+    PRIORITY = 'PRIORITY',
+    STATUS = 'STATUS',
+    CUSTOM = 'CUSTOM',
+}
+const SEARCH_COLUMNS_DESCRIPTION = {
+    [ESearchColumnsTypes.KEY]: 'Key',
+    [ESearchColumnsTypes.SUMMARY]: 'Summary',
+    [ESearchColumnsTypes.TYPE]: 'Type',
+    [ESearchColumnsTypes.CREATED]: 'Created',
+    [ESearchColumnsTypes.UPDATED]: 'Updated',
+    [ESearchColumnsTypes.REPORTER]: 'Reporter',
+    [ESearchColumnsTypes.ASSIGNEE]: 'Assignee',
+    [ESearchColumnsTypes.PRIORITY]: 'Priority',
+    [ESearchColumnsTypes.STATUS]: 'Status',
+    [ESearchColumnsTypes.CUSTOM]: 'Custom',
+}
+
+interface ISearchColumn {
+    type: ESearchColumnsTypes
+    compact: boolean
+    customField?: string
+}
+
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes
@@ -31,8 +62,9 @@ export interface IJiraIssueSettings {
     cacheTime: string
     searchResultsLimit: number
     statusColorCache: Record<string, string>
-    searchResultsRenderingType: ESearchResultsRenderingTypes,
-    darkMode: boolean,
+    searchResultsRenderingType: ESearchResultsRenderingTypes
+    darkMode: boolean
+    searchColumns: ISearchColumn[]
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
@@ -45,6 +77,17 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     statusColorCache: {},
     searchResultsRenderingType: ESearchResultsRenderingTypes.TABLE,
     darkMode: false,
+    searchColumns: [
+        { type: ESearchColumnsTypes.KEY, compact: false },
+        { type: ESearchColumnsTypes.SUMMARY, compact: false },
+        { type: ESearchColumnsTypes.TYPE, compact: true },
+        { type: ESearchColumnsTypes.CREATED, compact: false },
+        { type: ESearchColumnsTypes.UPDATED, compact: false },
+        { type: ESearchColumnsTypes.REPORTER, compact: false },
+        { type: ESearchColumnsTypes.ASSIGNEE, compact: false },
+        { type: ESearchColumnsTypes.PRIORITY, compact: true },
+        { type: ESearchColumnsTypes.STATUS, compact: false },
+    ],
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
@@ -88,7 +131,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 .setPlaceholder('Example: ' + DEFAULT_SETTINGS.host)
                 .setValue(this._data.host)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.host = value
                     await this.saveSettings()
                 }))
@@ -98,7 +141,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addDropdown(dropdown => dropdown
                 .addOptions(AUTHENTICATION_TYPE_DESCRIPTION)
                 .setValue(this._data.authenticationType)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.authenticationType = value as EAuthenticationTypes
                     await this.saveSettings()
                 }))
@@ -108,7 +151,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 // .setPlaceholder('')
                 .setValue(this._data.username)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.username = value
                     await this.saveSettings()
                 }))
@@ -118,7 +161,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 // .setPlaceholder('')
                 .setValue(DEFAULT_SETTINGS.password)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.password = value
                     await this.saveSettings()
                 }))
@@ -128,7 +171,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 // .setPlaceholder('')
                 .setValue(this._data.bareToken)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.bareToken = value
                     await this.saveSettings()
                 }))
@@ -141,7 +184,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 .setPlaceholder('Example: 15m, 24h, 5s')
                 .setValue(this._data.cacheTime)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.cacheTime = value
                     await this.saveSettings()
                 }))
@@ -154,7 +197,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addDropdown(dropdown => dropdown
                 .addOptions(SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION)
                 .setValue(this._data.searchResultsRenderingType)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.searchResultsRenderingType = value as ESearchResultsRenderingTypes
                     await this.saveSettings()
                 }))
@@ -164,21 +207,100 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .addText(text => text
                 // .setPlaceholder('Insert a number')
                 .setValue(this._data.searchResultsLimit.toString())
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.searchResultsLimit = parseInt(value) || DEFAULT_SETTINGS.searchResultsLimit
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
             .setName('Dark mode')
             // .setDesc('')
-            .addToggle(text => text
-                // .setPlaceholder('Insert a number')
+            .addToggle(toggle => toggle
                 .setValue(this._data.darkMode)
-                .onChange(async (value) => {
+                .onChange(async value => {
                     this._data.darkMode = value
                     await this.saveSettings()
                 }))
 
 
+        containerEl.createEl('h2', { text: 'Search columns' })
+        const desc = document.createDocumentFragment()
+        desc.append(
+            "Columns to display in the jira-search table visualization.",
+        )
+        new Setting(containerEl).setDesc(desc)
+        this._data.searchColumns.forEach((column, index) => {
+            const setting = new Setting(containerEl)
+                .addDropdown(dropdown => dropdown
+                    .addOptions(SEARCH_COLUMNS_DESCRIPTION)
+                    .setValue(column.type)
+                    .onChange(async value => {
+                        this._data.searchColumns[index].type = value as ESearchColumnsTypes
+                        await this.saveSettings()
+                        // Force refresh
+                        this.display()
+                    }).selectEl.addClass('flex-grow-1')
+                )
+
+            if (column.type === ESearchColumnsTypes.CUSTOM) {
+                setting.addText(text => text
+                    .setPlaceholder('Custom field name')
+                    .setValue(column.customField)
+                    .onChange(async value => {
+                        this._data.searchColumns[index].customField = value
+                        await this.saveSettings()
+                    }).inputEl.addClass('custom-field-text')
+                )
+            }
+            setting.addExtraButton(button => button
+                .setIcon(this._data.searchColumns[index].compact ? 'compress-glyph' : 'enlarge-glyph')
+                .setTooltip(this._data.searchColumns[index].compact ? 'Compact' : 'Full width')
+                .onClick(async () => {
+                    this._data.searchColumns[index].compact = !this._data.searchColumns[index].compact
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+            setting.addExtraButton(button => button
+                .setIcon('up-chevron-glyph')
+                .setDisabled(index === 0)
+                .onClick(async () => {
+                    const tmp = this._data.searchColumns[index]
+                    this._data.searchColumns[index] = this._data.searchColumns[index - 1]
+                    this._data.searchColumns[index - 1] = tmp
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+            setting.addExtraButton(button => button
+                .setIcon('down-chevron-glyph')
+                .setDisabled(index === this._data.searchColumns.length - 1)
+                .onClick(async () => {
+                    const tmp = this._data.searchColumns[index]
+                    this._data.searchColumns[index] = this._data.searchColumns[index + 1]
+                    this._data.searchColumns[index + 1] = tmp
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+            setting.addExtraButton(button => button
+                .setIcon('cross')
+                .onClick(async () => {
+                    this._data.searchColumns.splice(index, 1)
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+            setting.infoEl.remove()
+        })
+        new Setting(containerEl).addButton(button => button
+            .setButtonText("Add Column")
+            .setCta()
+            .onClick(async value => {
+                this._data.searchColumns.push({ type: ESearchColumnsTypes.STATUS, compact: false })
+                await this.saveSettings()
+                // Force refresh
+                this.display()
+            })
+        )
     }
 }

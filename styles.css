@@ -315,3 +315,14 @@ th {
 .jira-issue-container .table.is-hoverable.is-dark tbody tr:not(.is-selected):hover {
     background-color: #141414;
 }
+
+/* Settings */
+.setting-item-control select.flex-grow-1 {
+    flex-grow: 1;
+    max-width: none;
+}
+.setting-item-control input[type='text'].custom-field-text {
+    margin-left: 10px;
+    height: 2.5em;
+    border-radius: 8px;
+}
