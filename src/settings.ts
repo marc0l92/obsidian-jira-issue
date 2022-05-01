@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
 import JiraIssuePlugin from './main'
+import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
 export enum EAuthenticationTypes {
     OPEN = 'OPEN',
@@ -12,46 +13,6 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
-export enum ESearchResultsRenderingTypes {
-    TABLE = 'TABLE',
-    LIST = 'LIST',
-}
-const SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION = {
-    [ESearchResultsRenderingTypes.TABLE]: 'Table',
-    [ESearchResultsRenderingTypes.LIST]: 'List',
-}
-
-export enum ESearchColumnsTypes {
-    KEY = 'KEY',
-    SUMMARY = 'SUMMARY',
-    TYPE = 'TYPE',
-    CREATED = 'CREATED',
-    UPDATED = 'UPDATED',
-    REPORTER = 'REPORTER',
-    ASSIGNEE = 'ASSIGNEE',
-    PRIORITY = 'PRIORITY',
-    STATUS = 'STATUS',
-    // CUSTOM = 'CUSTOM',
-}
-export const SEARCH_COLUMNS_DESCRIPTION = {
-    [ESearchColumnsTypes.KEY]: 'Key',
-    [ESearchColumnsTypes.SUMMARY]: 'Summary',
-    [ESearchColumnsTypes.TYPE]: 'Type',
-    [ESearchColumnsTypes.CREATED]: 'Created',
-    [ESearchColumnsTypes.UPDATED]: 'Updated',
-    [ESearchColumnsTypes.REPORTER]: 'Reporter',
-    [ESearchColumnsTypes.ASSIGNEE]: 'Assignee',
-    [ESearchColumnsTypes.PRIORITY]: 'Priority',
-    [ESearchColumnsTypes.STATUS]: 'Status',
-    // [ESearchColumnsTypes.CUSTOM]: 'Custom',
-}
-
-interface ISearchColumn {
-    type: ESearchColumnsTypes
-    compact: boolean
-    customField?: string
-}
-
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes
@@ -62,7 +23,7 @@ export interface IJiraIssueSettings {
     cacheTime: string
     searchResultsLimit: number
     statusColorCache: Record<string, string>
-    searchResultsRenderingType: ESearchResultsRenderingTypes
+    customFieldsNames: Record<string, string>
     darkMode: boolean
     searchColumns: ISearchColumn[]
 }
@@ -75,7 +36,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     cacheTime: '15m',
     searchResultsLimit: 10,
     statusColorCache: {},
-    searchResultsRenderingType: ESearchResultsRenderingTypes.TABLE,
+    customFieldsNames: {},
     darkMode: false,
     searchColumns: [
         { type: ESearchColumnsTypes.KEY, compact: false },
@@ -198,18 +159,8 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
         containerEl.createEl('h2', { text: 'Rendering' })
         new Setting(containerEl)
-            .setName('Search rendering type')
-            .setDesc('Select how the results of a jira-search should be rendered.')
-            .addDropdown(dropdown => dropdown
-                .addOptions(SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION)
-                .setValue(this._data.searchResultsRenderingType)
-                .onChange(async value => {
-                    this._data.searchResultsRenderingType = value as ESearchResultsRenderingTypes
-                    await this.saveSettings()
-                }))
-        new Setting(containerEl)
-            .setName('Search results limit')
-            .setDesc('Maximum number of search results to retrieve from a JQL query performed with jira-search.')
+            .setName('Default search results limit')
+            .setDesc('Maximum number of search results to retrieve when using jira-search without specifying a limit.')
             .addText(text => text
                 // .setPlaceholder('Insert a number')
                 .setValue(this._data.searchResultsLimit.toString())

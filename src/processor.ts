@@ -2,7 +2,8 @@ import { MarkdownPostProcessorContext } from "obsidian"
 import { createProxy, IJiraIssue, IJiraSearchResults } from "./interfaces"
 import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
-import { ESearchColumnsTypes, ESearchResultsRenderingTypes, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from "./settings"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "./searchView"
+import { IJiraIssueSettings } from "./settings"
 
 const COMMENT_REGEX = /^\s*#/
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
@@ -63,18 +64,25 @@ export class JiraIssueProcessor {
 
     async searchResultsFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         // console.log(`Search query: ${source}`)
-        let searchResults: IJiraSearchResults = this._cache.get(source)
-        if (!searchResults) {
-            // console.log(`Search results not available in the cache`)
-            this.renderLoadingItem('View in browser', this.searchUrl(source))
-            this._client.getSearchResults(source, this._settings.searchResultsLimit).then(newSearchResults => {
-                searchResults = this._cache.add(source, newSearchResults)
-                this.renderSearchResults(el, source, searchResults)
-            }).catch(err => {
-                this.renderSearchError(el, source, err)
-            })
-        } else {
-            this.renderSearchResults(el, source, searchResults)
+        try {
+
+            const searchView = new SearchView().fromString(source)
+            let searchResults: IJiraSearchResults = this._cache.get(searchView.query + searchView.limit)
+            if (!searchResults) {
+                // console.log(`Search results not available in the cache`)
+                this.renderLoadingItem('View in browser', this.searchUrl(searchView.query))
+                this._client.getSearchResults(searchView.query, parseInt(searchView.limit) || this._settings.searchResultsLimit)
+                    .then(newSearchResults => {
+                        searchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults)
+                        this.renderSearchResults(el, searchView, searchResults)
+                    }).catch(err => {
+                        this.renderSearchError(el, err, searchView)
+                    })
+            } else {
+                this.renderSearchResults(el, searchView, searchResults)
+            }
+        } catch (err) {
+            this.renderSearchError(el, err, null)
         }
     }
 
@@ -122,11 +130,11 @@ export class JiraIssueProcessor {
         }
     }
 
-    private renderSearchResults(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
-        if (this._settings.searchResultsRenderingType === ESearchResultsRenderingTypes.LIST) {
+    private renderSearchResults(el: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+        if (searchView.type === ESearchResultsRenderingTypes.LIST) {
             this.renderSearchResultsList(el, searchResults)
         } else {
-            this.renderSearchResultsTable(el, query, searchResults)
+            this.renderSearchResultsTable(el, searchView, searchResults)
         }
     }
 
@@ -196,17 +204,18 @@ export class JiraIssueProcessor {
         return tagsRow
     }
 
-    private renderSearchResultsTable(el: HTMLElement, query: string, searchResults: IJiraSearchResults): void {
+    private renderSearchResultsTable(el: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
         const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${this.getTheme()}` })
-        this.renderSearchResultsTableHeader(table)
-        this.renderSearchResultsTableBody(table, searchResults)
-        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(query)}` })
+        this.renderSearchResultsTableHeader(table, searchView)
+        this.renderSearchResultsTableBody(table, searchResults, searchView)
+        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(searchView.query + searchView.limit)}` })
         el.replaceChildren(this.renderContainer([table, statistics]))
     }
 
-    private renderSearchResultsTableHeader(table: HTMLElement): void {
+    private renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchView): void {
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
-        for (const column of this._settings.searchColumns) {
+        const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
+        for (const column of columns) {
             // const name = column.type !== ESearchColumnsTypes.CUSTOM ? SEARCH_COLUMNS_DESCRIPTION[column.type] : column.customField
             const name = SEARCH_COLUMNS_DESCRIPTION[column.type]
             if (column.compact) {
@@ -217,12 +226,13 @@ export class JiraIssueProcessor {
         }
     }
 
-    private renderSearchResultsTableBody(table: HTMLElement, searchResults: IJiraSearchResults): void {
+    private renderSearchResultsTableBody(table: HTMLElement, searchResults: IJiraSearchResults, searchView: SearchView): void {
         const tbody = createEl('tbody', { parent: table })
         for (let issue of searchResults.issues) {
             issue = createProxy(issue)
             const row = createEl('tr', { parent: tbody })
-            for (const column of this._settings.searchColumns) {
+            const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
+            for (const column of columns) {
                 switch (column.type) {
                     case ESearchColumnsTypes.KEY:
                         createEl('a', {
@@ -332,10 +342,14 @@ export class JiraIssueProcessor {
         el.replaceChildren(this.renderContainer(list))
     }
 
-    private renderSearchError(el: HTMLElement, searchQuery: string, message: string): void {
+    private renderSearchError(el: HTMLElement, message: string, searchView: SearchView): void {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
-        createEl('a', { cls: `ji-tag is-danger ${this.getTheme()}`, href: this.searchUrl(searchQuery), text: "Search error", parent: tagsRow })
+        if (searchView) {
+            createEl('a', { cls: `ji-tag is-danger ${this.getTheme()}`, href: this.searchUrl(searchView.query), text: "Search error", parent: tagsRow })
+        } else {
+            createSpan({ cls: `ji-tag is-danger ${this.getTheme()}`, text: "Search error", parent: tagsRow })
+        }
         createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         el.replaceChildren(this.renderContainer([tagsRow]))
     }

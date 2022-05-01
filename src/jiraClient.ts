@@ -88,4 +88,18 @@ export class JiraClient {
         )
         this._settings.statusColorCache[status] = response.statusCategory.colorName
     }
+
+    async updateCustomFieldsCache(): Promise<void> {
+        const response = await this.sendRequest(
+            {
+                url: this.buildUrl(`/field`),
+                method: 'GET',
+                headers: this.buildHeaders(),
+            }
+        )
+        this._settings.customFieldsNames = {}
+        for (const field of response) {
+            this._settings.customFieldsNames[field.id] = field.name
+        }
+    }
 }

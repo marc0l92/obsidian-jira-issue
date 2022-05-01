@@ -2,6 +2,7 @@ import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
 import { JiraClient } from './jiraClient'
 import { ObjectsCache } from './objectsCache'
 import { JiraIssueProcessor } from './processor'
+import { SearchWizardModal } from './searchWizardModal'
 import { JiraIssueSettingsTab } from './settings'
 
 // TODO: jira issue inline
@@ -20,6 +21,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._cache = new ObjectsCache(this._settings.getData())
         this._settings.onChange(() => {
             this._cache.clear()
+            this._client.updateCustomFieldsCache()
         })
         this._client = new JiraClient(this._settings.getData())
         this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
@@ -33,6 +35,7 @@ export default class JiraIssuePlugin extends Plugin {
             name: 'Clear cache',
             callback: () => {
                 this._cache.clear()
+                this._client.updateCustomFieldsCache()
                 new Notice('JiraIssue: Cache cleaned')
             }
         })
@@ -40,21 +43,23 @@ export default class JiraIssuePlugin extends Plugin {
             id: 'obsidian-jira-issue-template-fence',
             name: 'Insert issue template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                editor.replaceRange('```jira-issue\n\n```', editor.getCursor());
+                editor.replaceRange('```jira-issue\n\n```', editor.getCursor())
             }
         })
         this.addCommand({
             id: 'obsidian-jira-search-template-fence',
             name: 'Insert search template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                editor.replaceRange('```jira-search\n\n```', editor.getCursor());
+                new SearchWizardModal(this.app, this._settings.getData(), (result) => {
+                    editor.replaceRange(result, editor.getCursor())
+                }).open()
             }
         })
         this.addCommand({
             id: 'obsidian-jira-count-template-fence',
             name: 'Insert count template',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                editor.replaceRange('```jira-count\n\n```', editor.getCursor());
+                editor.replaceRange('```jira-count\n\n```', editor.getCursor())
             }
         })
 

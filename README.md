@@ -22,6 +22,7 @@ This plugin stores your credentials in clear in the configuration file of this p
 
 ### Markdown syntax
 
+#### `jira-issue`
 Use the `jira-issue` fence to track issues:
 
     ```jira-issue
@@ -31,12 +32,39 @@ Use the `jira-issue` fence to track issues:
     # This is a comment
     ```
 
+### `jira-search`
 Use the `jira-search` fence to perform JQL queries:
 
     ```jira-search
     resolution = Unresolved AND assignee = currentUser() AND status = 'In Progress' order by priority DESC
     ```
 
+You can customize the output in the settings or directly in the fence using the following keywords:
+
+| Keyword | Description | Default | Values |
+| :- | :- | :- | :- |
+| `type` | Rendering mode of the search results | `TABLE` | `TABLE` or `LIST` |
+| `query` | Query to use with Jira to retrieve the results |  |  |
+| `limit` | Maximum number of items to display | Use value from settings | Integer number |
+| `columns` | List of columns to render | Use value from settings | Comma separated list |
+
+Example:
+
+    ```jira-search
+    type: TABLE
+    query: status = 'In Progress' order by priority DESC
+    limit: 15
+    columns: KEY, SUMMARY, #ASSIGNEE, #REPORTER, STATUS
+    ```
+
+#### Available columns
+
+Available columns:
+    KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS
+
+If the column starts with `#`, the compact mode is used.
+
+### `jira-count`
 Use the `jira-count` fence to perform JQL queries and display the number of results:
 
     ```jira-count
