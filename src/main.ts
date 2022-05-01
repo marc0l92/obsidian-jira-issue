@@ -47,8 +47,8 @@ export default class JiraIssuePlugin extends Plugin {
             }
         })
         this.addCommand({
-            id: 'obsidian-jira-search-template-fence',
-            name: 'Insert search template',
+            id: 'obsidian-jira-search-wizard-fence',
+            name: 'Search wizard',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 new SearchWizardModal(this.app, this._settings.getData(), (result) => {
                     editor.replaceRange(result, editor.getCursor())

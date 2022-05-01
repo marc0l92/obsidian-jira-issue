@@ -197,6 +197,7 @@
     background-color: #fff;
     color: #363636;
     font-size: small;
+    margin-bottom: 0;
 }
 .jira-issue-container .table.is-fullwidth {
     width: 100%;

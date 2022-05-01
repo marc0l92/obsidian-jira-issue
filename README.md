@@ -3,7 +3,8 @@
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.
 
 ![issues](./doc/issues.png)
-![searchResults](./doc/searchResults.png)
+
+![searchResults](./doc/searchResults2.png)
 
 ## Usage
 
@@ -75,6 +76,9 @@ Use the `jira-count` fence to perform JQL queries and display the number of resu
 
 - Insert fence template: insert at the cursor position, the jira-issue fence block.
 - Clear cache: clear cached issues before the expiration time to download them again.
+- Search wizard: open the search wizard modal:
+
+![searchWizard](./doc/searchWizard.png)
 
 ## Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
