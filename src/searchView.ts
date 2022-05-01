@@ -17,6 +17,7 @@ export enum ESearchColumnsTypes {
     ASSIGNEE = 'ASSIGNEE',
     PRIORITY = 'PRIORITY',
     STATUS = 'STATUS',
+    DUE_DATE = 'DUE_DATE',
     // CUSTOM = 'CUSTOM',
 }
 export const SEARCH_COLUMNS_DESCRIPTION = {
@@ -29,6 +30,7 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.ASSIGNEE]: 'Assignee',
     [ESearchColumnsTypes.PRIORITY]: 'Priority',
     [ESearchColumnsTypes.STATUS]: 'Status',
+    [ESearchColumnsTypes.DUE_DATE]: 'Due Date',
     // [ESearchColumnsTypes.CUSTOM]: 'Custom',
 }
 

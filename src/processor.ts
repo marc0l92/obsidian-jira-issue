@@ -326,11 +326,17 @@ export class JiraIssueProcessor {
                             createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
                         }
                         break
+                    case ESearchColumnsTypes.DUE_DATE:
+                        if (column.compact) {
+                            createEl('td', { text: '🕑', title: dateToStr(issue.fields.duedate), parent: row })
+                        } else {
+                            createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
+                        }
+                        break
                     // case ESearchColumnsTypes.CUSTOM:
                     //     break
                 }
             }
-            // createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
         }
     }
 
