@@ -333,6 +333,20 @@ export class JiraIssueProcessor {
                             createEl('td', { text: dateToStr(issue.fields.duedate), parent: row })
                         }
                         break
+                    case ESearchColumnsTypes.RESOLUTION:
+                        if (issue.fields.resolution.description) {
+                            createEl('abbr', { text: issue.fields.resolution.name, title: issue.fields.resolution.description, parent: createEl('td', { parent: row }) })
+                        } else {
+                            createEl('td', { text: issue.fields.resolution.name, title: issue.fields.resolution.description, parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.RESOLUTION_DATE:
+                        if (column.compact) {
+                            createEl('td', { text: '🕑', title: dateToStr(issue.fields.resolutiondate), parent: row })
+                        } else {
+                            createEl('td', { text: dateToStr(issue.fields.resolutiondate), parent: row })
+                        }
+                        break
                     // case ESearchColumnsTypes.CUSTOM:
                     //     break
                 }

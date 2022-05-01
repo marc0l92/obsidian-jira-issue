@@ -60,7 +60,7 @@ Example:
 #### Available columns
 
 Available columns:
-    KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS, DUE_DATE
+    KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS, DUE_DATE, RESOLUTION, RESOLUTION_DATE
 
 If the column starts with `#`, the compact mode is used.
 

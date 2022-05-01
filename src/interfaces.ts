@@ -7,6 +7,11 @@ export interface IJiraIssue {
         creator: IJiraUser
         description: string
         duedate: string
+        resolution: {
+            name: string
+            description: string
+        }
+        resolutiondate: string
         issuetype: {
             iconUrl: string
             name: string

@@ -18,6 +18,8 @@ export enum ESearchColumnsTypes {
     PRIORITY = 'PRIORITY',
     STATUS = 'STATUS',
     DUE_DATE = 'DUE_DATE',
+    RESOLUTION = 'RESOLUTION',
+    RESOLUTION_DATE = 'RESOLUTION_DATE',
     // CUSTOM = 'CUSTOM',
 }
 export const SEARCH_COLUMNS_DESCRIPTION = {
@@ -31,6 +33,8 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.PRIORITY]: 'Priority',
     [ESearchColumnsTypes.STATUS]: 'Status',
     [ESearchColumnsTypes.DUE_DATE]: 'Due Date',
+    [ESearchColumnsTypes.RESOLUTION]: 'Resolution',
+    [ESearchColumnsTypes.RESOLUTION_DATE]: 'Resolution Date',
     // [ESearchColumnsTypes.CUSTOM]: 'Custom',
 }
 

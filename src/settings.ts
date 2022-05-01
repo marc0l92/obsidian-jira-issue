@@ -257,7 +257,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setButtonText("Add Column")
             .setCta()
             .onClick(async value => {
-                this._data.searchColumns.push({ type: ESearchColumnsTypes.STATUS, compact: false })
+                this._data.searchColumns.push({ type: ESearchColumnsTypes.KEY, compact: false })
                 await this.saveSettings()
                 // Force refresh
                 this.display()

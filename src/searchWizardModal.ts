@@ -115,7 +115,7 @@ export class SearchWizardModal extends Modal {
             .setButtonText("Add Column")
             .setCta()
             .onClick(async value => {
-                this._searchView.columns.push({ type: ESearchColumnsTypes.STATUS, compact: false })
+                this._searchView.columns.push({ type: ESearchColumnsTypes.KEY, compact: false })
                 // Force refresh
                 this.open()
             })
