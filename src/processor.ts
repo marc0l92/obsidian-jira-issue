@@ -15,7 +15,7 @@ const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'red': 'is-danger',
     'medium-gray': 'is-dark',
 }
-const SUMMARY_COMPACT_MAX_LENGTH = 20
+const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
 function dateToStr(fullDate: string): string {
     if (fullDate) {
@@ -245,8 +245,8 @@ export class JiraIssueProcessor {
                         break
                     case ESearchColumnsTypes.SUMMARY:
                         if (column.compact) {
-                            let summaryCompact = issue.fields.summary.substring(0, SUMMARY_COMPACT_MAX_LENGTH)
-                            if (issue.fields.summary.length > SUMMARY_COMPACT_MAX_LENGTH) {
+                            let summaryCompact = issue.fields.summary.substring(0, DESCRIPTION_COMPACT_MAX_LENGTH)
+                            if (issue.fields.summary.length > DESCRIPTION_COMPACT_MAX_LENGTH) {
                                 summaryCompact += '…'
                             }
                             createEl('td', { text: summaryCompact, title: issue.fields.summary, parent: row })
@@ -346,6 +346,20 @@ export class JiraIssueProcessor {
                         } else {
                             createEl('td', { text: dateToStr(issue.fields.resolutiondate), parent: row })
                         }
+                        break
+                    case ESearchColumnsTypes.ENVIRONMENT:
+                        if (column.compact) {
+                            let environmentCompact = issue.fields.environment.substring(0, DESCRIPTION_COMPACT_MAX_LENGTH)
+                            if (issue.fields.environment.length > DESCRIPTION_COMPACT_MAX_LENGTH) {
+                                environmentCompact += '…'
+                            }
+                            createEl('td', { text: environmentCompact, title: issue.fields.environment, parent: row })
+                        } else {
+                            createEl('td', { text: issue.fields.environment, parent: row })
+                        }
+                        break
+                    case ESearchColumnsTypes.PROJECT:
+                        createEl('td', { text: issue.fields.project.key, title: issue.fields.project.name, parent: row })
                         break
                     // case ESearchColumnsTypes.CUSTOM:
                     //     break

@@ -30,6 +30,11 @@ export interface IJiraIssue {
         }
         summary: string
         updated: string
+        environment: string
+        project: {
+            key: string
+            name: string
+        }
     }
 }
 

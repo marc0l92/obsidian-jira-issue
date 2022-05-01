@@ -20,6 +20,8 @@ export enum ESearchColumnsTypes {
     DUE_DATE = 'DUE_DATE',
     RESOLUTION = 'RESOLUTION',
     RESOLUTION_DATE = 'RESOLUTION_DATE',
+    PROJECT = 'PROJECT',
+    ENVIRONMENT = 'ENVIRONMENT',
     // CUSTOM = 'CUSTOM',
 }
 export const SEARCH_COLUMNS_DESCRIPTION = {
@@ -35,6 +37,8 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.DUE_DATE]: 'Due Date',
     [ESearchColumnsTypes.RESOLUTION]: 'Resolution',
     [ESearchColumnsTypes.RESOLUTION_DATE]: 'Resolution Date',
+    [ESearchColumnsTypes.PROJECT]: 'Project',
+    [ESearchColumnsTypes.ENVIRONMENT]: 'Environment',
     // [ESearchColumnsTypes.CUSTOM]: 'Custom',
 }
 
