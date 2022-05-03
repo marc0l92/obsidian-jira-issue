@@ -6,9 +6,9 @@ This plugin allows you to track the progress of [Atlassian Jira](https://www.atl
 
 ![searchResults](./doc/searchResults2.png)
 
-## Usage
+# Usage
 
-### Configuration
+## Configuration
 
 Use the plugin options to configure the connection to your company Atlassian Jira server: host, username and password.
 
@@ -21,9 +21,9 @@ There are three authentication methods:
 
 This plugin stores your credentials in clear in the configuration file of this plugin.
 
-### Markdown syntax
+## Markdown Syntax
 
-#### `jira-issue`
+### `jira-issue`
 Use the `jira-issue` fence to track issues:
 
     ```jira-issue
@@ -33,7 +33,7 @@ Use the `jira-issue` fence to track issues:
     # This is a comment
     ```
 
-### `jira-search`
+## `jira-search`
 Use the `jira-search` fence to perform JQL queries:
 
     ```jira-search
@@ -58,21 +58,27 @@ Example:
     columns: KEY, SUMMARY, #ASSIGNEE, #REPORTER, STATUS
     ```
 
-#### Available columns
+### Available Jira Columns
 
 Available columns:
     KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS, DUE_DATE, RESOLUTION, RESOLUTION_DATE, PROJECT, ENVIRONMENT
 
-If the column starts with `#`, the compact mode is used.
+If the column starts with `#`, the compact mode is used. Example:
 
-### `jira-count`
+    ```jira-search
+    query: key = OPEN-357
+    columns: key, #key, type, #type, reporter, #reporter, created, #created
+    ```
+![Compact Columns](./doc/compactColumns.png)
+
+## `jira-count`
 Use the `jira-count` fence to perform JQL queries and display the number of results:
 
     ```jira-count
     project = REF AND status changed to (Done, "Won't Fix", Archived, "Can't Reproduce", "PM Validated") after -14d
     ```
 
-## Commands
+# Commands
 
 - Insert fence template: insert at the cursor position, the jira-issue fence block.
 - Clear cache: clear cached issues before the expiration time to download them again.
@@ -80,5 +86,5 @@ Use the `jira-count` fence to perform JQL queries and display the number of resu
 
 ![searchWizard](./doc/searchWizard.png)
 
-## Installation
+# Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.

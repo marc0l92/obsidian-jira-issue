@@ -6,7 +6,6 @@ import { SearchWizardModal } from './searchWizardModal'
 import { JiraIssueSettingsTab } from './settings'
 
 // TODO: jira issue inline
-// TODO: jira-search custom columns
 
 export default class JiraIssuePlugin extends Plugin {
     _settings: JiraIssueSettingsTab
