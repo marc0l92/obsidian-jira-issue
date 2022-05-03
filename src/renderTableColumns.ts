@@ -150,17 +150,20 @@ export const renderTableColumn = (column: ISearchColumn, issue: IJiraIssue, row:
             break
         case ESearchColumnsTypes.FIX_VERSIONS:
             const fixVersionsCell = createEl('td', { parent: row })
-            for (let i=0; i< issue.fields.fixVersions.length; i++) {
+            for (let i = 0; i < issue.fields.fixVersions.length; i++) {
                 const fixVersion = issue.fields.fixVersions[i]
                 if (fixVersion.released) {
                     createEl('strong', { text: fixVersion.name, title: fixVersion.description, parent: fixVersionsCell })
                 } else {
                     createSpan({ text: fixVersion.name, title: fixVersion.description, parent: fixVersionsCell })
                 }
-                if(i < issue.fields.fixVersions.length - 1) {
+                if (i < issue.fields.fixVersions.length - 1) {
                     createSpan({ text: ', ', parent: fixVersionsCell })
                 }
             }
+            break
+        case ESearchColumnsTypes.COMPONENTS:
+            createEl('td', { text: issue.fields.components.flatMap(c => c.name).join(', '), parent: row })
             break
         // case ESearchColumnsTypes.CUSTOM:
         //     break

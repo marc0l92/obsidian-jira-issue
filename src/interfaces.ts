@@ -41,6 +41,9 @@ export interface IJiraIssue {
             description: string
             released: boolean
         }]
+        components: [{
+            name: string
+        }]
     }
 }
 
@@ -69,7 +72,7 @@ export function createProxy<T extends object>(obj: T): T {
             if (p in target) {
                 const value = Reflect.get(target, p, receiver)
                 if (value) {
-                    if (value instanceof Object) {
+                    if (value instanceof Object && p !== 'prototype') {
                         return createProxy(value)
                     } else {
                         return value
