@@ -35,6 +35,12 @@ export interface IJiraIssue {
             key: string
             name: string
         }
+        labels: string[]
+        fixVersions: [{
+            name: string
+            description: string
+            released: boolean
+        }]
     }
 }
 
