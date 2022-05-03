@@ -34,9 +34,9 @@ export enum ESearchColumnsTypes {
     // LAST_VIEWED = 'LAST_VIEWED',
     // PROGRESS = 'PROGRESS',
     // SUBTASKS = 'SUBTASKS',
-    // TIME_ESTIMATED = 'TIME_ESTIMATED',
-    // TIME_ORIGINAL_ESTIMATE = 'TIME_ORIGINAL_ESTIMATE',
-    // TIME_SPENT = 'TIME_SPENT',
+    TIME_ESTIMATE = 'TIME_ESTIMATE',
+    TIME_ORIGINAL_ESTIMATE = 'TIME_ORIGINAL_ESTIMATE',
+    TIME_SPENT = 'TIME_SPENT',
 
     // CUSTOM_FIELD = 'CUSTOM_FIELD',
 }
@@ -66,9 +66,9 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     // [ESearchColumnsTypes.LAST_VIEWED]: 'Last Viewed',
     // [ESearchColumnsTypes.PROGRESS]: 'Progress',
     // [ESearchColumnsTypes.SUBTASKS]: 'Subtasks',
-    // [ESearchColumnsTypes.TIME_ESTIMATED]: 'Time Estimated',
-    // [ESearchColumnsTypes.TIME_ORIGINAL_ESTIMATE]: 'Time Original Estimate',
-    // [ESearchColumnsTypes.TIME_SPENT]: 'Time Spent',
+    [ESearchColumnsTypes.TIME_ESTIMATE]: 'Time Estimate',
+    [ESearchColumnsTypes.TIME_ORIGINAL_ESTIMATE]: 'Time Original Estimate',
+    [ESearchColumnsTypes.TIME_SPENT]: 'Time Spent',
 
     // [ESearchColumnsTypes.CUSTOM]: 'Custom',
 }

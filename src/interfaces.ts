@@ -44,6 +44,9 @@ export interface IJiraIssue {
         components: [{
             name: string
         }]
+        timeestimate: number
+        timeoriginalestimate: number
+        timespent: number
     }
 }
 
@@ -71,7 +74,7 @@ export function createProxy<T extends object>(obj: T): T {
         get: (target: T, p: string, receiver: any) => {
             if (p in target) {
                 const value = Reflect.get(target, p, receiver)
-                if (value) {
+                if (value !== undefined && value !== null) {
                     if (value instanceof Object && p !== 'prototype') {
                         return createProxy(value)
                     } else {
