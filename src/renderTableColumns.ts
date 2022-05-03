@@ -189,6 +189,12 @@ export const renderTableColumn = (column: ISearchColumn, issue: IJiraIssue, row:
             // TODO: convert to human readable time
             createEl('td', { text: issue.fields.timespent.toString(), parent: row })
             break
+        case ESearchColumnsTypes.AGGREGATE_PROGRESS:
+            createEl('td', { text: issue.fields.aggregateprogress.percent.toString()+'%', parent: row })
+            break
+        case ESearchColumnsTypes.PROGRESS:
+            createEl('td', { text: issue.fields.progress.percent.toString()+'%', parent: row })
+            break
         // case ESearchColumnsTypes.CUSTOM:
         //     break
     }

@@ -211,7 +211,7 @@ export class JiraIssueProcessor {
             // const name = column.type !== ESearchColumnsTypes.CUSTOM ? SEARCH_COLUMNS_DESCRIPTION[column.type] : column.customField
             const name = SEARCH_COLUMNS_DESCRIPTION[column.type]
             if (column.compact) {
-                createEl('abbr', { text: name[0].toUpperCase(), title: name, parent: createEl('th', { parent: header }) })
+                createEl('th', { text: name[0].toUpperCase(), title: column.type, parent: header })
             } else {
                 createEl('th', { text: name, title: column.type, parent: header })
             }

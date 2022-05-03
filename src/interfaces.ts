@@ -50,6 +50,23 @@ export interface IJiraIssue {
         timeestimate: number
         timeoriginalestimate: number
         timespent: number
+        issueLinks: [{
+            type: {
+                name: string
+            }
+            inwardIssue: {
+                key: string
+                fields: {
+                    summary: string
+                }
+            }
+        }]
+        aggregateprogress: {
+            percent: number
+        }
+        progress: {
+            percent: number
+        }
     }
 }
 
