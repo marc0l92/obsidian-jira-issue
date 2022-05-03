@@ -20,7 +20,7 @@ export class JiraClient {
     private buildHeaders(): Record<string, string> {
         const requestHeaders: Record<string, string> = {}
         if (this._settings.authenticationType === EAuthenticationTypes.BASIC) {
-            requestHeaders['Authorization'] = 'Basic ' + Buffer.from(`${this._settings.username}:${this._settings.password}`).toString('base64')
+            requestHeaders['Authorization'] = 'Basic ' + btoa(`${this._settings.username}:${this._settings.password}`)
         } else if (this._settings.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             requestHeaders['Authorization'] = `Bearer ${this._settings.bareToken}`
         }
