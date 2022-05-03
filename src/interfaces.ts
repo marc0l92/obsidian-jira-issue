@@ -44,6 +44,9 @@ export interface IJiraIssue {
         components: [{
             name: string
         }]
+        aggregatetimeestimate: number
+        aggregatetimeoriginalestimate: number
+        aggregatetimespent: number
         timeestimate: number
         timeoriginalestimate: number
         timespent: number

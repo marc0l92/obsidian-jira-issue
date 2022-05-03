@@ -165,6 +165,18 @@ export const renderTableColumn = (column: ISearchColumn, issue: IJiraIssue, row:
         case ESearchColumnsTypes.COMPONENTS:
             createEl('td', { text: issue.fields.components.flatMap(c => c.name).join(', '), parent: row })
             break
+        case ESearchColumnsTypes.AGGREGATE_TIME_ESTIMATED:
+            // TODO: convert to human readable time
+            createEl('td', { text: issue.fields.aggregatetimeestimate.toString(), parent: row })
+            break
+        case ESearchColumnsTypes.AGGREGATE_TIME_ORIGINAL_ESTIMATE:
+            // TODO: convert to human readable time
+            createEl('td', { text: issue.fields.aggregatetimeoriginalestimate.toString(), parent: row })
+            break
+        case ESearchColumnsTypes.AGGREGATE_TIME_SPENT:
+            // TODO: convert to human readable time
+            createEl('td', { text: issue.fields.aggregatetimespent.toString(), parent: row })
+            break
         case ESearchColumnsTypes.TIME_ESTIMATE:
             // TODO: convert to human readable time
             createEl('td', { text: issue.fields.timeestimate.toString(), parent: row })

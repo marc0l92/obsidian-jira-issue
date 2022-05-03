@@ -213,7 +213,7 @@ export class JiraIssueProcessor {
             if (column.compact) {
                 createEl('abbr', { text: name[0].toUpperCase(), title: name, parent: createEl('th', { parent: header }) })
             } else {
-                createEl('th', { text: name, parent: header })
+                createEl('th', { text: name, title: column.type, parent: header })
             }
         }
     }
