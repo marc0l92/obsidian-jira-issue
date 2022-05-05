@@ -63,6 +63,7 @@ Example:
 Available columns:
     KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS, DUE_DATE, RESOLUTION, RESOLUTION_DATE, PROJECT, ENVIRONMENT, LABELS, FIX_VERSIONS, COMPONENTS, AGGREGATE_TIME_ESTIMATE, AGGREGATE_TIME_ORIGINAL_ESTIMATE, AGGREGATE_TIME_SPENT, TIME_ESTIMATE, TIME_ORIGINAL_ESTIMATE, TIME_SPENT, AGGREGATE_PROGRESS, PROGRESS
 
+Columns names are case insensitive.
 If the column starts with `#`, the compact mode is used. Example:
 
     ```jira-search
@@ -70,6 +71,17 @@ If the column starts with `#`, the compact mode is used. Example:
     columns: key, #key, type, #type, reporter, #reporter, created, #created
     ```
 ![Compact Columns](./doc/compactColumns.png)
+
+### Link notes to `jira-search` table
+
+The special column `NOTES` can be used with `jira-search` tables to create a column that shows all the notes that start with the issue key.
+Example:
+    ```jira-search
+    query: key = OPEN-357
+    columns: key, summary, status, notes
+    ```
+
+![Notes Column](./doc/notesColumn.png)
 
 ## `jira-count`
 Use the `jira-count` fence to perform JQL queries and display the number of results:

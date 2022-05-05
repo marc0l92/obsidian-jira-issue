@@ -23,7 +23,7 @@ export default class JiraIssuePlugin extends Plugin {
             this._client.updateCustomFieldsCache()
         })
         this._client = new JiraClient(this._settings.getData())
-        this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache)
+        this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache, this.app.vault)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
         this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchResultsFence.bind(this._processor))
         this.registerMarkdownCodeBlockProcessor('jira-count', this._processor.searchCountFence.bind(this._processor))

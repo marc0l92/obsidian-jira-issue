@@ -39,6 +39,7 @@ export enum ESearchColumnsTypes {
     TIME_SPENT = 'TIME_SPENT',
 
     // CUSTOM_FIELD = 'CUSTOM_FIELD',
+    NOTES = 'NOTES',
 }
 export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.KEY]: 'Key',
@@ -71,6 +72,7 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.TIME_SPENT]: '🕑Spent',
 
     // [ESearchColumnsTypes.CUSTOM]: 'Custom',
+    [ESearchColumnsTypes.NOTES]: 'Notes',
 }
 
 export interface ISearchColumn {

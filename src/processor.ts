@@ -1,4 +1,4 @@
-import { MarkdownPostProcessorContext } from "obsidian"
+import { MarkdownPostProcessorContext, TFile, Vault } from "obsidian"
 import { createProxy, IJiraIssue, IJiraSearchResults } from "./interfaces"
 import { JiraClient } from "./jiraClient"
 import { ObjectsCache } from "./objectsCache"
@@ -21,11 +21,13 @@ export class JiraIssueProcessor {
     private _settings: IJiraIssueSettings
     private _client: JiraClient
     private _cache: ObjectsCache
+    private _vault: Vault
 
-    constructor(settings: IJiraIssueSettings, client: JiraClient, cache: ObjectsCache) {
+    constructor(settings: IJiraIssueSettings, client: JiraClient, cache: ObjectsCache, vault: Vault) {
         this._settings = settings
         this._client = client
         this._cache = cache
+        this._vault = vault
     }
 
     async issueFence(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
@@ -146,6 +148,10 @@ export class JiraIssueProcessor {
         return (new URL(`${this._settings.host}/issues?jql${searchQuery}`)).toString()
     }
 
+    public getNotes(): TFile[] {
+        return this._vault.getMarkdownFiles()
+    }
+
     private getTheme(): string {
         return this._settings.darkMode ? 'is-dark' : 'is-light'
     }
@@ -211,7 +217,7 @@ export class JiraIssueProcessor {
             // const name = column.type !== ESearchColumnsTypes.CUSTOM ? SEARCH_COLUMNS_DESCRIPTION[column.type] : column.customField
             const name = SEARCH_COLUMNS_DESCRIPTION[column.type]
             if (column.compact) {
-                createEl('th', { text: name[0].toUpperCase(), title: column.type, parent: header })
+                createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })
             } else {
                 createEl('th', { text: name, title: column.type, parent: header })
             }
@@ -224,9 +230,7 @@ export class JiraIssueProcessor {
             issue = createProxy(issue)
             const row = createEl('tr', { parent: tbody })
             const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
-            for (const column of columns) {
-                renderTableColumn(column, issue, row, this)
-            }
+            renderTableColumn(columns, issue, row, this)
         }
     }
 

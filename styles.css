@@ -317,6 +317,10 @@ th {
     background-color: #141414;
 }
 
+.jira-issue-container .internal-link {
+    text-decoration: none;
+}
+
 /* Settings */
 .setting-item-control select.flex-grow-1 {
     flex-grow: 1;
