@@ -326,6 +326,10 @@ th {
     display: inline-block;
 }
 
+.ji-inline-issue.jira-issue-container .ji-tag {
+    padding: 0.1rem 0.3rem;
+}
+
 /* Settings */
 .setting-item-control select.flex-grow-1 {
     flex-grow: 1;

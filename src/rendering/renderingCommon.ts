@@ -70,7 +70,7 @@ export class RenderingCommon {
         el.replaceChildren(this.renderContainer([tagsRow]))
     }
 
-    public renderIssue(issue: IJiraIssue): HTMLElement {
+    public renderIssue(issue: IJiraIssue, compact: boolean = false): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         createEl('img', {
             cls: 'fit-content',
@@ -79,7 +79,9 @@ export class RenderingCommon {
             parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow })
         })
         createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
-        createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
+        if (!compact) {
+            createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
+        }
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
         return tagsRow
