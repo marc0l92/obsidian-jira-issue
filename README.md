@@ -2,11 +2,28 @@
 
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.
 
+<!-- TOC -->
+
+- [Obsidian jira-issue](#obsidian-jira-issue)
+    - [Installation](#installation)
+    - [Configuration](#configuration)
+    - [Markdown Syntax](#markdown-syntax)
+        - [📃`jira-issue`](#jira-issue)
+        - [🔎`jira-search`](#jira-search)
+        - [🔢`jira-count`](#jira-count)
+    - [Available Columns](#available-columns)
+    - [Link notes to `jira-search` table](#link-notes-to-jira-search-table)
+    - [Inline issues](#inline-issues)
+    - [Commands](#commands)
+
+<!-- /TOC -->
+
 ![issues](./doc/issues.png)
 
 ![searchResults](./doc/searchResults2.png)
 
-# Usage
+## Installation
+From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
 
 ## Configuration
 
@@ -23,7 +40,7 @@ This plugin stores your credentials in clear in the configuration file of this p
 
 ## Markdown Syntax
 
-### `jira-issue`
+### 📃`jira-issue`
 Use the `jira-issue` fence to track issues:
 
     ```jira-issue
@@ -33,7 +50,7 @@ Use the `jira-issue` fence to track issues:
     # This is a comment
     ```
 
-## `jira-search`
+### 🔎`jira-search`
 Use the `jira-search` fence to perform JQL queries:
 
     ```jira-search
@@ -47,7 +64,7 @@ You can customize the output in the settings or directly in the fence using the 
 | `type` | Rendering mode of the search results | `TABLE` | `TABLE` or `LIST` |
 | `query` | Query to use with Jira to retrieve the results |  |  |
 | `limit` | Maximum number of items to display | Use value from settings | Integer number |
-| `columns` | List of columns to render | Use value from settings | Comma separated list |
+| `columns` | List of columns to render ([Available columns](#available-columns)) | Use value from settings | Comma separated list |
 
 Example:
 
@@ -58,13 +75,23 @@ Example:
     columns: KEY, SUMMARY, #ASSIGNEE, #REPORTER, STATUS
     ```
 
-### Available Jira Columns
+### 🔢`jira-count`
+Use the `jira-count` fence to perform JQL queries and display the number of results:
 
-Available columns:
+    ```jira-count
+    project = REF AND status changed to (Done, "Won't Fix", Archived, "Can't Reproduce", "PM Validated") after -14d
+    ```
+
+## Available Columns
+
+Available columns extracted from the Jira issue:
+
     KEY, SUMMARY, TYPE, CREATED, UPDATED, REPORTER, ASSIGNEE, PRIORITY, STATUS, DUE_DATE, RESOLUTION, RESOLUTION_DATE, PROJECT, ENVIRONMENT, LABELS, FIX_VERSIONS, COMPONENTS, AGGREGATE_TIME_ESTIMATE, AGGREGATE_TIME_ORIGINAL_ESTIMATE, AGGREGATE_TIME_SPENT, TIME_ESTIMATE, TIME_ORIGINAL_ESTIMATE, TIME_SPENT, AGGREGATE_PROGRESS, PROGRESS
 
-Columns names are case insensitive.
-If the column starts with `#`, the compact mode is used. Example:
+- Columns names are case insensitive.
+- If the column starts with `#`, the compact mode is used.
+
+Example:
 
     ```jira-search
     query: key = OPEN-357
@@ -72,10 +99,12 @@ If the column starts with `#`, the compact mode is used. Example:
     ```
 ![Compact Columns](./doc/compactColumns.png)
 
-### Link notes to `jira-search` table
+## Link notes to `jira-search` table
 
 The special column `NOTES` can be used with `jira-search` tables to create a column that shows all the notes that start with the issue key.
+
 Example:
+
     ```jira-search
     query: key = OPEN-357
     columns: key, summary, status, notes
@@ -83,20 +112,28 @@ Example:
 
 ![Notes Column](./doc/notesColumn.png)
 
-## `jira-count`
-Use the `jira-count` fence to perform JQL queries and display the number of results:
+## Inline issues
+This plugin allows you to detect inline issue and render them inside your text without creating a dedicated fence block. In the settings it is possible to configure the prefix used to identify inline issues and if you want to render url to issues.
 
-    ```jira-count
-    project = REF AND status changed to (Done, "Won't Fix", Archived, "Can't Reproduce", "PM Validated") after -14d
+Example:
+
+    With inline issue you can insert an issue like JIRA:OPEN-351 inside your text. The plugin will detect urls like https://jira.secondlife.com/browse/OPEN-352 and render the issue as tags.
+    - [ ] Issue can be extended JIRA:OPEN-353 with the summary
+    - [ ] Or compact JIRA:#OPEN-354 without the summary
+    - [ ] JIRA:#OPEN-355 use the `#` symbol before the issue key to make it compact
+    ```
+    The plugin searches inside the note for those patterns and replace them
+    JIRA:#OPEN-356
     ```
 
-# Commands
+![Inline issues](./doc/inlineIssues.png)
+
+
+
+## Commands
 
 - Insert fence template: insert at the cursor position, the jira-issue fence block.
 - Clear cache: clear cached issues before the expiration time to download them again.
-- Search wizard: open the search wizard modal:
+- Search wizard: open the search wizard modal to help you to create a search query:
 
 ![searchWizard](./doc/searchWizard.png)
-
-# Installation
-From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
