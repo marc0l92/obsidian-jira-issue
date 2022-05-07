@@ -25,7 +25,7 @@ export interface IJiraIssueSettings {
     statusColorCache: Record<string, string>
     customFieldsNames: Record<string, string>
     darkMode: boolean
-    issueUrlToTag: boolean
+    inlineIssueUrlToTag: boolean
     inlineIssuePrefix: string
     searchColumns: ISearchColumn[]
 }
@@ -40,7 +40,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     statusColorCache: {},
     customFieldsNames: {},
     darkMode: false,
-    issueUrlToTag: true,
+    inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',
     searchColumns: [
         { type: ESearchColumnsTypes.KEY, compact: false },
@@ -174,9 +174,9 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setName('Issue url to tags')
             .setDesc(`Convert links to issues to tags. Example: ${this._data.host}/browse/AAA-123`)
             .addToggle(toggle => toggle
-                .setValue(this._data.issueUrlToTag)
+                .setValue(this._data.inlineIssueUrlToTag)
                 .onChange(async value => {
-                    this._data.issueUrlToTag = value
+                    this._data.inlineIssueUrlToTag = value
                     await this.saveSettings()
                 }))
 

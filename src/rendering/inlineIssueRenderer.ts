@@ -1,64 +1,68 @@
 import { MarkdownPostProcessorContext } from "obsidian"
+import { JiraClient } from "src/client/jiraClient"
+import { IJiraIssue } from "src/client/jiraInterfaces"
+import { ObjectsCache } from "src/objectsCache"
 import { IJiraIssueSettings } from "../settings"
+import { RenderingCommon } from "./renderingCommon"
+
+
 
 export class InlineIssueRenderer {
+    private _rc: RenderingCommon
     private _settings: IJiraIssueSettings
+    private _client: JiraClient
+    private _cache: ObjectsCache
 
-    constructor(settings: IJiraIssueSettings) {
+    constructor(renderingCommon: RenderingCommon, settings: IJiraIssueSettings, client: JiraClient, cache: ObjectsCache) {
+        this._rc = renderingCommon
         this._settings = settings
+        this._client = client
+        this._cache = cache
     }
 
     async render(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
         console.log({ el })
+        this.convertInlineIssuesToTags(el)
+        this.convertInlineIssuesUrlToTags(el)
+
+        const inlineIssueTags: NodeListOf<HTMLSpanElement> = el.querySelectorAll(`span.ji-inline-issue`)
+        inlineIssueTags.forEach((value: HTMLSpanElement) => {
+            const issueKey = value.getAttribute('data-issue-key')
+            let issue: IJiraIssue = this._cache.get(issueKey)
+            if (!issue) {
+                this._client.getIssue(issueKey).then(newIssue => {
+                    issue = this._cache.add(issueKey, newIssue)
+                    value.replaceChildren(this._rc.renderIssue(issue))
+                }).catch(err => {
+                    value.replaceChildren(this._rc.renderIssueError(issueKey, err))
+                })
+            } else {
+                value.replaceChildren(this._rc.renderIssue(issue))
+            }
+        })
+    }
+
+    private convertInlineIssuesToTags(el: HTMLElement): void {
         if (this._settings.inlineIssuePrefix) {
-            const matches = el.innerHTML.match(new RegExp(`${this._settings.inlineIssuePrefix}([A-Z0-9]+-[0-9]+)`, 'g'))
-            console.log({ matches })
-            if (matches) {
-                for (const match of matches) {
-                    const issueKey = match.replace(this._settings.inlineIssuePrefix, '')
-                    const issueTag = this.renderInlineIssue(issueKey)
-                    el.innerHTML = el.innerHTML.replace(match, issueTag.outerHTML)
-                }
+            let match
+            while (match = new RegExp(`${this._settings.inlineIssuePrefix}([A-Z0-9]+-[0-9]+)`).exec(el.innerHTML)) {
+                const issueKey = match[1]
+                const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey } })
+                container.appendChild(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey), true))
+                el.innerHTML = el.innerHTML.replace(match[0], container.outerHTML)
             }
         }
-        if(this._settings.issueUrlToTag) {
-            
+    }
+
+    private convertInlineIssuesUrlToTags(el: HTMLElement): void {
+        if (this._settings.inlineIssueUrlToTag) {
+            const issueUrlElements: NodeListOf<HTMLAnchorElement> = el.querySelectorAll(`a.external-link[href^="${this._settings.host}/browse/"]`)
+            issueUrlElements.forEach((value: HTMLAnchorElement) => {
+                const issueKey = value.href.replace(`${this._settings.host}/browse/`, '')
+                const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey } })
+                container.appendChild(this._rc.renderLoadingItem(issueKey, value.href, true))
+                value.replaceWith(container)
+            })
         }
     }
-
-    private renderInlineIssue(issueKey: string): HTMLElement {
-        return createSpan({ text: 'test of ' + issueKey })
-        // console.log(`Issue found: ${issueKey}`)
-        // let issue: IJiraIssue = this._cache.get(issueKey)
-        // if (!issue) {
-        //     // console.log(`Issue not available in the cache`)
-        //     renderedItems[issueKey] = this.renderLoadingItem(issueKey, this.issueUrl(issueKey))
-        //     this._client.getIssue(issueKey).then(newIssue => {
-        //         issue = this._cache.add(issueKey, newIssue)
-        //         renderedItems[issueKey] = this.renderIssue(issue)
-        //         this.updateRenderedIssues(el, renderedItems)
-        //     }).catch(err => {
-        //         renderedItems[issueKey] = this.renderIssueError(issueKey, err)
-        //         this.updateRenderedIssues(el, renderedItems)
-        //     })
-        // } else {
-        //     return this.renderIssue(issue)
-        // }
-    }
-
-
-    // private renderIssue(issue: IJiraIssue): HTMLElement {
-    //     const tagsRow = createDiv('ji-tags has-addons')
-    //     createEl('img', {
-    //         cls: 'fit-content',
-    //         attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-    //         title: issue.fields.issuetype.name,
-    //         parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow })
-    //     })
-    //     createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
-    //     createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
-    //     const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
-    //     createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
-    //     return tagsRow
-    // }
 }

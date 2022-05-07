@@ -39,8 +39,8 @@ export default class JiraIssuePlugin extends Plugin {
         this.registerMarkdownCodeBlockProcessor('jira-search', this._searchFenceRenderer.render.bind(this._searchFenceRenderer))
         this._countFenceRenderer = new CountFenceRenderer(this._renderingCommon, this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-count', this._countFenceRenderer.render.bind(this._countFenceRenderer))
-        // this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._client, this._cache)
-        // this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
+        this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
+        this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',

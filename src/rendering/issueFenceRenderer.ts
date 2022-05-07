@@ -34,7 +34,7 @@ export class IssueFenceRenderer {
                         renderedItems[issueKey] = this._rc.renderIssue(issue)
                         this.updateRenderedIssues(el, renderedItems)
                     }).catch(err => {
-                        renderedItems[issueKey] = this.renderIssueError(issueKey, err)
+                        renderedItems[issueKey] = this._rc.renderIssueError(issueKey, err)
                         this.updateRenderedIssues(el, renderedItems)
                     })
                 } else {
@@ -72,14 +72,6 @@ export class IssueFenceRenderer {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-danger is-light', text: 'JiraIssue', parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger', text: 'No valid issues found', parent: tagsRow })
-        return tagsRow
-    }
-
-    private renderIssueError(issueKey: string, message: string): HTMLElement {
-        const tagsRow = createDiv('ji-tags has-addons')
-        createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
-        createEl('a', { cls: 'ji-tag is-danger is-light', href: this._rc.issueUrl(issueKey), text: issueKey, parent: tagsRow })
-        createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         return tagsRow
     }
 }

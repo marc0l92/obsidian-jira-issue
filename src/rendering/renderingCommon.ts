@@ -45,8 +45,13 @@ export class RenderingCommon {
         return container
     }
 
-    public renderLoadingItem(item: string, itemUrl: string): HTMLElement {
-        const tagsRow = createDiv('ji-tags has-addons')
+    public renderLoadingItem(item: string, itemUrl: string, inline: boolean = false): HTMLElement {
+        let tagsRow
+        if (inline) {
+            tagsRow = createSpan('ji-tags has-addons')
+        } else {
+            tagsRow = createDiv('ji-tags has-addons')
+        }
         createSpan({ cls: 'spinner', parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow }) })
         createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, href: itemUrl, text: item, parent: tagsRow })
         createSpan({ cls: `ji-tag ${this.getTheme()}`, text: 'Loading ...', parent: tagsRow })
@@ -77,6 +82,14 @@ export class RenderingCommon {
         createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
+        return tagsRow
+    }
+
+    public renderIssueError(issueKey: string, message: string): HTMLElement {
+        const tagsRow = createDiv('ji-tags has-addons')
+        createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
+        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.issueUrl(issueKey), text: issueKey, parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         return tagsRow
     }
 }

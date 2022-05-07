@@ -321,6 +321,11 @@ th {
     text-decoration: none;
 }
 
+/* Inline Issues */
+.ji-inline-issue.jira-issue-container {
+    display: inline-block;
+}
+
 /* Settings */
 .setting-item-control select.flex-grow-1 {
     flex-grow: 1;
