@@ -25,6 +25,8 @@ export interface IJiraIssueSettings {
     statusColorCache: Record<string, string>
     customFieldsNames: Record<string, string>
     darkMode: boolean
+    issueUrlToTag: boolean
+    inlineIssuePrefix: string
     searchColumns: ISearchColumn[]
 }
 
@@ -38,6 +40,8 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     statusColorCache: {},
     customFieldsNames: {},
     darkMode: false,
+    issueUrlToTag: true,
+    inlineIssuePrefix: 'JIRA:',
     searchColumns: [
         { type: ESearchColumnsTypes.KEY, compact: false },
         { type: ESearchColumnsTypes.SUMMARY, compact: false },
@@ -144,18 +148,6 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         }
 
 
-        containerEl.createEl('h2', { text: 'Cache' })
-        new Setting(containerEl)
-            .setName('Cache time')
-            .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
-            .addText(text => text
-                .setPlaceholder('Example: 15m, 24h, 5s')
-                .setValue(this._data.cacheTime)
-                .onChange(async value => {
-                    this._data.cacheTime = value
-                    await this.saveSettings()
-                }))
-
 
         containerEl.createEl('h2', { text: 'Rendering' })
         new Setting(containerEl)
@@ -177,6 +169,27 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     this._data.darkMode = value
                     await this.saveSettings()
                 }))
+
+        new Setting(containerEl)
+            .setName('Issue url to tags')
+            .setDesc(`Convert links to issues to tags. Example: ${this._data.host}/browse/AAA-123`)
+            .addToggle(toggle => toggle
+                .setValue(this._data.issueUrlToTag)
+                .onChange(async value => {
+                    this._data.issueUrlToTag = value
+                    await this.saveSettings()
+                }))
+
+        new Setting(containerEl)
+            .setName('Inline issue prefix')
+            .setDesc(`Prefix to use when rendering inline issues. Keep this field empty to disable this feature. Example: ${this._data.inlineIssuePrefix}AAA-123`)
+            .addText(text => text
+                .setValue(this._data.inlineIssuePrefix)
+                .onChange(async value => {
+                    this._data.inlineIssuePrefix = value
+                    await this.saveSettings()
+                }))
+
 
 
         containerEl.createEl('h2', { text: 'Search columns' })
@@ -273,5 +286,18 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 this.display()
             })
         )
+
+
+        containerEl.createEl('h2', { text: 'Cache' })
+        new Setting(containerEl)
+            .setName('Cache time')
+            .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
+            .addText(text => text
+                .setPlaceholder('Example: 15m, 24h, 5s')
+                .setValue(this._data.cacheTime)
+                .onChange(async value => {
+                    this._data.cacheTime = value
+                    await this.saveSettings()
+                }))
     }
 }

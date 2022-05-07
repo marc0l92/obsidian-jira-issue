@@ -1,15 +1,24 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
-import { JiraClient } from './jiraClient'
+import { JiraClient } from './client/jiraClient'
 import { ObjectsCache } from './objectsCache'
-import { JiraIssueProcessor } from './processor'
-import { SearchWizardModal } from './searchWizardModal'
+import { CountFenceRenderer } from './rendering/countFenceRenderer'
+import { InlineIssueRenderer } from './rendering/inlineIssueRenderer'
+import { IssueFenceRenderer } from './rendering/issueFenceRenderer'
+import { RenderingCommon } from './rendering/renderingCommon'
+import { SearchFenceRenderer } from './rendering/searchFenceRenderer'
+import { SearchWizardModal } from './rendering/searchWizardModal'
 import { JiraIssueSettingsTab } from './settings'
 
 // TODO: jira issue inline
+// TODO: text on mobile and implement horizontal scrolling
 
 export default class JiraIssuePlugin extends Plugin {
     _settings: JiraIssueSettingsTab
-    _processor: JiraIssueProcessor
+    _renderingCommon: RenderingCommon
+    _issueFenceRenderer: IssueFenceRenderer
+    _searchFenceRenderer: SearchFenceRenderer
+    _countFenceRenderer: CountFenceRenderer
+    _inlineIssueRenderer: InlineIssueRenderer
     _cache: ObjectsCache
     _client: JiraClient
 
@@ -23,11 +32,15 @@ export default class JiraIssuePlugin extends Plugin {
             this._client.updateCustomFieldsCache()
         })
         this._client = new JiraClient(this._settings.getData())
-        this._processor = new JiraIssueProcessor(this._settings.getData(), this._client, this._cache, this.app.vault)
-        this.registerMarkdownCodeBlockProcessor('jira-issue', this._processor.issueFence.bind(this._processor))
-        this.registerMarkdownCodeBlockProcessor('jira-search', this._processor.searchResultsFence.bind(this._processor))
-        this.registerMarkdownCodeBlockProcessor('jira-count', this._processor.searchCountFence.bind(this._processor))
-        // this.registerMarkdownPostProcessor(this._processor.issueInline.bind(this._processor))
+        this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app.vault)
+        this._issueFenceRenderer = new IssueFenceRenderer(this._renderingCommon, this._client, this._cache)
+        this.registerMarkdownCodeBlockProcessor('jira-issue', this._issueFenceRenderer.render.bind(this._issueFenceRenderer))
+        this._searchFenceRenderer = new SearchFenceRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
+        this.registerMarkdownCodeBlockProcessor('jira-search', this._searchFenceRenderer.render.bind(this._searchFenceRenderer))
+        this._countFenceRenderer = new CountFenceRenderer(this._renderingCommon, this._client, this._cache)
+        this.registerMarkdownCodeBlockProcessor('jira-count', this._countFenceRenderer.render.bind(this._countFenceRenderer))
+        // this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._client, this._cache)
+        // this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
@@ -68,7 +81,11 @@ export default class JiraIssuePlugin extends Plugin {
         this._settings = null
         this._cache = null
         this._client = null
-        this._processor = null
+        this._renderingCommon = null
+        this._issueFenceRenderer = null
+        this._searchFenceRenderer = null
+        this._countFenceRenderer = null
+        this._inlineIssueRenderer = null
     }
 }
 

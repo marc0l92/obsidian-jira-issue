@@ -1,6 +1,6 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraIssue, IJiraSearchResults } from './interfaces'
-import { EAuthenticationTypes, IJiraIssueSettings } from "./settings"
+import { IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
+import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
 
 export class JiraClient {
     private _settings: IJiraIssueSettings

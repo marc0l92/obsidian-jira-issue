@@ -1,7 +1,7 @@
 import { TFile } from "obsidian"
-import { IJiraIssue } from "./interfaces"
-import { JiraIssueProcessor, JIRA_STATUS_COLOR_MAP } from "./processor"
-import { ESearchColumnsTypes, ISearchColumn } from "./searchView"
+import { IJiraIssue } from "../client/jiraInterfaces"
+import { JIRA_STATUS_COLOR_MAP, RenderingCommon } from "./renderingCommon"
+import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -13,14 +13,14 @@ function dateToStr(fullDate: string): string {
     return fullDate
 }
 
-export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement, processor: JiraIssueProcessor): void => {
+export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement, renderingCommon: RenderingCommon): void => {
     let markdownNotes: TFile[] = null
     for (const column of columns) {
         switch (column.type) {
             case ESearchColumnsTypes.KEY:
                 createEl('a', {
                     cls: 'no-wrap',
-                    href: processor.issueUrl(issue.key),
+                    href: renderingCommon.issueUrl(issue.key),
                     text: column.compact ? '🔗' : issue.key,
                     title: column.compact ? issue.key : '',
                     parent: createEl('td', { parent: row })
@@ -202,7 +202,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
             //     break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
-                    markdownNotes = processor.getNotes()
+                    markdownNotes = renderingCommon.getNotes()
                 }
                 const noteCell = createEl('td', { parent: row })
                 const connectedNotes = markdownNotes.filter(n => n.name.startsWith(issue.key))

@@ -1,6 +1,6 @@
 import { App, Modal, Setting } from "obsidian"
-import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION, SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION } from "./searchView"
-import { IJiraIssueSettings } from "./settings"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION, SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION } from "../searchView"
+import { IJiraIssueSettings } from "../settings"
 
 
 export class SearchWizardModal extends Modal {
