@@ -1,4 +1,4 @@
-import { TFile, Vault } from "obsidian"
+import { App, TFile } from "obsidian"
 import { IJiraIssue } from "src/client/jiraInterfaces"
 import { SearchView } from "src/searchView"
 import { IJiraIssueSettings } from "src/settings"
@@ -13,11 +13,11 @@ export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
 
 export class RenderingCommon {
     private _settings: IJiraIssueSettings
-    private _vault: Vault
+    private _app: App
 
-    constructor(settings: IJiraIssueSettings, vault: Vault) {
+    constructor(settings: IJiraIssueSettings, app: App) {
         this._settings = settings
-        this._vault = vault
+        this._app = app
     }
 
     public issueUrl(issueKey: string): string {
@@ -34,7 +34,11 @@ export class RenderingCommon {
     }
 
     public getNotes(): TFile[] {
-        return this._vault.getMarkdownFiles()
+        return this._app.vault.getMarkdownFiles()
+    }
+
+    public getFrontMatter(file: TFile): any {
+        return this._app.metadataCache.getFileCache(file).frontmatter
     }
 
     public renderContainer(children: HTMLElement[]): HTMLElement {

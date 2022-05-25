@@ -64,8 +64,7 @@ export class SearchFenceRenderer {
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
         const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
         for (const column of columns) {
-            // const name = column.type !== ESearchColumnsTypes.CUSTOM ? SEARCH_COLUMNS_DESCRIPTION[column.type] : column.customField
-            const name = SEARCH_COLUMNS_DESCRIPTION[column.type]
+            const name = column.customField ? column.customField : SEARCH_COLUMNS_DESCRIPTION[column.type]
             if (column.compact) {
                 createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })
             } else {

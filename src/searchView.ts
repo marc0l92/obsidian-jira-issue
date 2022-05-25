@@ -100,7 +100,7 @@ export class SearchView {
                     break
                 }
 
-                switch (key) {
+                switch (key.toLowerCase()) {
                     case 'type':
                         value = value.trim()
                         if (value.toUpperCase() in ESearchResultsRenderingTypes) {
@@ -120,18 +120,27 @@ export class SearchView {
                         }
                         break
                     case 'columns':
-                        this.columns = value.split(',').map(column => {
-                            const compact = column.trim().startsWith('#')
-                            column = column.trim().replace('#', '').toUpperCase()
-                            if (!(column in ESearchColumnsTypes)) {
-                                throw new Error(`Invalid column: ${column}`)
-                            }
-                            return {
-                                type: column as ESearchColumnsTypes,
-                                compact: compact,
-                                customField: '',
-                            }
-                        })
+                        this.columns = value.split(',')
+                            .filter(column => column.trim())
+                            .map(column => {
+                                let customField = ''
+                                const compact = column.trim().startsWith('#')
+                                column = column.trim().replace('#', '')
+                                if (column.toUpperCase().startsWith('NOTES.')) {
+                                    const split = column.split('.')
+                                    column = split.splice(0, 1)[0]
+                                    customField = split.join('.')
+                                }
+                                column = column.toUpperCase()
+                                if (!(column in ESearchColumnsTypes)) {
+                                    throw new Error(`Invalid column: ${column}`)
+                                }
+                                return {
+                                    type: column as ESearchColumnsTypes,
+                                    compact: compact,
+                                    customField: customField,
+                                }
+                            })
                         break
                     default:
                         throw new Error(`Invalid key: ${key}`)

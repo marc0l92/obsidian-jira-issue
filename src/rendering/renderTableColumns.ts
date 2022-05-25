@@ -2,6 +2,7 @@ import { TFile } from "obsidian"
 import { IJiraIssue } from "../client/jiraInterfaces"
 import { JIRA_STATUS_COLOR_MAP, RenderingCommon } from "./renderingCommon"
 import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
+import * as jsonpath from 'jsonpath'
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -208,13 +209,10 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 const connectedNotes = markdownNotes.filter(n => n.name.startsWith(issue.key))
                 if (connectedNotes.length > 0) {
                     for (const note of connectedNotes) {
-                        if (column.compact) {
-                            createEl('a', { text: '📝', title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
+                        if (column.customField) {
+                            renderNoteFrontMatter(column, note, noteCell, renderingCommon)
                         } else {
-                            let noteNameWithoutExtension = note.name.split('.')
-                            noteNameWithoutExtension.pop()
-                            createEl('a', { text: noteNameWithoutExtension.join('.'), title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
-                            createEl('br', { parent: noteCell })
+                            renderNoteFile(column, note, noteCell)
                         }
                     }
                 } else {
@@ -222,5 +220,26 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 }
                 break
         }
+    }
+}
+
+function renderNoteFile(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement) {
+    if (column.compact) {
+        createEl('a', { text: '📝', title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
+    } else {
+        let noteNameWithoutExtension = note.name.split('.')
+        noteNameWithoutExtension.pop()
+        createEl('a', { text: noteNameWithoutExtension.join('.'), title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
+        createEl('br', { parent: noteCell })
+    }
+}
+
+function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement, renderingCommon: RenderingCommon) {
+    const frontMatter = renderingCommon.getFrontMatter(note)
+    const values = jsonpath.query(frontMatter, '$.' + column.customField)
+    for (let value of values) {
+        value = typeof value === 'object' ? JSON.stringify(value) : value.toString()
+        createEl('a', { text: value, title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
+        createEl('br', { parent: noteCell })
     }
 }

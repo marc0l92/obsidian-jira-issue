@@ -32,7 +32,7 @@ export default class JiraIssuePlugin extends Plugin {
             this._client.updateCustomFieldsCache()
         })
         this._client = new JiraClient(this._settings.getData())
-        this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app.vault)
+        this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
         this._issueFenceRenderer = new IssueFenceRenderer(this._renderingCommon, this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._issueFenceRenderer.render.bind(this._issueFenceRenderer))
         this._searchFenceRenderer = new SearchFenceRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
@@ -74,7 +74,6 @@ export default class JiraIssuePlugin extends Plugin {
                 editor.replaceRange('```jira-count\n\n```', editor.getCursor())
             }
         })
-
     }
 
     onunload() {
