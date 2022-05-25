@@ -112,6 +112,14 @@ Example:
 
 ![Notes Column](./doc/notesColumn.png)
 
+You can also access the frontmatter section of the note using the jsonpath syntax after the column `NOTES`. Example:
+
+```jira-search
+query: key = OPEN-357
+columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0]
+```
+
+
 ## Inline issues
 This plugin allows you to detect inline issue and render them inside your text without creating a dedicated fence block. In the settings it is possible to configure the prefix used to identify inline issues and if you want to render url to issues.
 
