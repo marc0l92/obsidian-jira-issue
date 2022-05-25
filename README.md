@@ -18,6 +18,8 @@ This plugin allows you to track the progress of [Atlassian Jira](https://www.atl
 
 <!-- /TOC -->
 
+<a href="https://www.buymeacoffee.com/marc0l92"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=marc0l92&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" /></a>
+
 ![issues](./doc/issues.png)
 
 ![searchResults](./doc/searchResults2.png)
