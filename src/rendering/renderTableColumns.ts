@@ -14,6 +14,26 @@ function dateToStr(fullDate: string): string {
     return fullDate
 }
 
+function deltaToStr(delta: number): string {
+    if (delta) {
+        const h = Math.floor(delta / 3600);
+        const m = Math.floor(delta % 3600 / 60);
+        const s = Math.floor(delta % 3600 % 60);
+        let timeStr = ''
+        if (h > 0) {
+            timeStr += h + 'h'
+        }
+        if (m > 0) {
+            timeStr += m + 'm'
+        }
+        if (s > 0) {
+            timeStr += s + 's'
+        }
+        return timeStr
+    }
+    return ''
+}
+
 export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement, renderingCommon: RenderingCommon): void => {
     let markdownNotes: TFile[] = null
     for (const column of columns) {
@@ -170,28 +190,22 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('td', { text: issue.fields.components.flatMap(c => c.name).join(', '), parent: row })
                 break
             case ESearchColumnsTypes.AGGREGATE_TIME_ESTIMATED:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.aggregatetimeestimate.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.aggregatetimeestimate), parent: row })
                 break
             case ESearchColumnsTypes.AGGREGATE_TIME_ORIGINAL_ESTIMATE:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.aggregatetimeoriginalestimate.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.aggregatetimeoriginalestimate), parent: row })
                 break
             case ESearchColumnsTypes.AGGREGATE_TIME_SPENT:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.aggregatetimespent.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.aggregatetimespent), parent: row })
                 break
             case ESearchColumnsTypes.TIME_ESTIMATE:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.timeestimate.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.timeestimate), parent: row })
                 break
             case ESearchColumnsTypes.TIME_ORIGINAL_ESTIMATE:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.timeoriginalestimate.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.timeoriginalestimate), parent: row })
                 break
             case ESearchColumnsTypes.TIME_SPENT:
-                // TODO: convert to human readable time
-                createEl('td', { text: issue.fields.timespent.toString(), parent: row })
+                createEl('td', { text: deltaToStr(issue.fields.timespent), parent: row })
                 break
             case ESearchColumnsTypes.AGGREGATE_PROGRESS:
                 createEl('td', { text: issue.fields.aggregateprogress.percent.toString() + '%', parent: row })
