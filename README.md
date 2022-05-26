@@ -18,7 +18,9 @@ This plugin allows you to track the progress of [Atlassian Jira](https://www.atl
 
 <!-- /TOC -->
 
-<a href='https://ko-fi.com/marc0l92' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee' /></a>
+<div style="display:inline-block;margin:10px 0">
+<a href='https://ko-fi.com/marc0l92' target='_blank' style="display:flex;justify-content:center;align-items:center;background:#FBAA19;color:#fff;border-radius:5px;padding:1px 10px;text-decoration:none"><img height='36' style='border:0px;height:36px;' src='https://uploads-ssl.webflow.com/5c14e387dab576fe667689cf/61e111774d3a2f67c827cd25_Frame%205.png' border='0' alt='' />Buy Me a Coffee</a></div>
+
 
 ![issues](./doc/issues.png)
 
