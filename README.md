@@ -129,9 +129,9 @@ This plugin allows you to detect inline issue and render them inside your text w
 Example:
 
     With inline issue you can insert an issue like JIRA:OPEN-351 inside your text. The plugin will detect urls like https://jira.secondlife.com/browse/OPEN-352 and render the issue as tags.
-    - [ ] Issue can be extended JIRA:OPEN-353 with the summary
-    - [ ] Or compact JIRA:#OPEN-354 without the summary
-    - [ ] JIRA:#OPEN-355 use the `#` symbol before the issue key to make it compact
+    - [x] Issue can be extended JIRA:OPEN-353 with the summary
+    - [x] Or compact JIRA:#OPEN-354 without the summary
+    - [x] JIRA:#OPEN-355 use the `#` symbol before the issue key to make it compact
     ```
     The plugin searches inside the note for those patterns and replace them
     JIRA:#OPEN-356

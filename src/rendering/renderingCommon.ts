@@ -25,8 +25,7 @@ export class RenderingCommon {
     }
 
     public searchUrl(searchQuery: string): string {
-        // TODO: find real url for search
-        return (new URL(`${this._settings.host}/issues?jql${searchQuery}`)).toString()
+        return (new URL(`${this._settings.host}/issues??filter=-4&jql${searchQuery}`)).toString()
     }
 
     public getTheme(): string {
