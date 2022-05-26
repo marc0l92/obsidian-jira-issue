@@ -31,7 +31,7 @@ export enum ESearchColumnsTypes {
     // LINKS = 'LINKS',  // Example with: key=STORM-1612
     LABELS = 'LABELS',
     COMPONENTS = 'COMPONENTS',
-    // LAST_VIEWED = 'LAST_VIEWED',
+    LAST_VIEWED = 'LAST_VIEWED',
     PROGRESS = 'PROGRESS',
     // SUBTASKS = 'SUBTASKS',
     TIME_ESTIMATE = 'TIME_ESTIMATE',
@@ -64,9 +64,9 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     // [ESearchColumnsTypes.LINKS]: 'Links',
     [ESearchColumnsTypes.LABELS]: 'Labels',
     [ESearchColumnsTypes.COMPONENTS]: 'Components',
-    // [ESearchColumnsTypes.LAST_VIEWED]: 'Last Viewed',
+    [ESearchColumnsTypes.LAST_VIEWED]: 'Last Viewed',
     [ESearchColumnsTypes.PROGRESS]: 'Progress',
-    // [ESearchColumnsTypes.SUBTASKS]: 'Subtasks',
+    // [ESearchColumnsTypes.SUBTASKS]: 'Subtasks', // TODO
     [ESearchColumnsTypes.TIME_ESTIMATE]: '🕑Estimate',
     [ESearchColumnsTypes.TIME_ORIGINAL_ESTIMATE]: '🕑Original Estimate',
     [ESearchColumnsTypes.TIME_SPENT]: '🕑Spent',

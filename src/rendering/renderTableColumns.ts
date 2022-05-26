@@ -233,6 +233,13 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link', parent: noteCell })
                 }
                 break
+            case ESearchColumnsTypes.LAST_VIEWED:
+                if (column.compact) {
+                    createEl('td', { text: '🕑', title: dateToStr(issue.fields.lastViewed), parent: row })
+                } else {
+                    createEl('td', { text: dateToStr(issue.fields.lastViewed), parent: row })
+                }
+                break
         }
     }
 }

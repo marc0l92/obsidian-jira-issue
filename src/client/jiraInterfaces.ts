@@ -67,6 +67,7 @@ export interface IJiraIssue {
         progress: {
             percent: number
         }
+        lastViewed: string
     }
 }
 
