@@ -105,6 +105,16 @@ Example:
     ```
 ![Compact Columns](./doc/compactColumns.png)
 
+Custom JIRA non standard column can be inserted using the `$` symbol.
+
+Example:
+    ```jira-search
+    query: key = OPEN-357
+    columns: key, summary, $12313422, $12313426, #$12313499
+    ```
+
+In the current implementation you must provide the custom column ID.
+
 ## Link notes to `jira-search` table
 
 The special column `NOTES` can be used with `jira-search` tables to create a column that shows all the notes that start with the issue key.
@@ -118,11 +128,11 @@ Example:
 
 ![Notes Column](./doc/notesColumn.png)
 
-You can also access the frontmatter section of the note using the jsonpath syntax after the column `NOTES`. Example:
+You can also access the frontmatter section of the note using the [jsonpath](https://github.com/dchester/jsonpath) syntax after the column `NOTES`. Example:
 
 ```jira-search
 query: key = OPEN-357
-columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0]
+columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0], notes..book[?(@.price<30 && @.category=="fiction")]
 ```
 
 
