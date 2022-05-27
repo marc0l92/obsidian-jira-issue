@@ -68,6 +68,7 @@ export interface IJiraIssue {
             percent: number
         }
         lastViewed: string
+        [k: string]: any
     }
 }
 

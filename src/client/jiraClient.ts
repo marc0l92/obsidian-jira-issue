@@ -103,7 +103,8 @@ export class JiraClient {
         )
         this._settings.customFieldsNames = {}
         for (const field of response) {
-            this._settings.customFieldsNames[field.id] = field.name
+            if(field.schema && field.schema.customId)
+            this._settings.customFieldsNames[field.schema.customId] = field.name
         }
     }
 }

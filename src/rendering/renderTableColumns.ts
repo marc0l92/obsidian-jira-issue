@@ -213,8 +213,9 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
             case ESearchColumnsTypes.PROGRESS:
                 createEl('td', { text: issue.fields.progress.percent.toString() + '%', parent: row })
                 break
-            // case ESearchColumnsTypes.CUSTOM:
-            //     break
+            case ESearchColumnsTypes.CUSTOM_FIELD:
+                createEl('td', { text: issue.fields[`customfield_${column.customField}`].toString(), parent: row })
+                break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
                     markdownNotes = renderingCommon.getNotes()

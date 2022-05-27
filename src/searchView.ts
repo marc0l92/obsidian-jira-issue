@@ -38,7 +38,7 @@ export enum ESearchColumnsTypes {
     TIME_ORIGINAL_ESTIMATE = 'TIME_ORIGINAL_ESTIMATE',
     TIME_SPENT = 'TIME_SPENT',
 
-    // CUSTOM_FIELD = 'CUSTOM_FIELD',
+    CUSTOM_FIELD = 'CUSTOM_FIELD',
     NOTES = 'NOTES',
 }
 export const SEARCH_COLUMNS_DESCRIPTION = {
@@ -71,7 +71,7 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.TIME_ORIGINAL_ESTIMATE]: '🕑Original Estimate',
     [ESearchColumnsTypes.TIME_SPENT]: '🕑Spent',
 
-    // [ESearchColumnsTypes.CUSTOM]: 'Custom',
+    [ESearchColumnsTypes.CUSTOM_FIELD]: 'Custom field',
     [ESearchColumnsTypes.NOTES]: 'Notes',
 }
 
@@ -124,13 +124,21 @@ export class SearchView {
                             .filter(column => column.trim())
                             .map(column => {
                                 let customField = ''
+                                // Compact
                                 const compact = column.trim().startsWith('#')
-                                column = column.trim().replace('#', '')
+                                column = column.trim().replace(/^#/, '')
+                                // Frontmatter
                                 if (column.toUpperCase().startsWith('NOTES.')) {
                                     const split = column.split('.')
                                     column = split.splice(0, 1)[0]
                                     customField = split.join('.')
                                 }
+                                // Custom field
+                                if (column.toUpperCase().startsWith('$')) {
+                                    customField = column.slice(1)
+                                    column = ESearchColumnsTypes.CUSTOM_FIELD
+                                }
+                                // Check validity
                                 column = column.toUpperCase()
                                 if (!(column in ESearchColumnsTypes)) {
                                     throw new Error(`Invalid column: ${column}`)

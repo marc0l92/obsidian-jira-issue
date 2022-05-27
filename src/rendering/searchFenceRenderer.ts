@@ -3,7 +3,7 @@ import { createProxy, IJiraIssue, IJiraSearchResults } from "../client/jiraInter
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
-import { ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "../searchView"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "../searchView"
 import { IJiraIssueSettings } from "../settings"
 import { RenderingCommon } from "./renderingCommon"
 
@@ -64,7 +64,15 @@ export class SearchFenceRenderer {
         const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
         const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
         for (const column of columns) {
-            const name = column.customField ? column.customField : SEARCH_COLUMNS_DESCRIPTION[column.type]
+            let name = SEARCH_COLUMNS_DESCRIPTION[column.type]
+            // Frontmatter
+            if (column.type === ESearchColumnsTypes.NOTES && column.customField) {
+                name = column.customField
+            }
+            // Custom field
+            if (column.type === ESearchColumnsTypes.CUSTOM_FIELD) {
+                name = this._settings.customFieldsNames[column.customField]
+            }
             if (column.compact) {
                 createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })
             } else {
