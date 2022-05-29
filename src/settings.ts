@@ -13,6 +13,8 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
+export const COMPACT_SYMBOL = '-'
+
 export interface IJiraIssueSettings {
     host: string
     authenticationType: EAuthenticationTypes

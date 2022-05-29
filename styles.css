@@ -349,3 +349,17 @@ th {
     width: 16px;
     height: 16px;
 }
+
+.jira-issue-suggestion {
+    font-size: small;
+    margin-right: 5px;
+}
+.jira-issue-suggestion:last-child {
+    margin-right: 0;
+}
+.jira-issue-suggestion.is-compact {
+    color: green;
+}
+.jira-issue-suggestion.is-custom-field {
+    color: orange;
+}

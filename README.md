@@ -75,7 +75,7 @@ Example:
     type: TABLE
     query: status = 'In Progress' order by priority DESC
     limit: 15
-    columns: KEY, SUMMARY, #ASSIGNEE, #REPORTER, STATUS
+    columns: KEY, SUMMARY, -ASSIGNEE, -REPORTER, STATUS
     ```
 
 ### 🔢`jira-count`
@@ -95,13 +95,13 @@ Available columns extracted from the Jira issue:
     TIME_ESTIMATE, TIME_ORIGINAL_ESTIMATE, TIME_SPENT, AGGREGATE_PROGRESS, PROGRESS, LAST_VIEWED
 
 - Columns names are case insensitive.
-- If the column starts with `#`, the compact mode is used.
+- If the column starts with `-`, the compact mode is used.
 
 Example:
 
     ```jira-search
     query: key = OPEN-357
-    columns: key, #key, type, #type, reporter, #reporter, created, #created
+    columns: key, -key, type, -type, reporter, -reporter, created, -created
     ```
 ![Compact Columns](./doc/compactColumns.png)
 
@@ -110,7 +110,7 @@ JIRA non standard column (custom fields) can be inserted using the `$` symbol.
 Example:
     ```jira-search
     query: key = OPEN-357
-    columns: key, summary, $12313422, $12313426, #$12313499, $Epic Link, $Global Rank
+    columns: key, summary, $12313422, $12313426, -$12313499, $Epic Link, $Global Rank
     ```
 
 It is possible to provide the ID number of the custom field or its name.
@@ -143,11 +143,11 @@ Example:
 
     With inline issue you can insert an issue like JIRA:OPEN-351 inside your text. The plugin will detect urls like https://jira.secondlife.com/browse/OPEN-352 and render the issue as tags.
     - [x] Issue can be extended JIRA:OPEN-353 with the summary
-    - [x] Or compact JIRA:#OPEN-354 without the summary
-    - [x] JIRA:#OPEN-355 use the `#` symbol before the issue key to make it compact
+    - [x] Or compact JIRA:-OPEN-354 without the summary
+    - [x] JIRA:-OPEN-355 use the `-` symbol before the issue key to make it compact
     ```
     The plugin searches inside the note for those patterns and replace them
-    JIRA:#OPEN-356
+    JIRA:-OPEN-356
     ```
 
 ![Inline issues](./doc/inlineIssues.png)

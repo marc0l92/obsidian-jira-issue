@@ -154,6 +154,18 @@
         .jira-issue-container .table.is-hoverable.is-dark tbody tr:not(.is-selected):hover {
             background-color: #141414;
         }
+
+        .jira-issue-suggestion {
+            font-size: small;
+        }
+
+        .jira-issue-compact {
+            color: blue;
+        }
+
+        .jira-issue-custom-field {
+            color: red;
+        }
     </style>
 </head>
 
@@ -314,6 +326,12 @@
                     </tr>
                 </tbody>
             </table>
+
+        </div>
+        <div class="container">
+            <span class="jira-issue-suggestion jira-issue-compact">#</span>
+            <span class="jira-issue-suggestion jira-issue-custom-field">$</span>
+            <span class="jira-issue-suggestion">Epic link</span>
         </div>
     </section>
     <section class="section" style="background-color: #202020;">

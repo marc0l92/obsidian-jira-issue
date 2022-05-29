@@ -1,6 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
 import { JiraClient } from './client/jiraClient'
 import { ObjectsCache } from './objectsCache'
+import { ColumnsSuggest } from './rendering/columnsSugget'
 import { CountFenceRenderer } from './rendering/countFenceRenderer'
 import { InlineIssueRenderer } from './rendering/inlineIssueRenderer'
 import { IssueFenceRenderer } from './rendering/issueFenceRenderer'
@@ -21,6 +22,7 @@ export default class JiraIssuePlugin extends Plugin {
     _inlineIssueRenderer: InlineIssueRenderer
     _cache: ObjectsCache
     _client: JiraClient
+    _columnsSuggest: ColumnsSuggest
 
     async onload() {
         this._settings = new JiraIssueSettingsTab(this.app, this)
@@ -42,6 +44,10 @@ export default class JiraIssuePlugin extends Plugin {
         this.registerMarkdownCodeBlockProcessor('jira-count', this._countFenceRenderer.render.bind(this._countFenceRenderer))
         this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
         this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
+        this.app.workspace.onLayoutReady(() => {
+            this._columnsSuggest = new ColumnsSuggest(this.app, this._settings.getData())
+            this.registerEditorSuggest(this._columnsSuggest)
+        })
 
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
@@ -86,6 +92,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._searchFenceRenderer = null
         this._countFenceRenderer = null
         this._inlineIssueRenderer = null
+        this._columnsSuggest = null
     }
 }
 

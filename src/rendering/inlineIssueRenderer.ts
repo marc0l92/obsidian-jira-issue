@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext } from "obsidian"
 import { JiraClient } from "src/client/jiraClient"
 import { IJiraIssue } from "src/client/jiraInterfaces"
 import { ObjectsCache } from "src/objectsCache"
-import { IJiraIssueSettings } from "../settings"
+import { COMPACT_SYMBOL, IJiraIssueSettings } from "../settings"
 import { RenderingCommon } from "./renderingCommon"
 
 
@@ -46,7 +46,7 @@ export class InlineIssueRenderer {
     private convertInlineIssuesToTags(el: HTMLElement): void {
         if (this._settings.inlineIssuePrefix) {
             let match
-            while (match = new RegExp(`${this._settings.inlineIssuePrefix}(#?)([A-Z0-9]+-[0-9]+)`).exec(el.innerHTML)) {
+            while (match = new RegExp(`${this._settings.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`).exec(el.innerHTML)) {
                 console.log({ match })
                 const compact = !!match[1]
                 const issueKey = match[2]

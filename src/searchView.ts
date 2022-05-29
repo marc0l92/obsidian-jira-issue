@@ -1,4 +1,4 @@
-import { IJiraIssueSettings } from "./settings"
+import { COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
 
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
@@ -96,11 +96,11 @@ export class SearchView {
 
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
-            if (line && !line.trimStart().startsWith('#')) {
+            if (line && !line.trimStart().startsWith(COMPACT_SYMBOL)) {
                 let [key, ...values] = line.split(':')
                 const value = values.join(':').trim()
 
-                switch (key.toLowerCase()) {
+                switch (key.trim().toLowerCase()) {
                     case 'type':
                         if (value.toUpperCase() in ESearchResultsRenderingTypes) {
                             this.type = value.toUpperCase() as ESearchResultsRenderingTypes
@@ -124,8 +124,8 @@ export class SearchView {
                             .map(column => {
                                 let columnExtra = ''
                                 // Compact
-                                const compact = column.trim().startsWith('#')
-                                column = column.trim().replace(/^#/, '')
+                                const compact = column.trim().startsWith(COMPACT_SYMBOL)
+                                column = column.trim().replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
                                 // Frontmatter
                                 if (column.toUpperCase().startsWith('NOTES.')) {
                                     const split = column.split('.')
@@ -145,7 +145,7 @@ export class SearchView {
                                     } else {
                                         // Custom field provided as name
                                         columnExtra = this._settings.customFieldsNameToId[customFieldInput]
-                                        if(!columnExtra){
+                                        if (!columnExtra) {
                                             throw new Error(`Custom field with name "${customFieldInput}" not found`)
                                         }
                                     }
@@ -153,6 +153,9 @@ export class SearchView {
                                 // Check validity
                                 column = column.toUpperCase()
                                 if (!(column in ESearchColumnsTypes)) {
+                                    if(column.startsWith('#')){
+                                        throw new Error(`Please replace the symbol "#" with "${COMPACT_SYMBOL}" to use the compact format`)
+                                    }
                                     throw new Error(`Invalid column: ${column}`)
                                 }
                                 return {
@@ -181,7 +184,7 @@ export class SearchView {
             result += `limit: ${this.limit}\n`
         }
         if (this.columns.length > 0) {
-            result += `columns: ${this.columns.map(c => (c.compact ? '#' : '') + c.type).join(', ')}\n`
+            result += `columns: ${this.columns.map(c => (c.compact ? COMPACT_SYMBOL : '') + c.type).join(', ')}\n`
         }
         return result + '```'
     }
