@@ -105,15 +105,15 @@ Example:
     ```
 ![Compact Columns](./doc/compactColumns.png)
 
-Custom JIRA non standard column can be inserted using the `$` symbol.
+JIRA non standard column (custom fields) can be inserted using the `$` symbol.
 
 Example:
     ```jira-search
     query: key = OPEN-357
-    columns: key, summary, $12313422, $12313426, #$12313499
+    columns: key, summary, $12313422, $12313426, #$12313499, $Epic Link, $Global Rank
     ```
 
-In the current implementation you must provide the custom column ID.
+It is possible to provide the ID number of the custom field or its name.
 
 ## Link notes to `jira-search` table
 
