@@ -17,21 +17,17 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
     }
 
     onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null {
-        console.log('0')
         // console.log('onTrigger', { cursor, editor, file })
         const cursorLine = editor.getLine(cursor.line)
         // check line contains prefix "columns:"
-        console.log('1')
         if (!cursorLine.match(/^\s*columns\s*:/)) {
             return null
         }
         // check cursor is after "columns:"
-        console.log('2')
         if (!cursorLine.substring(0, cursor.ch).match(/^\s*columns\s*:/)) {
             return null
         }
         // check cursor inside jira-search fence
-        console.log('3')
         let jiraSearchFenceStartFound = false
         for (let i = cursor.line - 1; i >= 0; i--) {
             const line = editor.getLine(i)
@@ -40,11 +36,9 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
                 break
             }
         }
-        console.log('4')
         if (!jiraSearchFenceStartFound) {
             return null
         }
-        console.log('continue')
 
         const strBeforeCursor = cursorLine.substring(0, cursor.ch)
         const strAfterColumnsKey = strBeforeCursor.split(':').slice(1).join(':')
@@ -62,8 +56,6 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
         let query = context.query.trim().toUpperCase()
         const isCompact = query.startsWith(COMPACT_SYMBOL)
         query = query.replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
-
-        console.log(query)
 
         // Standard fields
         if (!query.startsWith('$')) {

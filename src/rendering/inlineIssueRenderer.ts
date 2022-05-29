@@ -21,7 +21,7 @@ export class InlineIssueRenderer {
     }
 
     async render(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-        console.log({ el })
+        // console.log({ el })
         this.convertInlineIssuesToTags(el)
         this.convertInlineIssuesUrlToTags(el)
 
@@ -47,7 +47,7 @@ export class InlineIssueRenderer {
         if (this._settings.inlineIssuePrefix) {
             let match
             while (match = new RegExp(`${this._settings.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`).exec(el.innerHTML)) {
-                console.log({ match })
+                // console.log({ match })
                 const compact = !!match[1]
                 const issueKey = match[2]
                 const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': compact } })
