@@ -23,7 +23,7 @@ export class SearchFenceRenderer {
     async render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         // console.log(`Search query: ${source}`)
         try {
-            const searchView = new SearchView().fromString(source)
+            const searchView = new SearchView(this._settings).fromString(source)
             let searchResults: IJiraSearchResults = this._cache.get(searchView.query + searchView.limit)
             if (!searchResults) {
                 // console.log(`Search results not available in the cache`)
@@ -66,12 +66,12 @@ export class SearchFenceRenderer {
         for (const column of columns) {
             let name = SEARCH_COLUMNS_DESCRIPTION[column.type]
             // Frontmatter
-            if (column.type === ESearchColumnsTypes.NOTES && column.customField) {
-                name = column.customField
+            if (column.type === ESearchColumnsTypes.NOTES && column.extra) {
+                name = column.extra
             }
             // Custom field
             if (column.type === ESearchColumnsTypes.CUSTOM_FIELD) {
-                name = this._settings.customFieldsNames[column.customField]
+                name = this._settings.customFieldsIdToName[column.extra]
             }
             if (column.compact) {
                 createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })

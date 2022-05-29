@@ -214,7 +214,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('td', { text: issue.fields.progress.percent.toString() + '%', parent: row })
                 break
             case ESearchColumnsTypes.CUSTOM_FIELD:
-                createEl('td', { text: issue.fields[`customfield_${column.customField}`].toString(), parent: row })
+                createEl('td', { text: issue.fields[`customfield_${column.extra}`].toString(), parent: row })
                 break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
@@ -224,7 +224,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 const connectedNotes = markdownNotes.filter(n => n.name.startsWith(issue.key))
                 if (connectedNotes.length > 0) {
                     for (const note of connectedNotes) {
-                        if (column.customField) {
+                        if (column.extra) {
                             renderNoteFrontMatter(column, note, noteCell, renderingCommon)
                         } else {
                             renderNoteFile(column, note, noteCell)
@@ -258,7 +258,7 @@ function renderNoteFile(column: ISearchColumn, note: TFile, noteCell: HTMLTableC
 
 function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement, renderingCommon: RenderingCommon) {
     const frontMatter = renderingCommon.getFrontMatter(note)
-    const values = jsonpath.query(frontMatter, '$.' + column.customField)
+    const values = jsonpath.query(frontMatter, '$.' + column.extra)
     for (let value of values) {
         value = typeof value === 'object' ? JSON.stringify(value) : value.toString()
         createEl('a', { text: value, title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })

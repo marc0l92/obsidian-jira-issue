@@ -91,6 +91,16 @@ export interface IJiraSearchResults {
     total: number
 }
 
+export interface IJiraField {
+    custom: boolean
+    id: string
+    name: string
+    schema: {
+        customId: number
+        type: string
+    }
+}
+
 export function createProxy<T extends object>(obj: T): T {
     const proxy = new Proxy<T>(obj, {
         get: (target: T, p: string, receiver: any) => {

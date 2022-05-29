@@ -1,3 +1,5 @@
+import { IJiraIssueSettings } from "./settings"
+
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
     LIST = 'LIST',
@@ -78,7 +80,7 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
 export interface ISearchColumn {
     type: ESearchColumnsTypes
     compact: boolean
-    customField?: string
+    extra?: string
 }
 
 export class SearchView {
@@ -86,23 +88,20 @@ export class SearchView {
     query: string = ''
     limit: string = ''
     columns: ISearchColumn[] = []
+    private _settings: IJiraIssueSettings
+
+    constructor(settings: IJiraIssueSettings) {
+        this._settings = settings
+    }
 
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
             if (line && !line.trimStart().startsWith('#')) {
-                let [key, value] = line.split(':')
-
-                if (!value) {
-                    this.type = ESearchResultsRenderingTypes.TABLE
-                    this.query = str
-                    this.limit = ''
-                    this.columns = []
-                    break
-                }
+                let [key, ...values] = line.split(':')
+                const value = values.join(':').trim()
 
                 switch (key.toLowerCase()) {
                     case 'type':
-                        value = value.trim()
                         if (value.toUpperCase() in ESearchResultsRenderingTypes) {
                             this.type = value.toUpperCase() as ESearchResultsRenderingTypes
                         } else {
@@ -123,7 +122,7 @@ export class SearchView {
                         this.columns = value.split(',')
                             .filter(column => column.trim())
                             .map(column => {
-                                let customField = ''
+                                let columnExtra = ''
                                 // Compact
                                 const compact = column.trim().startsWith('#')
                                 column = column.trim().replace(/^#/, '')
@@ -131,12 +130,25 @@ export class SearchView {
                                 if (column.toUpperCase().startsWith('NOTES.')) {
                                     const split = column.split('.')
                                     column = split.splice(0, 1)[0]
-                                    customField = split.join('.')
+                                    columnExtra = split.join('.')
                                 }
                                 // Custom field
                                 if (column.toUpperCase().startsWith('$')) {
-                                    customField = column.slice(1)
+                                    const customFieldInput = column.slice(1)
                                     column = ESearchColumnsTypes.CUSTOM_FIELD
+                                    if (Number(customFieldInput)) {
+                                        // Custom field provided as number
+                                        if (!(customFieldInput in this._settings.customFieldsIdToName)) {
+                                            throw new Error(`Custom field with id ${customFieldInput} not found`)
+                                        }
+                                        columnExtra = customFieldInput
+                                    } else {
+                                        // Custom field provided as name
+                                        columnExtra = this._settings.customFieldsNameToId[customFieldInput]
+                                        if(!columnExtra){
+                                            throw new Error(`Custom field with name "${customFieldInput}" not found`)
+                                        }
+                                    }
                                 }
                                 // Check validity
                                 column = column.toUpperCase()
@@ -146,7 +158,7 @@ export class SearchView {
                                 return {
                                     type: column as ESearchColumnsTypes,
                                     compact: compact,
-                                    customField: customField,
+                                    extra: columnExtra,
                                 }
                             })
                         break
@@ -154,6 +166,9 @@ export class SearchView {
                         throw new Error(`Invalid key: ${key}`)
                 }
             }
+        }
+        if (this.type === ESearchResultsRenderingTypes.LIST && this.columns.length > 0) {
+            throw new Error('type LIST and custom columns are not compatible options')
         }
         return this
     }

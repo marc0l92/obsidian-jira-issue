@@ -12,7 +12,7 @@ export class SearchWizardModal extends Modal {
         super(app)
         this._settings = settings
         this._onSubmit = onSubmit
-        this._searchView = new SearchView()
+        this._searchView = new SearchView(this._settings)
     }
 
     onOpen() {
@@ -60,6 +60,7 @@ export class SearchWizardModal extends Modal {
                     }).selectEl.addClass('flex-grow-1')
                 )
 
+            // TODO: add support for custom fields
             // if (column.type === ESearchColumnsTypes.CUSTOM) {
             //     setting.addText(text => text
             //         .setPlaceholder('Custom field name')

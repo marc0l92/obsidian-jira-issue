@@ -23,7 +23,8 @@ export interface IJiraIssueSettings {
     cacheTime: string
     searchResultsLimit: number
     statusColorCache: Record<string, string>
-    customFieldsNames: Record<string, string>
+    customFieldsIdToName: Record<string, string>
+    customFieldsNameToId: Record<string, string>
     darkMode: boolean
     inlineIssueUrlToTag: boolean
     inlineIssuePrefix: string
@@ -38,7 +39,8 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     cacheTime: '15m',
     searchResultsLimit: 10,
     statusColorCache: {},
-    customFieldsNames: {},
+    customFieldsIdToName: {},
+    customFieldsNameToId: {},
     darkMode: false,
     inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',

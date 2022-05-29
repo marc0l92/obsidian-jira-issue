@@ -1,5 +1,5 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
+import { IJiraField, IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
 
 export class JiraClient {
@@ -38,16 +38,16 @@ export class JiraClient {
             response = await requestUrl(options)
         } catch (e) {
             console.error('JiraClient::response', e)
-            throw 'Request error'
+            throw new Error('Request error')
         }
         console.info('response', response)
 
         if (response.status !== 200) {
             // console.log(response.headers)
             if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
-                throw response.json.errorMessages.join('\n')
+                throw new Error(response.json.errorMessages.join('\n'))
             } else {
-                throw 'HTTP status ' + response.status
+                throw new Error(`HTTP status ${response.status}`)
             }
         }
 
@@ -94,17 +94,19 @@ export class JiraClient {
     }
 
     async updateCustomFieldsCache(): Promise<void> {
-        const response = await this.sendRequest(
+        const response: IJiraField[] = await this.sendRequest(
             {
                 url: this.buildUrl(`/field`),
                 method: 'GET',
                 headers: this.buildHeaders(),
             }
         )
-        this._settings.customFieldsNames = {}
+        this._settings.customFieldsIdToName = {}
         for (const field of response) {
-            if(field.schema && field.schema.customId)
-            this._settings.customFieldsNames[field.schema.customId] = field.name
+            if (field.custom && field.schema && field.schema.customId) {
+                this._settings.customFieldsIdToName[field.schema.customId] = field.name
+                this._settings.customFieldsNameToId[field.name] = field.schema.customId.toString()
+            }
         }
     }
 }
