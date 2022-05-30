@@ -1,4 +1,4 @@
-# Obsidian jira-issue
+# Obsidian jira-issue (CUSTOMIZED!!!)
 
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.
 
