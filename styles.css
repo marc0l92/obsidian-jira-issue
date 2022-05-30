@@ -363,3 +363,8 @@ th {
 .jira-issue-suggestion.is-custom-field {
     color: orange;
 }
+
+.jira-issue-inline-mark {
+    display: inline-block;
+    padding: 2px 5px;
+}

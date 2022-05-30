@@ -9,6 +9,7 @@ import { RenderingCommon } from './rendering/renderingCommon'
 import { SearchFenceRenderer } from './rendering/searchFenceRenderer'
 import { SearchWizardModal } from './rendering/searchWizardModal'
 import { JiraIssueSettingsTab } from './settings'
+import { ViewPluginManager } from './rendering/inlineIssueViewPlugin'
 
 // TODO: jira issue inline
 // TODO: text on mobile and implement horizontal scrolling
@@ -23,16 +24,13 @@ export default class JiraIssuePlugin extends Plugin {
     _cache: ObjectsCache
     _client: JiraClient
     _columnsSuggest: ColumnsSuggest
+    _inlineIssueViewPlugin: ViewPluginManager
 
     async onload() {
         this._settings = new JiraIssueSettingsTab(this.app, this)
         await this._settings.loadSettings()
         this.addSettingTab(this._settings)
         this._cache = new ObjectsCache(this._settings.getData())
-        this._settings.onChange(() => {
-            this._cache.clear()
-            this._client.updateCustomFieldsCache()
-        })
         this._client = new JiraClient(this._settings.getData())
         this._client.updateCustomFieldsCache()
         this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
@@ -48,7 +46,17 @@ export default class JiraIssuePlugin extends Plugin {
             this._columnsSuggest = new ColumnsSuggest(this.app, this._settings.getData())
             this.registerEditorSuggest(this._columnsSuggest)
         })
+        this._inlineIssueViewPlugin = new ViewPluginManager(this._settings.getData())
+        this.registerEditorExtension(this._inlineIssueViewPlugin.getViewPlugin())
 
+        // Settings refresh
+        this._settings.onChange(() => {
+            this._cache.clear()
+            this._client.updateCustomFieldsCache()
+            this._inlineIssueViewPlugin.update()
+        })
+
+        // Commands
         this.addCommand({
             id: 'obsidian-jira-issue-clear-cache',
             name: 'Clear cache',
@@ -93,6 +101,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._countFenceRenderer = null
         this._inlineIssueRenderer = null
         this._columnsSuggest = null
+        this._inlineIssueViewPlugin = null
     }
 }
 
