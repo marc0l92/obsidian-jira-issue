@@ -2,26 +2,27 @@ import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, Plug
 import { COMPACT_SYMBOL, IJiraIssueSettings } from "src/settings"
 
 class InlineIssueWidget extends WidgetType {
-    private key: string
-    constructor(key: string) {
+    private _key: string
+    private _settings: IJiraIssueSettings
+    constructor(key: string, settings: IJiraIssueSettings) {
         super()
-        this.key = key
+        this._key = key
+        this._settings = settings
     }
 
     toDOM(view: EditorView): HTMLElement {
-        return createSpan({ text: this.key, cls: 'test2', title: 'widget' })
+        return createSpan({ text: this._key, cls: 'test2', title: 'widget' })
     }
 }
 
+// Global variable with the last instance of the MatchDecorator rebuilt every time the settings are changed
 let matchDecorator: MatchDecorator
 
 function buildMatchDecorator(settings: IJiraIssueSettings) {
     return new MatchDecorator({
         regexp: new RegExp(`${settings.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
         decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
-            console.log({ match, view, pos })
-            console.log(settings)
-            const key = match[0]
+            const key = match[2]
             const cursor = view.state.selection.main.head
             if (cursor > pos - 1 && cursor < pos + match[0].length + 1) {
                 return Decoration.mark({
@@ -30,7 +31,7 @@ function buildMatchDecorator(settings: IJiraIssueSettings) {
                 })
             } else {
                 return Decoration.replace({
-                    widget: new InlineIssueWidget(key),
+                    widget: new InlineIssueWidget(key, settings),
                 })
             }
         }

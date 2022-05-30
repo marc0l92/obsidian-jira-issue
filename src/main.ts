@@ -34,18 +34,22 @@ export default class JiraIssuePlugin extends Plugin {
         this._client = new JiraClient(this._settings.getData())
         this._client.updateCustomFieldsCache()
         this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
+        // Fence rendering
         this._issueFenceRenderer = new IssueFenceRenderer(this._renderingCommon, this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-issue', this._issueFenceRenderer.render.bind(this._issueFenceRenderer))
         this._searchFenceRenderer = new SearchFenceRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-search', this._searchFenceRenderer.render.bind(this._searchFenceRenderer))
         this._countFenceRenderer = new CountFenceRenderer(this._renderingCommon, this._client, this._cache)
         this.registerMarkdownCodeBlockProcessor('jira-count', this._countFenceRenderer.render.bind(this._countFenceRenderer))
-        this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
-        this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
+        // Suggestion menu for columns inside jira-search fence
         this.app.workspace.onLayoutReady(() => {
             this._columnsSuggest = new ColumnsSuggest(this.app, this._settings.getData())
             this.registerEditorSuggest(this._columnsSuggest)
         })
+        // Reading mode inline issue rendering
+        this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
+        this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
+        // Live preview inline issue rendering
         this._inlineIssueViewPlugin = new ViewPluginManager(this._settings.getData())
         this.registerEditorExtension(this._inlineIssueViewPlugin.getViewPlugin())
 
