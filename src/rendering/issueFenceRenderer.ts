@@ -3,8 +3,8 @@ import { IJiraIssue } from "../client/jiraInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { RenderingCommon } from "./renderingCommon"
+import { COMMENT_REGEX } from "src/settings"
 
-const COMMENT_REGEX = /^\s*#/
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
 const ISSUE_LINK_REGEX = /\/([A-Z0-9]+-[0-9]+)\s*$/i
 

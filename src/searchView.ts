@@ -1,4 +1,4 @@
-import { COMMENT_SYMBOL, COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
+import { COMMENT_REGEX, COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
 
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
@@ -96,7 +96,7 @@ export class SearchView {
 
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
-            if (line.trim() && !line.trimStart().startsWith(COMMENT_SYMBOL)) {
+            if (line.trim() && !COMMENT_REGEX.test(line)) {
                 let [key, ...values] = line.split(':')
                 const value = values.join(':').trim()
 

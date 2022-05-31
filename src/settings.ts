@@ -14,7 +14,7 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
 }
 
 export const COMPACT_SYMBOL = '-'
-export const COMMENT_SYMBOL = '#'
+export const COMMENT_REGEX = /^\s*#/
 
 export interface IJiraIssueSettings {
     host: string
