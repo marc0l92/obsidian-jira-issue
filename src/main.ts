@@ -50,7 +50,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
         this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
         // Live preview inline issue rendering
-        this._inlineIssueViewPlugin = new ViewPluginManager(this._settings.getData())
+        this._inlineIssueViewPlugin = new ViewPluginManager(this._renderingCommon, this._settings.getData(), this._client, this._cache)
         this.registerEditorExtension(this._inlineIssueViewPlugin.getViewPlugin())
 
         // Settings refresh

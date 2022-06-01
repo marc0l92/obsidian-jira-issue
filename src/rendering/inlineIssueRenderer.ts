@@ -31,6 +31,7 @@ export class InlineIssueRenderer {
             const compact = value.getAttribute('data-compact') === 'true'
             let issue: IJiraIssue = this._cache.get(issueKey)
             if (!issue) {
+                value.replaceChildren(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey)))
                 this._client.getIssue(issueKey).then(newIssue => {
                     issue = this._cache.add(issueKey, newIssue)
                     value.replaceChildren(this._rc.renderIssue(issue, compact))

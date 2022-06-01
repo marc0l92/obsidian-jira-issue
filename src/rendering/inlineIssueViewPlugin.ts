@@ -1,27 +1,65 @@
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
+import { JiraClient } from "src/client/jiraClient"
+import { IJiraIssue } from "src/client/jiraInterfaces"
+import { ObjectsCache } from "src/objectsCache"
 import { COMPACT_SYMBOL, IJiraIssueSettings } from "src/settings"
+import { RenderingCommon } from "./renderingCommon"
 
 class InlineIssueWidget extends WidgetType {
-    private _key: string
-    private _settings: IJiraIssueSettings
-    constructor(key: string, settings: IJiraIssueSettings) {
+    private _issueKey: string
+    private _compact: boolean
+    private _rc: RenderingCommon
+    private _client: JiraClient
+    private _cache: ObjectsCache
+    private _htmlContainer: HTMLElement
+    constructor(key: string, compact: boolean, renderingCommon: RenderingCommon, client: JiraClient, cache: ObjectsCache) {
         super()
-        this._key = key
-        this._settings = settings
+        this._issueKey = key
+        this._compact = compact
+        this._rc = renderingCommon
+        this._client = client
+        this._cache = cache
+        this._htmlContainer = createSpan({ cls: 'ji-inline-issue jira-issue-container' })
+        this.buildTag()
     }
 
+    buildTag() {
+        let issue: IJiraIssue = this._cache.get(this._issueKey)
+        if (issue) {
+            this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
+            return
+        }
+        const error = this._cache.getError(this._issueKey)
+        if (error) {
+            this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, error))
+            return
+        }
+
+        this._htmlContainer.replaceChildren(this._rc.renderLoadingItem(this._issueKey, this._rc.issueUrl(this._issueKey)))
+        this._client.getIssue(this._issueKey).then(newIssue => {
+            issue = this._cache.add(this._issueKey, newIssue)
+            this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
+        }).catch(err => {
+            // TODO: thi rendering is breaking the UI
+            this._cache.addError(this._issueKey, err)
+            this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, err))
+        })
+    }
+
+    // TODO: do not render if source mode instead of live preview
     toDOM(view: EditorView): HTMLElement {
-        return createSpan({ text: this._key, cls: 'test2', title: 'widget' })
+        return this._htmlContainer
     }
 }
 
 // Global variable with the last instance of the MatchDecorator rebuilt every time the settings are changed
 let matchDecorator: MatchDecorator
 
-function buildMatchDecorator(settings: IJiraIssueSettings) {
+function buildMatchDecorator(renderingCommon: RenderingCommon, settings: IJiraIssueSettings, client: JiraClient, cache: ObjectsCache) {
     return new MatchDecorator({
         regexp: new RegExp(`${settings.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
         decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
+            const compact = !!match[1]
             const key = match[2]
             const cursor = view.state.selection.main.head
             if (cursor > pos - 1 && cursor < pos + match[0].length + 1) {
@@ -31,7 +69,7 @@ function buildMatchDecorator(settings: IJiraIssueSettings) {
                 })
             } else {
                 return Decoration.replace({
-                    widget: new InlineIssueWidget(key, settings),
+                    widget: new InlineIssueWidget(key, compact, renderingCommon, client, cache),
                 })
             }
         }
@@ -62,16 +100,23 @@ const ViewPluginSpec: PluginSpec<ViewPluginClass> = {
 }
 
 export class ViewPluginManager {
+    private _rc: RenderingCommon
     private _settings: IJiraIssueSettings
     private _viewPlugin: ViewPlugin<ViewPluginClass>
-    constructor(settings: IJiraIssueSettings) {
+    private _client: JiraClient
+    private _cache: ObjectsCache
+
+    constructor(renderingCommon: RenderingCommon, settings: IJiraIssueSettings, client: JiraClient, cache: ObjectsCache) {
+        this._rc = renderingCommon
         this._settings = settings
+        this._client = client
+        this._cache = cache
         this.update()
         this._viewPlugin = ViewPlugin.fromClass(ViewPluginClass, ViewPluginSpec)
     }
 
     update() {
-        matchDecorator = buildMatchDecorator(this._settings)
+        matchDecorator = buildMatchDecorator(this._rc, this._settings, this._client, this._cache)
     }
 
     getViewPlugin(): ViewPlugin<ViewPluginClass> {
