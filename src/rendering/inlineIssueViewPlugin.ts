@@ -1,3 +1,4 @@
+import { StateField } from "@codemirror/state"
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
 import { editorLivePreviewField } from "obsidian"
 import { JiraClient } from "src/client/jiraClient"
@@ -59,7 +60,8 @@ function buildMatchDecorator(renderingCommon: RenderingCommon, settings: IJiraIs
             const compact = !!match[1]
             const key = match[2]
             const cursor = view.state.selection.main.head
-            if (!view.state.field(editorLivePreviewField) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
+            // TODO: improve this type cast
+            if (!view.state.field(editorLivePreviewField as unknown as StateField<boolean>) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
                 return Decoration.mark({
                     tagName: 'div',
                     class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
@@ -82,7 +84,8 @@ class ViewPluginClass implements PluginValue {
     }
 
     update(update: ViewUpdate): void {
-        const editorModeChanged = update.startState.field(editorLivePreviewField) !== update.state.field(editorLivePreviewField)
+        // TODO: improve this type cast
+        const editorModeChanged = update.startState.field(editorLivePreviewField as unknown as StateField<boolean>) !== update.state.field(editorLivePreviewField as unknown as StateField<boolean>)
         if (update.docChanged || update.startState.selection.main !== update.state.selection.main || editorModeChanged) {
             this.decorators = matchDecorator.createDeco(update.view)
         }
