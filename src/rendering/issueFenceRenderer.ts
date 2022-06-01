@@ -40,6 +40,7 @@ export class IssueFenceRenderer {
                         renderedItems[issueKey] = this._rc.renderIssue(issue)
                         this.updateRenderedIssues(el, renderedItems)
                     }).catch(err => {
+                        this._cache.add(issueKey, err, true)
                         renderedItems[issueKey] = this._rc.renderIssueError(issueKey, err)
                         this.updateRenderedIssues(el, renderedItems)
                     })
