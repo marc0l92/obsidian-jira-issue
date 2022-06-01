@@ -2,49 +2,36 @@ import { IJiraIssueSettings } from "./settings"
 const ms = require('ms')
 const moment = require('moment')
 
+interface CacheItem {
+    updateTime: number,
+    data: any,
+    isError: boolean,
+}
 interface Cache {
-    [key: string]: {
-        updateTime: number,
-        data: any,
-    }
+    [key: string]: CacheItem
 }
 
 export class ObjectsCache {
     private _settings: IJiraIssueSettings
     private _cache: Cache
-    private _errors: Cache
 
     constructor(settings: IJiraIssueSettings) {
         this._settings = settings
         this._cache = {}
-        this._errors = {}
     }
 
-    add<T>(key: string, object: T): T {
+    add<T>(key: string, object: T, isError: boolean = false): CacheItem {
         this._cache[key] = {
             updateTime: Date.now(),
             data: object,
+            isError: isError,
         }
-        return object
-    }
-
-    addError<T>(key: string, error: T) {
-        this._errors[key] = {
-            updateTime: Date.now(),
-            data: error,
-        }
+        return this._cache[key]
     }
 
     get(key: string) {
         if (key in this._cache && this._cache[key].updateTime + ms(this._settings.cacheTime) > Date.now()) {
-            return this._cache[key].data
-        }
-        return null
-    }
-
-    getError(key: string) {
-        if (key in this._errors && this._errors[key].updateTime + ms(this._settings.cacheTime) > Date.now()) {
-            return this._errors[key].data
+            return this._cache[key]
         }
         return null
     }
@@ -58,6 +45,5 @@ export class ObjectsCache {
 
     clear() {
         this._cache = {}
-        this._errors = {}
     }
 }

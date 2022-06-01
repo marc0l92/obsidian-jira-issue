@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
 import { JiraClient } from './client/jiraClient'
 import { ObjectsCache } from './objectsCache'
-import { ColumnsSuggest } from './rendering/columnsSugget'
+import { ColumnsSuggest } from './rendering/columnsSuggest'
 import { CountFenceRenderer } from './rendering/countFenceRenderer'
 import { InlineIssueRenderer } from './rendering/inlineIssueRenderer'
 import { IssueFenceRenderer } from './rendering/issueFenceRenderer'

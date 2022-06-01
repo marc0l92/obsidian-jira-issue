@@ -24,19 +24,25 @@ export class SearchFenceRenderer {
         // console.log(`Search query: ${source}`)
         try {
             const searchView = new SearchView(this._settings).fromString(source)
-            let searchResults: IJiraSearchResults = this._cache.get(searchView.query + searchView.limit)
-            if (!searchResults) {
+
+            const cachedSearchResults = this._cache.get(searchView.query + searchView.limit)
+            if (cachedSearchResults) {
+                if (cachedSearchResults.isError) {
+                    this._rc.renderSearchError(el, cachedSearchResults.data, searchView)
+                } else {
+                    this.renderSearchResults(el, searchView, cachedSearchResults.data)
+                }
+            } else {
                 // console.log(`Search results not available in the cache`)
                 this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(searchView.query))
                 this._client.getSearchResults(searchView.query, parseInt(searchView.limit) || this._settings.searchResultsLimit)
                     .then(newSearchResults => {
-                        searchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults)
+                        const searchResults: IJiraSearchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults).data
                         this.renderSearchResults(el, searchView, searchResults)
                     }).catch(err => {
+                        this._cache.add(searchView.query + searchView.limit, err, true)
                         this._rc.renderSearchError(el, err, searchView)
                     })
-            } else {
-                this.renderSearchResults(el, searchView, searchResults)
             }
         } catch (err) {
             this._rc.renderSearchError(el, err, null)

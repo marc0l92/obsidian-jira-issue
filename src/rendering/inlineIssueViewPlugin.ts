@@ -24,26 +24,23 @@ class InlineIssueWidget extends WidgetType {
     }
 
     buildTag() {
-        let issue: IJiraIssue = this._cache.get(this._issueKey)
-        if (issue) {
-            this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
-            return
+        const cachedIssue = this._cache.get(this._issueKey)
+        if (cachedIssue) {
+            if (cachedIssue.isError) {
+                this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, cachedIssue.data))
+            } else {
+                this._htmlContainer.replaceChildren(this._rc.renderIssue(cachedIssue.data, this._compact))
+            }
+        } else {
+            this._htmlContainer.replaceChildren(this._rc.renderLoadingItem(this._issueKey, this._rc.issueUrl(this._issueKey)))
+            this._client.getIssue(this._issueKey).then(newIssue => {
+                const issue: IJiraIssue = this._cache.add(this._issueKey, newIssue).data
+                this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
+            }).catch(err => {
+                this._cache.add(this._issueKey, err, true)
+                this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, err))
+            })
         }
-        const error = this._cache.getError(this._issueKey)
-        if (error) {
-            this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, error))
-            return
-        }
-
-        this._htmlContainer.replaceChildren(this._rc.renderLoadingItem(this._issueKey, this._rc.issueUrl(this._issueKey)))
-        this._client.getIssue(this._issueKey).then(newIssue => {
-            issue = this._cache.add(this._issueKey, newIssue)
-            this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
-        }).catch(err => {
-            // TODO: thi rendering is breaking the UI
-            this._cache.addError(this._issueKey, err)
-            this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, err))
-        })
     }
 
     // TODO: do not render if source mode instead of live preview

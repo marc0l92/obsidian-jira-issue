@@ -17,18 +17,22 @@ export class CountFenceRenderer {
 
     async render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         // console.log(`Search query: ${source}`)
-        let searchResults: IJiraSearchResults = this._cache.get(source)
-        if (!searchResults) {
-            // console.log(`Search results not available in the cache`)
+        const cachedSearchResults = this._cache.get(source)
+        if (cachedSearchResults) {
+            if (cachedSearchResults.isError) {
+                this._rc.renderSearchError(el, source, cachedSearchResults.data)
+            } else {
+                this.renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults).total, source)
+            }
+        } else {
             this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(source))
             this._client.getSearchResults(source, -1).then(newSearchResults => {
-                searchResults = this._cache.add(source, newSearchResults)
+                const searchResults: IJiraSearchResults = this._cache.add(source, newSearchResults).data
                 this.renderSearchCount(el, searchResults.total, source)
             }).catch(err => {
+                this._cache.add(source, err, true)
                 this._rc.renderSearchError(el, source, err)
             })
-        } else {
-            this.renderSearchCount(el, searchResults.total, source)
         }
     }
 
