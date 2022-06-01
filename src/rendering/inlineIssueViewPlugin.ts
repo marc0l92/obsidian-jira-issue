@@ -1,4 +1,5 @@
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
+import { editorLivePreviewField } from "obsidian"
 import { JiraClient } from "src/client/jiraClient"
 import { IJiraIssue } from "src/client/jiraInterfaces"
 import { ObjectsCache } from "src/objectsCache"
@@ -43,7 +44,6 @@ class InlineIssueWidget extends WidgetType {
         }
     }
 
-    // TODO: do not render if source mode instead of live preview
     toDOM(view: EditorView): HTMLElement {
         return this._htmlContainer
     }
@@ -59,7 +59,7 @@ function buildMatchDecorator(renderingCommon: RenderingCommon, settings: IJiraIs
             const compact = !!match[1]
             const key = match[2]
             const cursor = view.state.selection.main.head
-            if (cursor > pos - 1 && cursor < pos + match[0].length + 1) {
+            if (!view.state.field(editorLivePreviewField) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
                 return Decoration.mark({
                     tagName: 'div',
                     class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
@@ -82,7 +82,8 @@ class ViewPluginClass implements PluginValue {
     }
 
     update(update: ViewUpdate): void {
-        if (update.docChanged || update.startState.selection.main !== update.state.selection.main) {
+        const editorModeChanged = update.startState.field(editorLivePreviewField) !== update.state.field(editorLivePreviewField)
+        if (update.docChanged || update.startState.selection.main !== update.state.selection.main || editorModeChanged) {
             this.decorators = matchDecorator.createDeco(update.view)
         }
     }
