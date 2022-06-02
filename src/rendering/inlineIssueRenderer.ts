@@ -29,16 +29,22 @@ export class InlineIssueRenderer {
         inlineIssueTags.forEach((value: HTMLSpanElement) => {
             const issueKey = value.getAttribute('data-issue-key')
             const compact = value.getAttribute('data-compact') === 'true'
-            let issue: IJiraIssue = this._cache.get(issueKey)
-            if (!issue) {
+            const cachedIssue = this._cache.get(issueKey)
+            if (cachedIssue) {
+                if (cachedIssue.isError) {
+                    value.replaceChildren(this._rc.renderIssueError(issueKey, cachedIssue.data))
+                } else {
+                    value.replaceChildren(this._rc.renderIssue(cachedIssue.data, compact))
+                }
+            } else {
+                value.replaceChildren(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey)))
                 this._client.getIssue(issueKey).then(newIssue => {
-                    issue = this._cache.add(issueKey, newIssue)
+                    const issue: IJiraIssue = this._cache.add(issueKey, newIssue).data
                     value.replaceChildren(this._rc.renderIssue(issue, compact))
                 }).catch(err => {
+                    this._cache.add(issueKey, err, true)
                     value.replaceChildren(this._rc.renderIssueError(issueKey, err))
                 })
-            } else {
-                value.replaceChildren(this._rc.renderIssue(issue, compact))
             }
         })
     }

@@ -1,4 +1,4 @@
-import { COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
+import { COMMENT_REGEX, COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
 
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
@@ -96,77 +96,83 @@ export class SearchView {
 
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
-            if (line && !line.trimStart().startsWith(COMPACT_SYMBOL)) {
+            if (line.trim() && !COMMENT_REGEX.test(line)) {
                 let [key, ...values] = line.split(':')
                 const value = values.join(':').trim()
 
-                switch (key.trim().toLowerCase()) {
-                    case 'type':
-                        if (value.toUpperCase() in ESearchResultsRenderingTypes) {
-                            this.type = value.toUpperCase() as ESearchResultsRenderingTypes
-                        } else {
-                            throw new Error(`Invalid type: ${value}`)
-                        }
-                        break
-                    case 'query':
-                        this.query = value
-                        break
-                    case 'limit':
-                        if (parseInt(value)) {
-                            this.limit = parseInt(value).toString()
-                        } else {
-                            throw new Error(`Invalid limit: ${value}`)
-                        }
-                        break
-                    case 'columns':
-                        this.columns = value.split(',')
-                            .filter(column => column.trim())
-                            .map(column => {
-                                let columnExtra = ''
-                                // Compact
-                                const compact = column.trim().startsWith(COMPACT_SYMBOL)
-                                column = column.trim().replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
-                                // Frontmatter
-                                if (column.toUpperCase().startsWith('NOTES.')) {
-                                    const split = column.split('.')
-                                    column = split.splice(0, 1)[0]
-                                    columnExtra = split.join('.')
-                                }
-                                // Custom field
-                                if (column.toUpperCase().startsWith('$')) {
-                                    const customFieldInput = column.slice(1)
-                                    column = ESearchColumnsTypes.CUSTOM_FIELD
-                                    if (Number(customFieldInput)) {
-                                        // Custom field provided as number
-                                        if (!(customFieldInput in this._settings.customFieldsIdToName)) {
-                                            throw new Error(`Custom field with id ${customFieldInput} not found`)
-                                        }
-                                        columnExtra = customFieldInput
-                                    } else {
-                                        // Custom field provided as name
-                                        columnExtra = this._settings.customFieldsNameToId[customFieldInput]
-                                        if (!columnExtra) {
-                                            throw new Error(`Custom field with name "${customFieldInput}" not found`)
+                if (!value) {
+                    // Basic mode with only the query
+                    this.query = line
+                } else {
+                    // Advanced mode with key value structure
+                    switch (key.trim().toLowerCase()) {
+                        case 'type':
+                            if (value.toUpperCase() in ESearchResultsRenderingTypes) {
+                                this.type = value.toUpperCase() as ESearchResultsRenderingTypes
+                            } else {
+                                throw new Error(`Invalid type: ${value}`)
+                            }
+                            break
+                        case 'query':
+                            this.query = value
+                            break
+                        case 'limit':
+                            if (parseInt(value)) {
+                                this.limit = parseInt(value).toString()
+                            } else {
+                                throw new Error(`Invalid limit: ${value}`)
+                            }
+                            break
+                        case 'columns':
+                            this.columns = value.split(',')
+                                .filter(column => column.trim())
+                                .map(column => {
+                                    let columnExtra = ''
+                                    // Compact
+                                    const compact = column.trim().startsWith(COMPACT_SYMBOL)
+                                    column = column.trim().replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
+                                    // Frontmatter
+                                    if (column.toUpperCase().startsWith('NOTES.')) {
+                                        const split = column.split('.')
+                                        column = split.splice(0, 1)[0]
+                                        columnExtra = split.join('.')
+                                    }
+                                    // Custom field
+                                    if (column.toUpperCase().startsWith('$')) {
+                                        const customFieldInput = column.slice(1)
+                                        column = ESearchColumnsTypes.CUSTOM_FIELD
+                                        if (Number(customFieldInput)) {
+                                            // Custom field provided as number
+                                            if (!(customFieldInput in this._settings.customFieldsIdToName)) {
+                                                throw new Error(`Custom field with id ${customFieldInput} not found`)
+                                            }
+                                            columnExtra = customFieldInput
+                                        } else {
+                                            // Custom field provided as name
+                                            columnExtra = this._settings.customFieldsNameToId[customFieldInput]
+                                            if (!columnExtra) {
+                                                throw new Error(`Custom field with name "${customFieldInput}" not found`)
+                                            }
                                         }
                                     }
-                                }
-                                // Check validity
-                                column = column.toUpperCase()
-                                if (!(column in ESearchColumnsTypes)) {
-                                    if(column.startsWith('#')){
-                                        throw new Error(`Please replace the symbol "#" with "${COMPACT_SYMBOL}" to use the compact format`)
+                                    // Check validity
+                                    column = column.toUpperCase()
+                                    if (!(column in ESearchColumnsTypes)) {
+                                        if (column.startsWith('#')) {
+                                            throw new Error(`Please replace the symbol "#" with "${COMPACT_SYMBOL}" to use the compact format`)
+                                        }
+                                        throw new Error(`Invalid column: ${column}`)
                                     }
-                                    throw new Error(`Invalid column: ${column}`)
-                                }
-                                return {
-                                    type: column as ESearchColumnsTypes,
-                                    compact: compact,
-                                    extra: columnExtra,
-                                }
-                            })
-                        break
-                    default:
-                        throw new Error(`Invalid key: ${key}`)
+                                    return {
+                                        type: column as ESearchColumnsTypes,
+                                        compact: compact,
+                                        extra: columnExtra,
+                                    }
+                                })
+                            break
+                        default:
+                            throw new Error(`Invalid key: ${key}`)
+                    }
                 }
             }
         }
