@@ -10,8 +10,8 @@ import { SearchFenceRenderer } from './rendering/searchFenceRenderer'
 import { SearchWizardModal } from './rendering/searchWizardModal'
 import { JiraIssueSettingsTab } from './settings'
 import { ViewPluginManager } from './rendering/inlineIssueViewPlugin'
+import { QuerySuggest } from './rendering/querySuggest'
 
-// TODO: jira issue inline
 // TODO: text on mobile and implement horizontal scrolling
 
 export default class JiraIssuePlugin extends Plugin {
@@ -24,6 +24,7 @@ export default class JiraIssuePlugin extends Plugin {
     _cache: ObjectsCache
     _client: JiraClient
     _columnsSuggest: ColumnsSuggest
+    _querySuggest: QuerySuggest
     _inlineIssueViewPlugin: ViewPluginManager
 
     async onload() {
@@ -33,6 +34,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._cache = new ObjectsCache(this._settings.getData())
         this._client = new JiraClient(this._settings.getData())
         this._client.updateCustomFieldsCache()
+        this._client.updateJQLAutoCompleteCache()
         this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
         // Fence rendering
         this._issueFenceRenderer = new IssueFenceRenderer(this._renderingCommon, this._client, this._cache)
@@ -46,6 +48,11 @@ export default class JiraIssuePlugin extends Plugin {
             this._columnsSuggest = new ColumnsSuggest(this.app, this._settings.getData())
             this.registerEditorSuggest(this._columnsSuggest)
         })
+        // Suggestion menu for query inside jira-search fence
+        this.app.workspace.onLayoutReady(() => {
+            this._querySuggest = new QuerySuggest(this.app, this._settings.getData())
+            this.registerEditorSuggest(this._querySuggest)
+        })
         // Reading mode inline issue rendering
         this._inlineIssueRenderer = new InlineIssueRenderer(this._renderingCommon, this._settings.getData(), this._client, this._cache)
         this.registerMarkdownPostProcessor(this._inlineIssueRenderer.render.bind(this._inlineIssueRenderer))
@@ -57,6 +64,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._settings.onChange(() => {
             this._cache.clear()
             this._client.updateCustomFieldsCache()
+            this._client.updateJQLAutoCompleteCache()
             this._inlineIssueViewPlugin.update()
         })
 
@@ -67,6 +75,7 @@ export default class JiraIssuePlugin extends Plugin {
             callback: () => {
                 this._cache.clear()
                 this._client.updateCustomFieldsCache()
+                this._client.updateJQLAutoCompleteCache()
                 new Notice('JiraIssue: Cache cleaned')
             }
         })

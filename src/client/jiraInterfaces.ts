@@ -101,6 +101,35 @@ export interface IJiraField {
     }
 }
 
+export interface IJiraAutocompleteDataField {
+    value: string
+    displayName: string
+    auto: string
+    orderable: string
+    searchable: string
+    cfid: string
+    operators: [string]
+    types: [string]
+}
+
+export interface IJiraAutocompleteData {
+    visibleFieldNames: IJiraAutocompleteDataField[]
+    visibleFunctionNames: [{
+        value: string
+        displayName: string
+        isList?: string
+        types: [string]
+    }]
+    jqlReservedWords: [string]
+}
+
+export interface IJiraAutocompleteField {
+    results: [{
+        value: string
+        displayName: string
+    }]
+}
+
 export function createProxy<T extends object>(obj: T): T {
     const proxy = new Proxy<T>(obj, {
         get: (target: T, p: string, receiver: any) => {

@@ -1,4 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
+import { IJiraAutocompleteDataField } from './client/jiraInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
@@ -28,6 +29,12 @@ export interface IJiraIssueSettings {
     statusColorCache: Record<string, string>
     customFieldsIdToName: Record<string, string>
     customFieldsNameToId: Record<string, string>
+    jqlAutocomplete: {
+        fields: IJiraAutocompleteDataField[]
+        functions: {
+            [key: string]: [string]
+        }
+    }
     darkMode: boolean
     inlineIssueUrlToTag: boolean
     inlineIssuePrefix: string
@@ -58,6 +65,10 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
         { type: ESearchColumnsTypes.PRIORITY, compact: true },
         { type: ESearchColumnsTypes.STATUS, compact: false },
     ],
+    jqlAutocomplete: {
+        fields: [],
+        functions: {},
+    },
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {

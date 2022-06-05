@@ -1,14 +1,14 @@
-import { App, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from "obsidian";
-import { ESearchColumnsTypes } from "src/searchView";
-import { COMPACT_SYMBOL, IJiraIssueSettings } from "src/settings";
+import { App, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from "obsidian"
+import { ESearchColumnsTypes } from "src/searchView"
+import { COMPACT_SYMBOL, IJiraIssueSettings } from "src/settings"
 
-interface DictionaryEntry {
+interface SuggestionEntry {
     name: string
     isCompact: boolean
     isCustomField: boolean
 }
 
-export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
+export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
     private _settings: IJiraIssueSettings
 
     constructor(app: App, settings: IJiraIssueSettings) {
@@ -51,8 +51,8 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
         }
     }
 
-    getSuggestions(context: EditorSuggestContext): DictionaryEntry[] | Promise<DictionaryEntry[]> {
-        const suggestions: DictionaryEntry[] = []
+    getSuggestions(context: EditorSuggestContext): SuggestionEntry[] | Promise<SuggestionEntry[]> {
+        const suggestions: SuggestionEntry[] = []
         let query = context.query.trim().toUpperCase()
         const isCompact = query.startsWith(COMPACT_SYMBOL)
         query = query.replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
@@ -92,7 +92,7 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
         return suggestions
     }
 
-    renderSuggestion(value: DictionaryEntry, el: HTMLElement): void {
+    renderSuggestion(value: SuggestionEntry, el: HTMLElement): void {
         // console.log('renderSuggestion', { value, el })
         if (value.isCompact) {
             el.createSpan({ text: COMPACT_SYMBOL, cls: 'jira-issue-suggestion is-compact' })
@@ -103,7 +103,7 @@ export class ColumnsSuggest extends EditorSuggest<DictionaryEntry> {
         el.createSpan({ text: value.name, cls: 'jira-issue-suggestion' })
     }
 
-    selectSuggestion(value: DictionaryEntry, evt: MouseEvent | KeyboardEvent): void {
+    selectSuggestion(value: SuggestionEntry, evt: MouseEvent | KeyboardEvent): void {
         // console.log('selectSuggestion', { value, evt }, this.context)
         if (!this.context) return
 

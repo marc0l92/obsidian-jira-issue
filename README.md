@@ -36,7 +36,7 @@ There are three authentication methods:
 
 - Open: used for server without authentication.
 - [Basic](https://datatracker.ietf.org/doc/html/rfc7617): username and password are used to login in your server.
-  - Note for Jira Cloud instances this will be your email address and an API token.  API tokens can be generated in Jira Cloud from `Account Settings > Security > Create and manage API tokens`
+  - Note for Jira Cloud instances this will be your email address and an API token. API tokens can be generated in Jira Cloud from `Account Settings > Security > Create and manage API tokens`
 - [Bearer](https://datatracker.ietf.org/doc/html/rfc6750): a token is used to login in your server.
 
 This plugin stores your credentials in clear in the configuration file of this plugin.
@@ -137,14 +137,16 @@ columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0], notes
 
 
 ## Inline issues
-This plugin allows you to detect inline issue and render them inside your text without creating a dedicated fence block. In the settings it is possible to configure the prefix used to identify inline issues and if you want to render url to issues.
+This plugin allows you to detect inline issue and render them inside your text without creating a dedicated fence block.
+In the settings it is possible to configure the prefix used to identify inline issues and if you want to render url to issues.
 
 Example:
 
-    With inline issue you can insert an issue like JIRA:OPEN-351 inside your text. The plugin will detect urls like https://jira.secondlife.com/browse/OPEN-352 and render the issue as tags.
-    - [x] Issue can be extended JIRA:OPEN-353 with the summary
+    With inline issue you can insert an issue like JIRA:OPEN-351 inside your text.
+    The plugin will detect urls like https://jira.secondlife.com/browse/OPEN-352 and render the issue as tags.
+    - [ ] Issue can be extended JIRA:OPEN-353 with the summary
     - [x] Or compact JIRA:-OPEN-354 without the summary
-    - [x] JIRA:-OPEN-355 use the `-` symbol before the issue key to make it compact
+    - [ ] JIRA:-OPEN-355 use the `-` symbol before the issue key to make it compact
     ```
     The plugin searches inside the note for those patterns and replace them
     JIRA:-OPEN-356

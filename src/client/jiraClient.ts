@@ -1,5 +1,5 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraField, IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
+import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraField, IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
 
 export class JiraClient {
@@ -108,5 +108,36 @@ export class JiraClient {
                 this._settings.customFieldsNameToId[field.name] = field.schema.customId.toString()
             }
         }
+    }
+
+    async updateJQLAutoCompleteCache(): Promise<void> {
+        const response: IJiraAutocompleteData = await this.sendRequest(
+            {
+                url: this.buildUrl(`/jql/autocompletedata`),
+                method: 'GET',
+                headers: this.buildHeaders(),
+            }
+        )
+        this._settings.jqlAutocomplete.functions = {}
+        for (const functionData of response.visibleFunctionNames) {
+            for (const functionType of functionData.types) {
+                this._settings.jqlAutocomplete.functions[functionType].push(functionData.value)
+            }
+        }
+        this._settings.jqlAutocomplete.fields = response.visibleFieldNames
+    }
+
+    async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
+        const queryParameters = new URLSearchParams({
+            fieldName: fieldName,
+            fieldValue: fieldValue,
+        })
+        return await this.sendRequest(
+            {
+                url: this.buildUrl(`/jql/autocompletedata/suggestions`, queryParameters),
+                method: 'GET',
+                headers: this.buildHeaders(),
+            }
+        )
     }
 }
