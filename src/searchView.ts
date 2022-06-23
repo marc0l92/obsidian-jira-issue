@@ -85,8 +85,8 @@ export interface ISearchColumn {
 
 export class SearchView {
     type: ESearchResultsRenderingTypes = ESearchResultsRenderingTypes.TABLE
-    query: string = ''
-    limit: string = ''
+    query = ''
+    limit = ''
     columns: ISearchColumn[] = []
     private _settings: IJiraIssueSettings
 
@@ -97,7 +97,7 @@ export class SearchView {
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
             if (line.trim() && !COMMENT_REGEX.test(line)) {
-                let [key, ...values] = line.split(':')
+                const [key, ...values] = line.split(':')
                 const value = values.join(':').trim()
 
                 if (!value) {

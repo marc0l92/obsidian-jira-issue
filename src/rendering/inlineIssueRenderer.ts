@@ -32,14 +32,14 @@ export class InlineIssueRenderer {
             const cachedIssue = this._cache.get(issueKey)
             if (cachedIssue) {
                 if (cachedIssue.isError) {
-                    value.replaceChildren(this._rc.renderIssueError(issueKey, cachedIssue.data))
+                    value.replaceChildren(this._rc.renderIssueError(issueKey, cachedIssue.data as string))
                 } else {
-                    value.replaceChildren(this._rc.renderIssue(cachedIssue.data, compact))
+                    value.replaceChildren(this._rc.renderIssue(cachedIssue.data as IJiraIssue, compact))
                 }
             } else {
                 value.replaceChildren(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey)))
                 this._client.getIssue(issueKey).then(newIssue => {
-                    const issue: IJiraIssue = this._cache.add(issueKey, newIssue).data
+                    const issue = this._cache.add(issueKey, newIssue).data as IJiraIssue
                     value.replaceChildren(this._rc.renderIssue(issue, compact))
                 }).catch(err => {
                     this._cache.add(issueKey, err, true)

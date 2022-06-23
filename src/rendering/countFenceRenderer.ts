@@ -3,6 +3,7 @@ import { IJiraSearchResults } from "../client/jiraInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { RenderingCommon } from "./renderingCommon"
+import { SearchView } from "src/searchView"
 
 export class CountFenceRenderer {
     private _rc: RenderingCommon
@@ -20,14 +21,14 @@ export class CountFenceRenderer {
         const cachedSearchResults = this._cache.get(source)
         if (cachedSearchResults) {
             if (cachedSearchResults.isError) {
-                this._rc.renderSearchError(el, source, cachedSearchResults.data)
+                this._rc.renderSearchError(el, source, cachedSearchResults.data as SearchView)
             } else {
                 this.renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults).total, source)
             }
         } else {
             this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(source))
             this._client.getSearchResults(source, -1).then(newSearchResults => {
-                const searchResults: IJiraSearchResults = this._cache.add(source, newSearchResults).data
+                const searchResults = this._cache.add(source, newSearchResults).data as IJiraSearchResults
                 this.renderSearchCount(el, searchResults.total, source)
             }).catch(err => {
                 this._cache.add(source, err, true)

@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian"
+import { App, FrontMatterCache, TFile } from "obsidian"
 import { IJiraIssue } from "src/client/jiraInterfaces"
 import { SearchView } from "src/searchView"
 import { IJiraIssueSettings } from "src/settings"
@@ -36,7 +36,7 @@ export class RenderingCommon {
         return this._app.vault.getMarkdownFiles()
     }
 
-    public getFrontMatter(file: TFile): any {
+    public getFrontMatter(file: TFile): FrontMatterCache {
         return this._app.metadataCache.getFileCache(file).frontmatter
     }
 
@@ -48,7 +48,7 @@ export class RenderingCommon {
         return container
     }
 
-    public renderLoadingItem(item: string, itemUrl: string, inline: boolean = false): HTMLElement {
+    public renderLoadingItem(item: string, itemUrl: string, inline = false): HTMLElement {
         let tagsRow
         if (inline) {
             tagsRow = createSpan('ji-tags has-addons')
@@ -73,7 +73,7 @@ export class RenderingCommon {
         el.replaceChildren(this.renderContainer([tagsRow]))
     }
 
-    public renderIssue(issue: IJiraIssue, compact: boolean = false): HTMLElement {
+    public renderIssue(issue: IJiraIssue, compact = false): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         createEl('img', {
             cls: 'fit-content',

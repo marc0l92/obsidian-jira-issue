@@ -29,14 +29,14 @@ class InlineIssueWidget extends WidgetType {
         const cachedIssue = this._cache.get(this._issueKey)
         if (cachedIssue) {
             if (cachedIssue.isError) {
-                this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, cachedIssue.data))
+                this._htmlContainer.replaceChildren(this._rc.renderIssueError(this._issueKey, cachedIssue.data as string))
             } else {
-                this._htmlContainer.replaceChildren(this._rc.renderIssue(cachedIssue.data, this._compact))
+                this._htmlContainer.replaceChildren(this._rc.renderIssue(cachedIssue.data as IJiraIssue, this._compact))
             }
         } else {
             this._htmlContainer.replaceChildren(this._rc.renderLoadingItem(this._issueKey, this._rc.issueUrl(this._issueKey)))
             this._client.getIssue(this._issueKey).then(newIssue => {
-                const issue: IJiraIssue = this._cache.add(this._issueKey, newIssue).data
+                const issue = this._cache.add(this._issueKey, newIssue).data as IJiraIssue
                 this._htmlContainer.replaceChildren(this._rc.renderIssue(issue, this._compact))
             }).catch(err => {
                 this._cache.add(this._issueKey, err, true)

@@ -28,15 +28,15 @@ export class IssueFenceRenderer {
                 const cachedIssue = this._cache.get(issueKey)
                 if (cachedIssue) {
                     if (cachedIssue.isError) {
-                        renderedItems[issueKey] = this._rc.renderIssueError(issueKey, cachedIssue.data)
+                        renderedItems[issueKey] = this._rc.renderIssueError(issueKey, cachedIssue.data as string)
                     } else {
-                        renderedItems[issueKey] = this._rc.renderIssue(cachedIssue.data)
+                        renderedItems[issueKey] = this._rc.renderIssue(cachedIssue.data as IJiraIssue)
                     }
                 } else {
                     // console.log(`Issue not available in the cache`)
                     renderedItems[issueKey] = this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey))
                     this._client.getIssue(issueKey).then(newIssue => {
-                        const issue: IJiraIssue = this._cache.add(issueKey, newIssue).data
+                        const issue = this._cache.add(issueKey, newIssue).data as IJiraIssue
                         renderedItems[issueKey] = this._rc.renderIssue(issue)
                         this.updateRenderedIssues(el, renderedItems)
                     }).catch(err => {

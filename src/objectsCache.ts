@@ -4,7 +4,7 @@ const moment = require('moment')
 
 interface CacheItem {
     updateTime: number,
-    data: any,
+    data: unknown,
     isError: boolean,
 }
 interface Cache {
@@ -20,7 +20,7 @@ export class ObjectsCache {
         this._cache = {}
     }
 
-    add<T>(key: string, object: T, isError: boolean = false): CacheItem {
+    add<T>(key: string, object: T, isError = false): CacheItem {
         this._cache[key] = {
             updateTime: Date.now(),
             data: object,

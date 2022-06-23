@@ -1,5 +1,5 @@
-import { MarkdownPostProcessorContext, TFile, Vault } from "obsidian"
-import { createProxy, IJiraIssue, IJiraSearchResults } from "../client/jiraInterfaces"
+import { MarkdownPostProcessorContext } from "obsidian"
+import { createProxy, IJiraSearchResults } from "../client/jiraInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
@@ -28,16 +28,16 @@ export class SearchFenceRenderer {
             const cachedSearchResults = this._cache.get(searchView.query + searchView.limit)
             if (cachedSearchResults) {
                 if (cachedSearchResults.isError) {
-                    this._rc.renderSearchError(el, cachedSearchResults.data, searchView)
+                    this._rc.renderSearchError(el, cachedSearchResults.data as string, searchView)
                 } else {
-                    this.renderSearchResults(el, searchView, cachedSearchResults.data)
+                    this.renderSearchResults(el, searchView, cachedSearchResults.data as IJiraSearchResults)
                 }
             } else {
                 // console.log(`Search results not available in the cache`)
                 this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(searchView.query))
                 this._client.getSearchResults(searchView.query, parseInt(searchView.limit) || this._settings.searchResultsLimit)
                     .then(newSearchResults => {
-                        const searchResults: IJiraSearchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults).data
+                        const searchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults).data as IJiraSearchResults
                         this.renderSearchResults(el, searchView, searchResults)
                     }).catch(err => {
                         this._cache.add(searchView.query + searchView.limit, err, true)
