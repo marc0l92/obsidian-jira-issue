@@ -221,7 +221,8 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     markdownNotes = renderingCommon.getNotes()
                 }
                 const noteCell = createEl('td', { parent: row })
-                const connectedNotes = markdownNotes.filter(n => n.name.startsWith(issue.key))
+                const noteRegex = new RegExp('^' + issue.key + '[^0-9]')
+                const connectedNotes = markdownNotes.filter(n => n.name.match(noteRegex))
                 if (connectedNotes.length > 0) {
                     for (const note of connectedNotes) {
                         if (column.extra) {
@@ -249,7 +250,7 @@ function renderNoteFile(column: ISearchColumn, note: TFile, noteCell: HTMLTableC
     if (column.compact) {
         createEl('a', { text: '📝', title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
     } else {
-        let noteNameWithoutExtension = note.name.split('.')
+        const noteNameWithoutExtension = note.name.split('.')
         noteNameWithoutExtension.pop()
         createEl('a', { text: noteNameWithoutExtension.join('.'), title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
         createEl('br', { parent: noteCell })
