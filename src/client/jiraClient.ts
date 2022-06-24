@@ -121,7 +121,11 @@ export class JiraClient {
         this._settings.jqlAutocomplete.functions = {}
         for (const functionData of response.visibleFunctionNames) {
             for (const functionType of functionData.types) {
-                this._settings.jqlAutocomplete.functions[functionType].push(functionData.value)
+                if (functionType in this._settings.jqlAutocomplete.functions) {
+                    this._settings.jqlAutocomplete.functions[functionType].push(functionData.value)
+                } else {
+                    this._settings.jqlAutocomplete.functions[functionType] = [functionData.value]
+                }
             }
         }
         this._settings.jqlAutocomplete.fields = response.visibleFieldNames
