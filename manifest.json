@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-jira-issue",
 	"name": "JiraIssue",
-	"version": "1.20.0",
+	"version": "1.21.0",
 	"minAppVersion": "0.12.0",
 	"description": "This plugin allows you to track the progress of Atlassian Jira issues from your Obsidian notes.",
 	"author": "marc0l92",
