@@ -30,7 +30,7 @@ From the obsidian app go in `Settings > Third-party plugins > Community Plugins 
 
 ## Configuration
 
-Use the plugin options to configure the connection to your company Atlassian Jira server: host, username and password.
+Use the plugin options to configure the connection to your Atlassian Jira server: host, username and password.
 
 There are three authentication methods:
 
@@ -38,6 +38,10 @@ There are three authentication methods:
 - [Basic](https://datatracker.ietf.org/doc/html/rfc7617): username and password are used to login in your server.
   - Note for Jira Cloud instances this will be your email address and an API token. API tokens can be generated in Jira Cloud from `Account Settings > Security > Create and manage API tokens`
 - [Bearer](https://datatracker.ietf.org/doc/html/rfc6750): a token is used to login in your server.
+
+If you use Atlassian Jira Server, you should be able to login using your username and password.
+If you use Atlassian Jira Cloud, you should be able to login using your email address as username and an API token as password.
+You can create a new API token in Jira Cloud from `Account Settings > Security > Create and manage API tokens` ([Official Documentation](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)).
 
 This plugin stores your credentials in clear in the configuration file of this plugin.
 

@@ -130,8 +130,8 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
         if (this._data.authenticationType === EAuthenticationTypes.BASIC) {
             new Setting(containerEl)
-                .setName('Username')
-                .setDesc('Username to access your Jira account using HTTP basic authentication.')
+                .setName('Username/Email')
+                .setDesc('Username to access your Jira Server account using HTTP basic authentication. Use the email in case of Jira Cloud.')
                 .addText(text => text
                     // .setPlaceholder('')
                     .setValue(this._data.username)
@@ -140,8 +140,8 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                         await this.saveSettings()
                     }))
             new Setting(containerEl)
-                .setName('Password')
-                .setDesc('Password to access your Jira account using HTTP basic authentication.')
+                .setName('Password/API Token')
+                .setDesc('Password to access your Jira Server account using HTTP basic authentication. Use an API token in case of Jira Cloud.')
                 .addText(text => text
                     // .setPlaceholder('')
                     .setValue(DEFAULT_SETTINGS.password)
