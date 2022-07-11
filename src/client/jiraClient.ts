@@ -43,6 +43,7 @@ export class JiraClient {
         // console.info('response', response)
 
         if (response.status !== 200) {
+            console.error('jiraClient error response:', response)
             // console.log(response.headers)
             if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
                 throw new Error(response.json.errorMessages.join('\n'))
