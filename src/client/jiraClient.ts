@@ -34,17 +34,15 @@ export class JiraClient {
     private async sendRequest(options: RequestUrlParam): Promise<any> {
         let response: RequestUrlResponse
         try {
-            console.info('request', options)
+            this._settings.logRequestsResponses && console.info('Request:', options)
             response = await requestUrl(options)
         } catch (e) {
             console.error('JiraClient::response', e)
             throw new Error('Request error')
         }
-        console.info('response', response)
+        this._settings.logRequestsResponses && console.info('Response:', response)
 
         if (response.status !== 200) {
-            console.error('jiraClient error response:', response)
-            // console.log(response.headers)
             if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
                 throw new Error(response.json.errorMessages.join('\n'))
             } else {

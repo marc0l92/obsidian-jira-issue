@@ -39,6 +39,7 @@ export interface IJiraIssueSettings {
     inlineIssueUrlToTag: boolean
     inlineIssuePrefix: string
     searchColumns: ISearchColumn[]
+    logRequestsResponses: boolean
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
@@ -69,6 +70,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
         fields: [],
         functions: {},
     },
+    logRequestsResponses: false,
 }
 
 export class JiraIssueSettingsTab extends PluginSettingTab {
@@ -313,6 +315,18 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setValue(this._data.cacheTime)
                 .onChange(async value => {
                     this._data.cacheTime = value
+                    await this.saveSettings()
+                }))
+
+
+        containerEl.createEl('h2', { text: 'Troubleshooting' })
+        new Setting(containerEl)
+            .setName('Log Request and Responses')
+            .setDesc('Long in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
+            .addToggle(toggle => toggle
+                .setValue(this._data.logRequestsResponses)
+                .onChange(async value => {
+                    this._data.logRequestsResponses = value
                     await this.saveSettings()
                 }))
     }
