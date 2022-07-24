@@ -21,9 +21,9 @@ This plugin allows you to track the progress of [Atlassian Jira](https://www.atl
 <a href='https://ko-fi.com/marc0l92' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png' border='0' alt='Buy Me a Coffee'></a>
 
 
-![issues](./doc/issues.png)
+![issues](./assets/issues.png)
 
-![searchResults](./doc/searchResults2.png)
+![searchResults](./assets/searchResults2.png)
 
 ## Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
@@ -107,7 +107,7 @@ Example:
     query: key = OPEN-357
     columns: key, -key, type, -type, reporter, -reporter, created, -created
     ```
-![Compact Columns](./doc/compactColumns.png)
+![Compact Columns](./assets/compactColumns.png)
 
 JIRA non standard column (custom fields) can be inserted using the `$` symbol.
 
@@ -130,7 +130,7 @@ Example:
     columns: key, summary, status, notes
     ```
 
-![Notes Column](./doc/notesColumn.png)
+![Notes Column](./assets/notesColumn.png)
 
 You can also access the frontmatter section of the note using the [jsonpath](https://github.com/dchester/jsonpath) syntax after the column `NOTES`. Example:
 
@@ -156,7 +156,7 @@ Example:
     JIRA:-OPEN-356
     ```
 
-![Inline issues](./doc/inlineIssues.png)
+![Inline issues](./assets/inlineIssues.png)
 
 
 
@@ -166,4 +166,4 @@ Example:
 - Clear cache: clear cached issues before the expiration time to download them again.
 - Search wizard: open the search wizard modal to help you to create a search query:
 
-![searchWizard](./doc/searchWizard.png)
+![searchWizard](./assets/searchWizard.png)
