@@ -16,9 +16,13 @@ jobs:
           node-version: 18
           cache: yarn
 
-      - name: Change directory to docs-gen
-        run: cd docs-gen
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        with:
+          path: ./docs-gen
       - name: Build website
-        run: GIT_USER=marc0l92 && yarn run deploy
+        run: yarn run deploy
+        env:
+          GIT_USER: marc0l92
+        with:
+          path: ./docs-gen
