@@ -16,6 +16,8 @@ jobs:
           node-version: 18
           cache: yarn
 
+      - name: Change directory to docs-gen
+        run: cd docs-gen
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build website
