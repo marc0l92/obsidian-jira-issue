@@ -9,6 +9,7 @@ const config = {
   title: 'Obsidian Jira Issue',
   tagline: 'Track the progress of Atlassian Jira issues from your Obsidian notes',
   url: 'https://marc0l92.github.io',
+  trailingSlash: false,
   baseUrl: '/obsidian-jira-issue/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
