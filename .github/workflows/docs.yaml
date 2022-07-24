@@ -17,12 +17,12 @@ jobs:
           cache: yarn
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
-        with:
-          path: ./docs-gen
+        run: |
+          cd ./docs-gen
+          yarn install --frozen-lockfile
       - name: Build website
-        run: yarn run deploy
+        run: |
+          cd ./docs-gen
+          yarn run deploy
         env:
           GIT_USER: marc0l92
-        with:
-          path: ./docs-gen
