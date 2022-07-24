@@ -19,4 +19,4 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build website
-        run: GIT_USER=marc0l92 && yarn deploy
+        run: GIT_USER=marc0l92 && yarn run deploy
