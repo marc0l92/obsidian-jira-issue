@@ -8,8 +8,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Obsidian Jira Issue',
   tagline: 'Track the progress of Atlassian Jira issues from your Obsidian notes',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://marc0l92.github.io',
+  baseUrl: '/obsidian-jira-issue/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -58,7 +58,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'get-started/introduction',
+            docId: '/get-started/introduction',
             position: 'left',
             label: 'Get Started',
           },
@@ -94,11 +94,11 @@ const config = {
             items: [
               {
                 label: 'Get Started',
-                to: '/docs/get-started',
+                to: '/docs/get-started/introduction',
               },
               {
                 label: 'Components',
-                to: '/docs/components',
+                to: '/category/components',
               },
             ],
           },
