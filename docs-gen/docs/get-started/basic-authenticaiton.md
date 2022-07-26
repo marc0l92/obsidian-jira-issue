@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
 ---
-# Jira Count
+# Basic authentication
 
 Work in progress

@@ -3,6 +3,6 @@
   "position": 3,
   "link": {
     "type": "generated-index",
-    "description": "components description."
+    "description": "Plugin elements that can be integrated in the notes."
   }
 }

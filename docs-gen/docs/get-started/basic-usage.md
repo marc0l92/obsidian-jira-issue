@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
 ---
-# Inline Issue
+# Basic usage
+
 Work in progress
