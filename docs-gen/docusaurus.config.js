@@ -13,7 +13,7 @@ const config = {
   baseUrl: '/obsidian-jira-issue/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  // favicon: 'img/favicon.ico',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -48,10 +48,10 @@ const config = {
     ({
       navbar: {
         title: 'Obsidian Jira Issue',
-        logo: {
-          alt: 'obsidian-jira-issue',
-          src: 'img/logo.svg',
-        },
+        // logo: {
+        //   alt: 'obsidian-jira-issue',
+        //   src: 'img/logo.svg',
+        // },
         items: [
           {
             type: 'doc',
@@ -116,6 +116,15 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+    plugins: [],
+    themes: [
+      [
+        require.resolve("@easyops-cn/docusaurus-search-local"),
+        {
+          hashed: true,
+        },
+      ],
+    ],
 };
 
 module.exports = config;
