@@ -1,0 +1,1 @@
+(self.webpackChunkobsidian_jira_issue=self.webpackChunkobsidian_jira_issue||[]).push([[525],{5525:()=>{}}]);
