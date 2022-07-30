@@ -19,15 +19,25 @@ This setting allows you to enable the dark mode of the plugin.
 Examples:
 
 ![light-mode1](/img/light-mode1.png)
+
 ![dark-mode1](/img/dark-mode1.png)
 
 ## Issue URL to tag
 
-:::info
-
-Work in progress
-
+:::caution
+This feature is currently not available in Live Preview mode, but only in reading mode.
 :::
+
+This settings allows you to enable the conversion of Jira issue URL to tags. The plugin looks for URL that are composed like:
+
+```
+<host>/browse/<issue-key>
+```
+
+Example:
+```
+https://my-project.jira.com/browse/ABCD-1234
+```
 
 ## Inline issue prefix
 
@@ -35,7 +45,7 @@ This setting allows you to configure the prefix used to identify inline issues. 
 
 Example:
 ```
-JIRA:AMQCPP-711
+JIRA:ABCD-711
 ```
 
 The default value is `JIRA:`.
