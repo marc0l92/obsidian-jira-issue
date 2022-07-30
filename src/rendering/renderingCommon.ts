@@ -51,9 +51,9 @@ export class RenderingCommon {
     public renderLoadingItem(item: string, itemUrl: string, inline = false): HTMLElement {
         let tagsRow
         if (inline) {
-            tagsRow = createSpan('ji-tags has-addons')
+            tagsRow = createSpan({ cls: 'ji-tags has-addons' })
         } else {
-            tagsRow = createDiv('ji-tags has-addons')
+            tagsRow = createDiv({ cls: 'ji-tags has-addons' })
         }
         createSpan({ cls: 'spinner', parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow }) })
         createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, href: itemUrl, text: item, parent: tagsRow })

@@ -77,6 +77,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
     private _data: IJiraIssueSettings = DEFAULT_SETTINGS
     private _onChangeListener: (() => void) | null = null
+    private _searchColumnsDetails: HTMLDetailsElement = null
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
@@ -104,6 +105,11 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     }
 
     display(): void {
+        // Backup the search columns details status
+        const isSearchColumnsDetailsOpen = this._searchColumnsDetails
+            && this._searchColumnsDetails.getAttribute('open') !== null
+
+        // Clean the page
         const { containerEl } = this
         containerEl.empty()
 
@@ -216,8 +222,12 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             "Columns to display in the jira-search table visualization.",
         )
         new Setting(containerEl).setDesc(desc)
+        this._searchColumnsDetails = containerEl.createEl('details',
+            { attr: isSearchColumnsDetailsOpen ? { open: true } : {} }
+        )
+        this._searchColumnsDetails.createEl('summary', { text: 'Show/Hide columns' })
         this._data.searchColumns.forEach((column, index) => {
-            const setting = new Setting(containerEl)
+            const setting = new Setting(this._searchColumnsDetails)
                 .addDropdown(dropdown => dropdown
                     .addOptions(SEARCH_COLUMNS_DESCRIPTION)
                     .setValue(column.type)
@@ -283,7 +293,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
             setting.infoEl.remove()
         })
-        const searchColumnsButtons = new Setting(containerEl)
+        const searchColumnsButtons = new Setting(this._searchColumnsDetails)
         searchColumnsButtons.addButton(button => button
             .setButtonText("Add Column")
             .setCta()
