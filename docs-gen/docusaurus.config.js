@@ -91,30 +91,30 @@ const config = {
       },
       footer: {
         style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Get Started',
-                to: '/docs/get-started/introduction',
-              },
-              {
-                label: 'Components',
-                to: '/docs/category/components',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/marc0l92',
-              },
-            ],
-          },
-        ],
+        // links: [
+        //   {
+        //     title: 'Docs',
+        //     items: [
+        //       {
+        //         label: 'Get Started',
+        //         to: '/docs/get-started/introduction',
+        //       },
+        //       {
+        //         label: 'Components',
+        //         to: '/docs/category/components',
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     title: 'Community',
+        //     items: [
+        //       {
+        //         label: 'GitHub',
+        //         href: 'https://github.com/marc0l92',
+        //       },
+        //     ],
+        //   },
+        // ],
         copyright: `Copyright © ${new Date().getFullYear()} obsidian-jira-issue. Built with Docusaurus.`,
       },
       prism: {
