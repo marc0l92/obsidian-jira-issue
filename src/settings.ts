@@ -332,7 +332,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         containerEl.createEl('h2', { text: 'Troubleshooting' })
         new Setting(containerEl)
             .setName('Log Request and Responses')
-            .setDesc('Long in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
+            .setDesc('Log in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
             .addToggle(toggle => toggle
                 .setValue(this._data.logRequestsResponses)
                 .onChange(async value => {
