@@ -57,7 +57,7 @@ TIME_ESTIMATE, TIME_ORIGINAL_ESTIMATE, TIME_SPENT, AGGREGATE_PROGRESS, PROGRESS,
 Example:
 ````
 ```jira-search
-query: key = OPEN-357
+query: status = 'In Progress' order by priority DESC
 columns: key, -key, type, -type, reporter, -reporter, created, -created
 ```
 ````
@@ -70,7 +70,7 @@ Jira non standard fields (a.k.a. custom fields) can be inserted using the `$` sy
 Example:
 ````
 ```jira-search
-query: key = OPEN-357
+query: status = 'In Progress' order by priority DESC
 columns: key, summary, $Epic Link, $Global Rank, $12313422, -$12313499
 ```
 ````
@@ -78,22 +78,32 @@ columns: key, summary, $Epic Link, $Global Rank, $12313422, -$12313499
 It is possible to provide the ID number of the custom field or its name.
 
 ## Link to notes
-------------------continue from here
 The special column `NOTES` can be used with `jira-search` tables to create a column that shows all the notes that start with the issue key.
 
 Example:
 ````
 ```jira-search
-query: key = OPEN-357
+query: status = 'In Progress' order by priority DESC
 columns: key, summary, status, notes
 ```
 ````
 
 ![Notes Column](/img/notesColumn.png)
 
-You can also access the frontmatter section of the note using the [jsonpath](https://github.com/dchester/jsonpath) syntax after the column `NOTES`. Example:
+This column is useful to connect the issues with your notes about them. The note title must start with the issue key but it can also contains other letters after that.
+Examples:
+```
+AAA-123
+AAA-123 User story summary
+AAA-123 Custom string
+```
+If no notes are found, a `➕` button will be shown in order to allow the creation of a new note directly from this table.
+
+### Frontmatter
+
+You can also access the frontmatter section of the linked notes using the [jsonpath](https://github.com/dchester/jsonpath) syntax after the column `NOTES`. Example:
 
 ```jira-search
-query: key = OPEN-357
+query: status = 'In Progress' order by priority DESC
 columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0], notes..book[?(@.price<30 && @.category=="fiction")]
 ```
