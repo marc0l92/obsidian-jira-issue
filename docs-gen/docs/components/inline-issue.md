@@ -9,7 +9,7 @@ They can be added inside paragraphs, titles, bullet points list, checkbox lists,
 
 Example:
 
-![inlineissues](/img/inlineissues.png)
+![inlineIssues](/img/inlineIssues.png)
 
 Syntax:
 ````
