@@ -9,10 +9,10 @@ export const SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION = {
     [ESearchResultsRenderingTypes.LIST]: 'List',
 }
 
-// TODO: jira-search custom columns
 export enum ESearchColumnsTypes {
     KEY = 'KEY',
     SUMMARY = 'SUMMARY',
+    DESCRIPTION = 'DESCRIPTION',
     TYPE = 'TYPE',
     CREATED = 'CREATED',
     UPDATED = 'UPDATED',
@@ -46,6 +46,7 @@ export enum ESearchColumnsTypes {
 export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.KEY]: 'Key',
     [ESearchColumnsTypes.SUMMARY]: 'Summary',
+    [ESearchColumnsTypes.DESCRIPTION]: 'Description',
     [ESearchColumnsTypes.TYPE]: 'Type',
     [ESearchColumnsTypes.CREATED]: 'Created',
     [ESearchColumnsTypes.UPDATED]: 'Updated',
@@ -63,7 +64,7 @@ export const SEARCH_COLUMNS_DESCRIPTION = {
     [ESearchColumnsTypes.AGGREGATE_TIME_ORIGINAL_ESTIMATE]: '#🕑Original Estimate',
     [ESearchColumnsTypes.AGGREGATE_TIME_SPENT]: '#🕑Spent',
     [ESearchColumnsTypes.FIX_VERSIONS]: 'Fix Versions',
-    // [ESearchColumnsTypes.LINKS]: 'Links',
+    // [ESearchColumnsTypes.LINKS]: 'Links', // TODO
     [ESearchColumnsTypes.LABELS]: 'Labels',
     [ESearchColumnsTypes.COMPONENTS]: 'Components',
     [ESearchColumnsTypes.LAST_VIEWED]: 'Last Viewed',

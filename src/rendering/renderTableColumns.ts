@@ -58,6 +58,17 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('td', { text: issue.fields.summary, parent: row })
                 }
                 break
+            case ESearchColumnsTypes.DESCRIPTION:
+                if (column.compact) {
+                    let descriptionCompact = issue.fields.description.substring(0, DESCRIPTION_COMPACT_MAX_LENGTH)
+                    if (issue.fields.description.length > DESCRIPTION_COMPACT_MAX_LENGTH) {
+                        descriptionCompact += '…'
+                    }
+                    createEl('td', { text: descriptionCompact, title: issue.fields.description, parent: row })
+                } else {
+                    createEl('td', { text: issue.fields.description, parent: row })
+                }
+                break
             case ESearchColumnsTypes.TYPE:
                 const typeCell = createEl('td', { parent: row })
                 createEl('img', {
