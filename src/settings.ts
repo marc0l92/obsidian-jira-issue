@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
-import { IJiraAutocompleteDataField } from './client/jiraInterfaces'
+import { IJiraAutocompleteDataField, IJiraFieldSchema } from './client/jiraInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
@@ -26,13 +26,16 @@ export interface IJiraIssueSettings {
     apiBasePath: string
     cacheTime: string
     searchResultsLimit: number
-    statusColorCache: Record<string, string>
-    customFieldsIdToName: Record<string, string>
-    customFieldsNameToId: Record<string, string>
-    jqlAutocomplete: {
-        fields: IJiraAutocompleteDataField[]
-        functions: {
-            [key: string]: [string]
+    cache: {
+        statusColor: Record<string, string>
+        customFieldsIdToName: Record<string, string>
+        customFieldsNameToId: Record<string, string>
+        customFieldsType: Record<string, IJiraFieldSchema>
+        jqlAutocomplete: {
+            fields: IJiraAutocompleteDataField[]
+            functions: {
+                [key: string]: [string]
+            }
         }
     }
     darkMode: boolean
@@ -49,9 +52,16 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     password: '********',
     cacheTime: '15m',
     searchResultsLimit: 10,
-    statusColorCache: {},
-    customFieldsIdToName: {},
-    customFieldsNameToId: {},
+    cache: {
+        statusColor: {},
+        customFieldsIdToName: {},
+        customFieldsNameToId: {},
+        customFieldsType: {},
+        jqlAutocomplete: {
+            fields: [],
+            functions: {},
+        },
+    },
     darkMode: false,
     inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',
@@ -66,10 +76,6 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
         { type: ESearchColumnsTypes.PRIORITY, compact: true },
         { type: ESearchColumnsTypes.STATUS, compact: false },
     ],
-    jqlAutocomplete: {
-        fields: [],
-        functions: {},
-    },
     logRequestsResponses: false,
 }
 
@@ -90,11 +96,11 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     async loadSettings() {
         this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
-        this._data.statusColorCache = DEFAULT_SETTINGS.statusColorCache
+        this._data.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
     }
 
     async saveSettings() {
-        await this._plugin.saveData(this._data)
+        await this._plugin.saveData(Object.assign({}, this._data, { cache: {} }))
         if (this._onChangeListener) {
             this._onChangeListener()
         }

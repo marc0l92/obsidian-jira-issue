@@ -73,9 +73,9 @@ export class QuerySuggest extends EditorSuggest<SuggestionEntry> {
         // query = query.replace(/^\$/, '')
         // let customFieldsOptions = []
         // if (Number(query)) {
-        //     customFieldsOptions = Object.keys(this._settings.customFieldsIdToName)
+        //     customFieldsOptions = Object.keys(this._settings.cache.customFieldsIdToName)
         // } else {
-        //     customFieldsOptions = Object.keys(this._settings.customFieldsNameToId)
+        //     customFieldsOptions = Object.keys(this._settings.cache.customFieldsNameToId)
         // }
         // for (const column of customFieldsOptions) {
         //     if (suggestions.length >= this.limit) break

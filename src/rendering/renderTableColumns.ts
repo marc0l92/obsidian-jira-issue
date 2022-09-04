@@ -225,7 +225,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('td', { text: issue.fields.progress.percent.toString() + '%', parent: row })
                 break
             case ESearchColumnsTypes.CUSTOM_FIELD:
-                createEl('td', { text: issue.fields[`customfield_${column.extra}`].toString(), parent: row })
+                createEl('td', { text: renderCustomField(issue.fields[`customfield_${column.extra}`]), parent: row })
                 break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
@@ -276,4 +276,11 @@ function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTM
         createEl('a', { text: value, title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
         createEl('br', { parent: noteCell })
     }
+}
+
+function renderCustomField(value: any): string {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return value.toString()
+    }
+    return JSON.stringify(value)
 }

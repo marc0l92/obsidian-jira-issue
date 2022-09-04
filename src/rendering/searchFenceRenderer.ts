@@ -77,7 +77,7 @@ export class SearchFenceRenderer {
             }
             // Custom field
             if (column.type === ESearchColumnsTypes.CUSTOM_FIELD) {
-                name = this._settings.customFieldsIdToName[column.extra]
+                name = this._settings.cache.customFieldsIdToName[column.extra]
             }
             if (column.compact) {
                 createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })

@@ -160,7 +160,7 @@ export class JiraClient {
     }
 
     async updateStatusColorCache(status: string): Promise<void> {
-        if (status in this._settings.statusColorCache) {
+        if (status in this._settings.cache.statusColor) {
             return
         }
         const response = await this.sendRequest(
@@ -170,7 +170,7 @@ export class JiraClient {
                 headers: this.buildHeaders(),
             }
         )
-        this._settings.statusColorCache[status] = response.statusCategory.colorName
+        this._settings.cache.statusColor[status] = response.statusCategory.colorName
     }
 
     async updateCustomFieldsCache(): Promise<void> {
@@ -181,11 +181,14 @@ export class JiraClient {
                 headers: this.buildHeaders(),
             }
         )
-        this._settings.customFieldsIdToName = {}
+        this._settings.cache.customFieldsIdToName = {}
+        this._settings.cache.customFieldsNameToId = {}
+        this._settings.cache.customFieldsType = {}
         for (const field of response) {
             if (field.custom && field.schema && field.schema.customId) {
-                this._settings.customFieldsIdToName[field.schema.customId] = field.name
-                this._settings.customFieldsNameToId[field.name] = field.schema.customId.toString()
+                this._settings.cache.customFieldsIdToName[field.schema.customId] = field.name
+                this._settings.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
+                this._settings.cache.customFieldsType[field.schema.customId] = field.schema
             }
         }
     }
@@ -198,17 +201,17 @@ export class JiraClient {
                 headers: this.buildHeaders(),
             }
         )
-        this._settings.jqlAutocomplete.functions = {}
+        this._settings.cache.jqlAutocomplete = { fields: [], functions: {} }
         for (const functionData of response.visibleFunctionNames) {
             for (const functionType of functionData.types) {
-                if (functionType in this._settings.jqlAutocomplete.functions) {
-                    this._settings.jqlAutocomplete.functions[functionType].push(functionData.value)
+                if (functionType in this._settings.cache.jqlAutocomplete.functions) {
+                    this._settings.cache.jqlAutocomplete.functions[functionType].push(functionData.value)
                 } else {
-                    this._settings.jqlAutocomplete.functions[functionType] = [functionData.value]
+                    this._settings.cache.jqlAutocomplete.functions[functionType] = [functionData.value]
                 }
             }
         }
-        this._settings.jqlAutocomplete.fields = response.visibleFieldNames
+        this._settings.cache.jqlAutocomplete.fields = response.visibleFieldNames
     }
 
     async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {

@@ -95,10 +95,13 @@ export interface IJiraField {
     custom: boolean
     id: string
     name: string
-    schema: {
-        customId: number
-        type: string
-    }
+    schema: IJiraFieldSchema
+}
+
+export interface IJiraFieldSchema {
+    customId: number
+    type: string
+    items?: string
 }
 
 export interface IJiraAutocompleteDataField {

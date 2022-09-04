@@ -144,13 +144,13 @@ export class SearchView {
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
                                         if (Number(customFieldInput)) {
                                             // Custom field provided as number
-                                            if (!(customFieldInput in this._settings.customFieldsIdToName)) {
+                                            if (!(customFieldInput in this._settings.cache.customFieldsIdToName)) {
                                                 throw new Error(`Custom field with id ${customFieldInput} not found`)
                                             }
                                             columnExtra = customFieldInput
                                         } else {
                                             // Custom field provided as name
-                                            columnExtra = this._settings.customFieldsNameToId[customFieldInput]
+                                            columnExtra = this._settings.cache.customFieldsNameToId[customFieldInput]
                                             if (!columnExtra) {
                                                 throw new Error(`Custom field with name "${customFieldInput}" not found`)
                                             }
