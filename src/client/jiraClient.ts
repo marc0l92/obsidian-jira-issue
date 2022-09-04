@@ -2,6 +2,38 @@ import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsid
 import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraField, IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
 
+function getMimeType(imageBuffer: ArrayBuffer): string {
+    const imageBufferUint8 = new Uint8Array(imageBuffer.slice(0, 4))
+    let bytes: string[] = []
+    imageBufferUint8.forEach((byte) => {
+        bytes.push(byte.toString(16))
+    })
+    const hex = bytes.join('').toUpperCase()
+    switch (hex) {
+        case '89504E47':
+            return 'image/png'
+        case '47494638':
+            return 'image/gif'
+        case 'FFD8FFDB':
+        case 'FFD8FFE0':
+        case 'FFD8FFE1':
+            return 'image/jpeg'
+        case '3C737667':
+            return 'image/svg+xml'
+        default:
+            console.error('Image mimeType not found')
+            return null
+    }
+}
+
+function base64Encode(s: string) {
+    if (Platform.isMobileApp) {
+        return btoa(s)
+    } else {
+        return Buffer.from(s).toString('base64')
+    }
+}
+
 export class JiraClient {
     private _settings: IJiraIssueSettings
 
@@ -20,11 +52,7 @@ export class JiraClient {
     private buildHeaders(): Record<string, string> {
         const requestHeaders: Record<string, string> = {}
         if (this._settings.authenticationType === EAuthenticationTypes.BASIC) {
-            if (Platform.isMobileApp) {
-                requestHeaders['Authorization'] = 'Basic ' + btoa(`${this._settings.username}:${this._settings.password}`)
-            } else {
-                requestHeaders['Authorization'] = 'Basic ' + Buffer.from(`${this._settings.username}:${this._settings.password}`).toString('base64')
-            }
+            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${this._settings.username}:${this._settings.password}`)
         } else if (this._settings.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             requestHeaders['Authorization'] = `Bearer ${this._settings.bareToken}`
         }
@@ -34,13 +62,13 @@ export class JiraClient {
     private async sendRequest(options: RequestUrlParam): Promise<any> {
         let response: RequestUrlResponse
         try {
-            this._settings.logRequestsResponses && console.info('Request:', options)
+            this._settings.logRequestsResponses && console.info('JiraIssue:Request:', options)
             response = await requestUrl(options)
         } catch (e) {
-            console.error('JiraClient::response', e)
+            console.error('JiraIssue:response', e)
             throw new Error('Request error')
         }
-        this._settings.logRequestsResponses && console.info('Response:', response)
+        this._settings.logRequestsResponses && console.info('JiraIssue:Response:', response)
 
         if (response.status !== 200) {
             if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
@@ -53,14 +81,63 @@ export class JiraClient {
         return response.json
     }
 
-    async getIssue(issue: string): Promise<IJiraIssue> {
-        return await this.sendRequest(
+    private async preFetchImage(url: string): Promise<string> {
+        // Pre fetch only images hosted on the Jira server
+        if (!url.startsWith(this._settings.host)) {
+            return url
+        }
+
+        const options = {
+            url: url,
+            method: 'GET',
+            headers: this.buildHeaders(),
+        }
+        let response: RequestUrlResponse
+        try {
+            this._settings.logRequestsResponses && console.info('JiraIssue:RequestImage:', options)
+            response = await requestUrl(options)
+        } catch (e) {
+            console.error('JiraIssue:ResponseImage', e)
+            return url
+        }
+        this._settings.logRequestsResponses && console.info('JiraIssue:ResponseImage:', response)
+
+        if (response.status === 200) {
+            const mimeType = getMimeType(response.arrayBuffer)
+            if (mimeType) {
+                return `data:${mimeType};base64,` + base64Encode(response.text)
+            }
+        }
+        return url
+    }
+
+    private async fetchIssueImages(issue: IJiraIssue) {
+        if (issue.fields) {
+            if (issue.fields.issuetype) {
+                issue.fields.issuetype.iconUrl = await this.preFetchImage(issue.fields.issuetype.iconUrl)
+            }
+            if (issue.fields.reporter) {
+                issue.fields.reporter.avatarUrls['16x16'] = await this.preFetchImage(issue.fields.reporter.avatarUrls['16x16'])
+            }
+            if (issue.fields.assignee) {
+                issue.fields.assignee.avatarUrls['16x16'] = await this.preFetchImage(issue.fields.assignee.avatarUrls['16x16'])
+            }
+            if (issue.fields.priority) {
+                issue.fields.priority.iconUrl = await this.preFetchImage(issue.fields.priority.iconUrl)
+            }
+        }
+    }
+
+    async getIssue(issueKey: string): Promise<IJiraIssue> {
+        const issue = await this.sendRequest(
             {
-                url: this.buildUrl(`/issue/${issue}`),
+                url: this.buildUrl(`/issue/${issueKey}`),
                 method: 'GET',
                 headers: this.buildHeaders(),
             }
-        )
+        ) as IJiraIssue
+        await this.fetchIssueImages(issue)
+        return issue
     }
 
     async getSearchResults(query: string, max: number): Promise<IJiraSearchResults> {
@@ -69,13 +146,17 @@ export class JiraClient {
             startAt: "0",
             maxResults: max > 0 ? max.toString() : '',
         })
-        return await this.sendRequest(
+        const searchResults = await this.sendRequest(
             {
                 url: this.buildUrl(`/search`, queryParameters),
                 method: 'GET',
                 headers: this.buildHeaders(),
             }
-        )
+        ) as IJiraSearchResults
+        for (let issue of searchResults.issues) {
+            await this.fetchIssueImages(issue)
+        }
+        return searchResults
     }
 
     async updateStatusColorCache(status: string): Promise<void> {
