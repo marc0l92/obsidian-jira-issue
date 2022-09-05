@@ -26,6 +26,15 @@ function getMimeType(imageBuffer: ArrayBuffer): string {
     }
 }
 
+function bufferBase64Encode(b: ArrayBuffer) {
+    const a = new Uint8Array(b)
+    if (Platform.isMobileApp) {
+        return btoa(String.fromCharCode(...a))
+    } else {
+        return Buffer.from(a).toString('base64')
+    }
+}
+
 function base64Encode(s: string) {
     if (Platform.isMobileApp) {
         return btoa(s)
@@ -105,7 +114,7 @@ export class JiraClient {
         if (response.status === 200) {
             const mimeType = getMimeType(response.arrayBuffer)
             if (mimeType) {
-                return `data:${mimeType};base64,` + base64Encode(response.text)
+                return `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
             }
         }
         return url
