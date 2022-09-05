@@ -21,7 +21,7 @@ function getMimeType(imageBuffer: ArrayBuffer): string {
         case '3C737667':
             return 'image/svg+xml'
         default:
-            console.error('Image mimeType not found')
+            console.error('Image mimeType not found:', hex)
             return null
     }
 }
