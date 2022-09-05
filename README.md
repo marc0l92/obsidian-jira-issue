@@ -2,14 +2,14 @@
 
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian.md](https://obsidian.md/) notes.
 
-- [Get started](https://marc0l92.github.io/obsidian-jira-issue/docs/get-started/introduction)
-
 <a href='https://ko-fi.com/marc0l92' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png' border='0' alt='Buy Me a Coffee'></a>
-
 
 ![issues](./assets/issues.png)
 
 ![searchResults](./assets/searchResults2.png)
+
+## Documentation
+Check out the complete [documentation](https://marc0l92.github.io/obsidian-jira-issue) to start using Jira-Issue.
 
 ## Installation
 From the obsidian app go in `Settings > Third-party plugins > Community Plugins > Browse` and search for `jira-issue`.
@@ -86,3 +86,7 @@ JIRA:-OPEN-356
 Feel free to share your experiences, feedbacks and suggestions in the by opening a GitHub issue.
 
 Pull requests are welcome.
+
+## License
+
+Jira-Issue is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https://github.com/marc0l92/obsidian-jira-issue/blob/master/LICENSE) for more information.
