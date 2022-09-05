@@ -19,6 +19,7 @@ function getMimeType(imageBuffer: ArrayBuffer): string {
         case 'FFD8FFE1':
             return 'image/jpeg'
         case '3C737667':
+        case '3C3F786D':
             return 'image/svg+xml'
         default:
             console.error('Image mimeType not found:', hex)
