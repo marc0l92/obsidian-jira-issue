@@ -41,9 +41,9 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
             case ESearchColumnsTypes.KEY:
                 createEl('a', {
                     cls: 'no-wrap',
-                    href: renderingCommon.issueUrl(issue.key),
+                    href: renderingCommon.issueUrl(issue.account, issue.key),
                     text: column.compact ? '🔗' : issue.key,
-                    title: column.compact ? issue.key : '',
+                    title: column.compact ? issue.key : renderingCommon.issueUrl(issue.account, issue.key),
                     parent: createEl('td', { parent: row })
                 })
                 break

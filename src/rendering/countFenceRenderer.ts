@@ -23,13 +23,13 @@ export class CountFenceRenderer {
             if (cachedSearchResults.isError) {
                 this._rc.renderSearchError(el, source, cachedSearchResults.data as SearchView)
             } else {
-                this.renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults).total, source)
+                this.renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults), source)
             }
         } else {
-            this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(source))
+            this._rc.renderLoadingItem('Loading...')
             this._client.getSearchResults(source, -1).then(newSearchResults => {
                 const searchResults = this._cache.add(source, newSearchResults).data as IJiraSearchResults
-                this.renderSearchCount(el, searchResults.total, source)
+                this.renderSearchCount(el, searchResults, source)
             }).catch(err => {
                 this._cache.add(source, err, true)
                 this._rc.renderSearchError(el, source, err)
@@ -37,10 +37,11 @@ export class CountFenceRenderer {
         }
     }
 
-    private renderSearchCount(el: HTMLElement, searchResultsCount: number, query: string): void {
+    private renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, query: string): void {
         const tagsRow = createDiv('ji-tags has-addons')
+        this._rc.renderAccountColorBand(searchResults.account, tagsRow)
         createSpan({ cls: `ji-tag is-link ${this._rc.getTheme()}`, text: `Count`, title: query, parent: tagsRow })
-        createSpan({ cls: `ji-tag ${this._rc.getTheme()}`, text: searchResultsCount.toString(), title: query, parent: tagsRow })
+        createSpan({ cls: `ji-tag ${this._rc.getTheme()}`, text: searchResults.total.toString(), title: query, parent: tagsRow })
         el.replaceChildren(this._rc.renderContainer([tagsRow]))
     }
 }

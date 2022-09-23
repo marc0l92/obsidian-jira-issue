@@ -1,3 +1,4 @@
+import { IJiraIssueAccountSettings } from "./client/jiraInterfaces"
 import { COMMENT_REGEX, COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
 
 export enum ESearchResultsRenderingTypes {
@@ -89,6 +90,7 @@ export class SearchView {
     query = ''
     limit = ''
     columns: ISearchColumn[] = []
+    account: IJiraIssueAccountSettings // TODO: support explicit accounts
     private _settings: IJiraIssueSettings
 
     constructor(settings: IJiraIssueSettings) {

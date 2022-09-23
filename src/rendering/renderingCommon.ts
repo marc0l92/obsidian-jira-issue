@@ -1,5 +1,5 @@
 import { App, FrontMatterCache, TFile } from "obsidian"
-import { IJiraIssue } from "src/client/jiraInterfaces"
+import { IJiraIssue, IJiraIssueAccountSettings } from "src/client/jiraInterfaces"
 import { SearchView } from "src/searchView"
 import { IJiraIssueSettings } from "src/settings"
 
@@ -20,12 +20,16 @@ export class RenderingCommon {
         this._app = app
     }
 
-    public issueUrl(issueKey: string): string {
-        return (new URL(`${this._settings.host}/browse/${issueKey}`)).toString()
+    public issueUrl(account: IJiraIssueAccountSettings, issueKey: string): string {
+        try {
+            return (new URL(`${account.host}/browse/${issueKey}`)).toString()
+        } catch (e) { return '' }
     }
 
-    public searchUrl(searchQuery: string): string {
-        return (new URL(`${this._settings.host}/issues??filter=-4&jql${searchQuery}`)).toString()
+    public searchUrl(account: IJiraIssueAccountSettings, searchQuery: string): string {
+        try {
+            return (new URL(`${account.host}/issues?filter=-4&jql=${searchQuery}`)).toString()
+        } catch (e) { return '' }
     }
 
     public getTheme(): string {
@@ -48,7 +52,7 @@ export class RenderingCommon {
         return container
     }
 
-    public renderLoadingItem(item: string, itemUrl: string, inline = false): HTMLElement {
+    public renderLoadingItem(item: string, inline = false): HTMLElement {
         let tagsRow
         if (inline) {
             tagsRow = createSpan({ cls: 'ji-tags has-addons' })
@@ -56,7 +60,7 @@ export class RenderingCommon {
             tagsRow = createDiv({ cls: 'ji-tags has-addons' })
         }
         createSpan({ cls: 'spinner', parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow }) })
-        createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, href: itemUrl, text: item, parent: tagsRow })
+        createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, text: item, parent: tagsRow })
         createSpan({ cls: `ji-tag ${this.getTheme()}`, text: 'Loading ...', parent: tagsRow })
         return tagsRow
     }
@@ -65,7 +69,7 @@ export class RenderingCommon {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
         if (searchView) {
-            createEl('a', { cls: `ji-tag is-danger ${this.getTheme()}`, href: this.searchUrl(searchView.query), text: "Search error", parent: tagsRow })
+            createSpan({ cls: `ji-tag is-danger ${this.getTheme()}`, text: "Search error", parent: tagsRow })
         } else {
             createSpan({ cls: `ji-tag is-danger ${this.getTheme()}`, text: "Search error", parent: tagsRow })
         }
@@ -75,13 +79,14 @@ export class RenderingCommon {
 
     public renderIssue(issue: IJiraIssue, compact = false): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
+        this.renderAccountColorBand(issue.account, tagsRow)
         createEl('img', {
             cls: 'fit-content',
             attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
             title: issue.fields.issuetype.name,
-            parent: createSpan({ cls: `ji-tag ${this.getTheme()}`, parent: tagsRow })
+            parent: createSpan({ cls: `ji-tag ${this.getTheme()} ji-sm-tag`, parent: tagsRow })
         })
-        createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.key), text: issue.key, parent: tagsRow })
+        createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.account, issue.key), title: this.issueUrl(issue.account, issue.key), text: issue.key, parent: tagsRow })
         if (!compact) {
             createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
         }
@@ -93,8 +98,14 @@ export class RenderingCommon {
     public renderIssueError(issueKey: string, message: string): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
-        createEl('a', { cls: 'ji-tag is-danger is-light', href: this.issueUrl(issueKey), text: issueKey, parent: tagsRow })
+        createSpan({ cls: 'ji-tag is-danger is-light', text: issueKey, parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         return tagsRow
+    }
+
+    public renderAccountColorBand(account: IJiraIssueAccountSettings, parent: HTMLDivElement) {
+        if (this._settings.showColorBand) {
+            createSpan({ cls: `ji-tag ${this.getTheme()} ji-band`, attr: { style: `background-color: ${account.color}` }, title: account.alias, parent: parent })
+        }
     }
 }

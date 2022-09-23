@@ -1,16 +1,19 @@
-import { App, PluginSettingTab, Setting } from 'obsidian'
-import { IJiraAutocompleteDataField, IJiraFieldSchema } from './client/jiraInterfaces'
+import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
+import { JiraClient } from './client/jiraClient'
+import { IJiraAutocompleteDataField, IJiraFieldSchema, IJiraIssueAccountSettings } from './client/jiraInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
 export enum EAuthenticationTypes {
     OPEN = 'OPEN',
     BASIC = 'BASIC',
+    CLOUD = 'CLOUD', // TODO: Add to documentation
     BEARER_TOKEN = 'BEARER_TOKEN',
 }
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
     [EAuthenticationTypes.BASIC]: 'Basic Authentication',
+    [EAuthenticationTypes.CLOUD]: 'Jira Cloud',
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
@@ -18,11 +21,7 @@ export const COMPACT_SYMBOL = '-'
 export const COMMENT_REGEX = /^\s*#/
 
 export interface IJiraIssueSettings {
-    host: string
-    authenticationType: EAuthenticationTypes
-    username?: string
-    password?: string
-    bareToken?: string
+    accounts: IJiraIssueAccountSettings[]
     apiBasePath: string
     cacheTime: string
     searchResultsLimit: number
@@ -43,13 +42,28 @@ export interface IJiraIssueSettings {
     inlineIssuePrefix: string
     searchColumns: ISearchColumn[]
     logRequestsResponses: boolean
+    showColorBand: boolean
+
+    // Legacy credentials
+    host?: string
+    authenticationType?: EAuthenticationTypes
+    username?: string
+    password?: string
+    bareToken?: string
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
-    host: 'https://issues.apache.org/jira',
-    authenticationType: EAuthenticationTypes.OPEN,
+    accounts: [
+        {
+            alias: 'Default',
+            host: 'https://your.company.com/jira',
+            authenticationType: EAuthenticationTypes.OPEN,
+            password: '********',
+            priority: 1,
+            color: '#000000',
+        }
+    ],
     apiBasePath: '/rest/api/latest',
-    password: '********',
     cacheTime: '15m',
     searchResultsLimit: 10,
     cache: {
@@ -65,6 +79,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     darkMode: false,
     inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',
+    showColorBand: true,
     searchColumns: [
         { type: ESearchColumnsTypes.KEY, compact: false },
         { type: ESearchColumnsTypes.SUMMARY, compact: false },
@@ -79,15 +94,29 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     logRequestsResponses: false,
 }
 
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 export class JiraIssueSettingsTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
     private _data: IJiraIssueSettings = DEFAULT_SETTINGS
+    private _jiraClient: JiraClient = null
     private _onChangeListener: (() => void) | null = null
     private _searchColumnsDetails: HTMLDetailsElement = null
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
         this._plugin = plugin
+    }
+
+    setJiraClient(client: JiraClient) {
+        this._jiraClient = client
     }
 
     getData(): IJiraIssueSettings {
@@ -97,10 +126,29 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     async loadSettings() {
         this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
         this._data.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
+
+        // Legacy credentials migration
+        if (this._data.accounts.first() === null) {
+            this._data.accounts = [
+                {
+                    host: this._data.host,
+                    authenticationType: this._data.authenticationType,
+                    password: this._data.password,
+                    alias: 'Default',
+                    color: '#000000',
+                    priority: 1,
+                }
+            ]
+            this.saveSettings()
+        }
+        this.accountsConflictsFix()
     }
 
     async saveSettings() {
-        await this._plugin.saveData(Object.assign({}, this._data, { cache: {} }))
+        await this._plugin.saveData(Object.assign({}, this._data, {
+            // Cache settings cleanup
+            cache: {}, jqlAutocomplete: {}, customFieldsIdToName: {}, customFieldsNameToId: {},
+        }))
         if (this._onChangeListener) {
             this._onChangeListener()
         }
@@ -111,75 +159,223 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     }
 
     display(): void {
-        // Backup the search columns details status
+        // Backup the search columns details status before cleaning the page
         const isSearchColumnsDetailsOpen = this._searchColumnsDetails
             && this._searchColumnsDetails.getAttribute('open') !== null
 
         // Clean the page
+        this.containerEl.empty()
+
+        this.displayAccountsSettings()
+        this.displayRenderingSettings()
+        this.displaySearchColumnsSettings(isSearchColumnsDetailsOpen)
+        this.displayExtraSettings()
+    }
+
+    displayAccountsSettings() {
+        const { containerEl } = this
+        containerEl.createEl('h2', { text: 'Accounts' })
+
+        for (const account of this._data.accounts) {
+            const accountSetting = new Setting(containerEl)
+                .setName(`${account.priority}: ${account.alias}`)
+                .setDesc(account.host)
+                .addExtraButton(button => button
+                    .setIcon('pencil')
+                    .setTooltip('Modify')
+                    .onClick(async () => {
+                        // Change page
+                        this.displayModifyAccountPage(account)
+                    }))
+                .addExtraButton(button => button
+                    .setIcon('trash')
+                    .setTooltip('Delete')
+                    .setDisabled(this._data.accounts.length <= 1)
+                    .onClick(async () => {
+                        this._data.accounts.remove(account)
+                        this.accountsConflictsFix()
+                        await this.saveSettings()
+                        // Force refresh
+                        this.display()
+                    }))
+            accountSetting.infoEl.setAttr('style', 'padding-left:5px;border-left:5px solid ' + account.color)
+        }
+        new Setting(containerEl)
+            .addButton(button => button
+                .setButtonText("Add account")
+                .setCta()
+                .onClick(async value => {
+                    this._data.accounts.push(this.createNewEmptyAccount())
+                    this.accountsConflictsFix()
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+    }
+
+    displayModifyAccountPage(prevAccount: IJiraIssueAccountSettings, newAccount: IJiraIssueAccountSettings = null) {
+        if (!newAccount) newAccount = Object.assign({}, prevAccount)
         const { containerEl } = this
         containerEl.empty()
+        containerEl.createEl('h2', { text: 'Modify account' })
 
-        containerEl.createEl('h2', { text: 'Connection' })
+        new Setting(containerEl)
+            .setName('Alias')
+            .setDesc('Name of this account.')
+            .addText(text => text
+                .setPlaceholder('Example: Company name')
+                .setValue(newAccount.alias)
+                .onChange(async value => {
+                    newAccount.alias = value
+                }))
         new Setting(containerEl)
             .setName('Host')
             .setDesc('Hostname of your company Jira server.')
             .addText(text => text
                 .setPlaceholder('Example: ' + DEFAULT_SETTINGS.host)
-                .setValue(this._data.host)
+                .setValue(newAccount.host)
                 .onChange(async value => {
-                    this._data.host = value
-                    await this.saveSettings()
+                    newAccount.host = value
                 }))
         new Setting(containerEl)
             .setName('Authentication type')
             .setDesc('Select how the plugin should authenticate in your Jira server.')
             .addDropdown(dropdown => dropdown
                 .addOptions(AUTHENTICATION_TYPE_DESCRIPTION)
-                .setValue(this._data.authenticationType)
+                .setValue(newAccount.authenticationType)
                 .onChange(async value => {
-                    this._data.authenticationType = value as EAuthenticationTypes
-                    await this.saveSettings()
+                    newAccount.authenticationType = value as EAuthenticationTypes
                     // Force refresh
-                    this.display()
+                    this.displayModifyAccountPage(prevAccount, newAccount)
                 }))
-        if (this._data.authenticationType === EAuthenticationTypes.BASIC) {
+        if (newAccount.authenticationType === EAuthenticationTypes.BASIC) {
             new Setting(containerEl)
-                .setName('Username/Email')
-                .setDesc('Username to access your Jira Server account using HTTP basic authentication. Use the email in case of Jira Cloud.')
+                .setName('Username')
+                .setDesc('Username to access your Jira Server account using HTTP basic authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(this._data.username)
+                    .setValue(newAccount.username)
                     .onChange(async value => {
-                        this._data.username = value
-                        await this.saveSettings()
+                        newAccount.username = value
                     }))
             new Setting(containerEl)
-                .setName('Password/API Token')
-                .setDesc('Password to access your Jira Server account using HTTP basic authentication. Use an API token in case of Jira Cloud.')
+                .setName('Password')
+                .setDesc('Password to access your Jira Server account using HTTP basic authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
                     .setValue(DEFAULT_SETTINGS.password)
                     .onChange(async value => {
-                        this._data.password = value
-                        await this.saveSettings()
+                        newAccount.password = value
                     }))
-        }
-        if (this._data.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
+        } else if (newAccount.authenticationType === EAuthenticationTypes.CLOUD) {
+            new Setting(containerEl)
+                .setName('Email')
+                .setDesc('Email of your Jira Cloud account.')
+                .addText(text => text
+                    // .setPlaceholder('')
+                    .setValue(newAccount.username)
+                    .onChange(async value => {
+                        newAccount.username = value
+                    }))
+            new Setting(containerEl)
+                .setName('API Token')
+                .setDesc('API token of your Jira Cloud account.') // TODO: add link to create token
+                .addText(text => text
+                    // .setPlaceholder('')
+                    .setValue(DEFAULT_SETTINGS.password)
+                    .onChange(async value => {
+                        newAccount.password = value
+                    }))
+        } else if (newAccount.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             new Setting(containerEl)
                 .setName('Bearer token')
                 .setDesc('Token to access your Jira account using OAuth2 Bearer token authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(this._data.bareToken)
+                    .setValue(newAccount.bareToken)
                     .onChange(async value => {
-                        this._data.bareToken = value
-                        await this.saveSettings()
+                        newAccount.bareToken = value
                     }))
         }
+        new Setting(containerEl)
+            .setName('Priority')
+            .setDesc('Accounts search priority.')
+            .addDropdown(dropdown => dropdown
+                .addOptions(this.createPriorityOptions())
+                .setValue(newAccount.priority.toString())
+                .onChange(async value => {
+                    newAccount.priority = parseInt(value)
+                }))
+        let colorTextComponent: TextComponent = null
+        const colorInput = new Setting(containerEl)
+            .setName('Color')
+            .setDesc('Color of the tag border in hexadecimal format (Example: #000000).')
+            .addText(text => {
+                text
+                    .setPlaceholder('Example: #000000')
+                    .setValue(newAccount.color)
+                    .onChange(async value => {
+                        newAccount.color = value
+                        colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
+                    })
+                colorTextComponent = text
+            })
+            .addExtraButton(button => button
+                .setIcon('dice')
+                .setTooltip('New random color')
+                .onClick(async () => {
+                    newAccount.color = getRandomColor()
+                    if (colorTextComponent != null) colorTextComponent.setValue(newAccount.color)
+                    colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
+                })).controlEl.children[0]
+        colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
 
+        new Setting(containerEl)
+            .addButton(button => button
+                .setButtonText("Back")
+                .setWarning()
+                .onClick(async value => {
+                    this.display()
+                }))
+            .addButton(button => button
+                .setButtonText("Test Connection")
+                .onClick(async value => {
+                    button.setDisabled(true)
+                    button.setButtonText("Testing...")
+                    try {
+                        await this._jiraClient.testConnection(newAccount)
+                        new Notice('JiraIssue: Connection established!')
+                        try {
+                            const loggedUser = await this._jiraClient.getLoggedUser(newAccount)
+                            new Notice(`JiraIssue: Logged as ${loggedUser.displayName}`)
+                        } catch (e) {
+                            new Notice('JiraIssue: Logged as Guest')
+                            console.error('JiraIssue:TestConnection', e)
+                        }
+                    } catch (e) {
+                        console.error('JiraIssue:TestConnection', e)
+                        new Notice('JiraIssue: Connection failed!')
+                    }
+                    button.setButtonText("Test Connection")
+                    button.setDisabled(false)
+                }))
+            .addButton(button => button
+                .setButtonText("Save")
+                .setCta()
+                .onClick(async value => {
+                    // Swap priority with another existing account
+                    this._data.accounts.find(a => a.priority === newAccount.priority).priority = prevAccount.priority
+                    Object.assign(prevAccount, newAccount)
+                    this.accountsConflictsFix()
+                    await this.saveSettings()
+                    this.display()
+                }))
+    }
 
-
+    displayRenderingSettings() {
+        const { containerEl } = this
         containerEl.createEl('h2', { text: 'Rendering' })
+
         new Setting(containerEl)
             .setName('Default search results limit')
             .setDesc('Maximum number of search results to retrieve when using jira-search without specifying a limit.')
@@ -202,7 +398,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Issue url to tags')
-            .setDesc(`Convert links to issues to tags. Example: ${this._data.host}/browse/AAA-123`)
+            .setDesc(`Convert links to issues to tags. Example: ${this._data.accounts[0].host}/browse/AAA-123`)
             .addToggle(toggle => toggle
                 .setValue(this._data.inlineIssueUrlToTag)
                 .onChange(async value => {
@@ -219,10 +415,21 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     this._data.inlineIssuePrefix = value
                     await this.saveSettings()
                 }))
+        new Setting(containerEl)
+            .setName('Show color band')
+            .setDesc('Display color band near by inline issue to simplify the account identification.')
+            .addToggle(toggle => toggle
+                .setValue(this._data.showColorBand)
+                .onChange(async value => {
+                    this._data.showColorBand = value
+                    await this.saveSettings()
+                }))
+    }
 
-
-
+    displaySearchColumnsSettings(isSearchColumnsDetailsOpen: boolean) {
+        const { containerEl } = this
         containerEl.createEl('h2', { text: 'Search columns' })
+
         const desc = document.createDocumentFragment()
         desc.append(
             "Columns to display in the jira-search table visualization.",
@@ -299,30 +506,31 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
             setting.infoEl.remove()
         })
-        const searchColumnsButtons = new Setting(this._searchColumnsDetails)
-        searchColumnsButtons.addButton(button => button
-            .setButtonText("Add Column")
-            .setCta()
-            .onClick(async value => {
-                this._data.searchColumns.push({ type: ESearchColumnsTypes.KEY, compact: false })
-                await this.saveSettings()
-                // Force refresh
-                this.display()
-            })
-        )
-        searchColumnsButtons.addButton(button => button
-            .setButtonText("Reset columns")
-            .setWarning()
-            .onClick(async value => {
-                this._data.searchColumns = DEFAULT_SETTINGS.searchColumns
-                await this.saveSettings()
-                // Force refresh
-                this.display()
-            })
-        )
+        new Setting(this._searchColumnsDetails)
+            .addButton(button => button
+                .setButtonText("Reset columns")
+                .setWarning()
+                .onClick(async value => {
+                    this._data.searchColumns = DEFAULT_SETTINGS.searchColumns
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+            .addButton(button => button
+                .setButtonText("Add Column")
+                .setCta()
+                .onClick(async value => {
+                    this._data.searchColumns.push({ type: ESearchColumnsTypes.KEY, compact: false })
+                    await this.saveSettings()
+                    // Force refresh
+                    this.display()
+                }))
+    }
 
-
+    displayExtraSettings() {
+        const { containerEl } = this
         containerEl.createEl('h2', { text: 'Cache' })
+
         new Setting(containerEl)
             .setName('Cache time')
             .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
@@ -334,7 +542,6 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     await this.saveSettings()
                 }))
 
-
         containerEl.createEl('h2', { text: 'Troubleshooting' })
         new Setting(containerEl)
             .setName('Log Request and Responses')
@@ -345,5 +552,33 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     this._data.logRequestsResponses = value
                     await this.saveSettings()
                 }))
+    }
+
+    createNewEmptyAccount() {
+        const newAccount = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.accounts.first()))
+        newAccount.priority = this._data.accounts.length + 1
+        this.accountsConflictsFix()
+        return newAccount
+    }
+
+    accountsConflictsFix() {
+        const aliases: string[] = []
+        this._data.accounts.sort((a, b) => a.priority - b.priority)
+        let priority = 1
+        for (const account of this._data.accounts) {
+            while (aliases.indexOf(account.alias) >= 0) account.alias += '1'
+            aliases.push(account.alias)
+
+            account.priority = priority
+            priority++
+        }
+    }
+
+    createPriorityOptions(): Record<string, string> {
+        const options: Record<string, string> = {}
+        for (let i = 1; i <= this._data.accounts.length; i++) {
+            options[i.toString()] = i.toString()
+        }
+        return options
     }
 }

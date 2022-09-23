@@ -35,6 +35,7 @@ export default class JiraIssuePlugin extends Plugin {
         this._client = new JiraClient(this._settings.getData())
         this._client.updateCustomFieldsCache()
         this._client.updateJQLAutoCompleteCache()
+        this._settings.setJiraClient(this._client)
         this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
         // Fence rendering
         this._issueFenceRenderer = new IssueFenceRenderer(this._renderingCommon, this._client, this._cache)

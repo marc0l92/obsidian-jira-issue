@@ -5,7 +5,7 @@ import { ObjectsCache } from "src/objectsCache"
 import { COMPACT_SYMBOL, IJiraIssueSettings } from "../settings"
 import { RenderingCommon } from "./renderingCommon"
 
-
+// TODO: support explicit account selection in inline issues
 
 export class InlineIssueRenderer {
     private _rc: RenderingCommon
@@ -37,7 +37,7 @@ export class InlineIssueRenderer {
                     value.replaceChildren(this._rc.renderIssue(cachedIssue.data as IJiraIssue, compact))
                 }
             } else {
-                value.replaceChildren(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey)))
+                value.replaceChildren(this._rc.renderLoadingItem(issueKey))
                 this._client.getIssue(issueKey).then(newIssue => {
                     const issue = this._cache.add(issueKey, newIssue).data as IJiraIssue
                     value.replaceChildren(this._rc.renderIssue(issue, compact))
@@ -57,7 +57,7 @@ export class InlineIssueRenderer {
                 const compact = !!match[1]
                 const issueKey = match[2]
                 const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': compact } })
-                container.appendChild(this._rc.renderLoadingItem(issueKey, this._rc.issueUrl(issueKey), true))
+                container.appendChild(this._rc.renderLoadingItem(issueKey, true))
                 el.innerHTML = el.innerHTML.replace(match[0], container.outerHTML)
             }
         }
@@ -65,13 +65,15 @@ export class InlineIssueRenderer {
 
     private convertInlineIssuesUrlToTags(el: HTMLElement): void {
         if (this._settings.inlineIssueUrlToTag) {
-            const issueUrlElements: NodeListOf<HTMLAnchorElement> = el.querySelectorAll(`a.external-link[href^="${this._settings.host}/browse/"]`)
-            issueUrlElements.forEach((value: HTMLAnchorElement) => {
-                const issueKey = value.href.replace(`${this._settings.host}/browse/`, '')
-                const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': false } })
-                container.appendChild(this._rc.renderLoadingItem(issueKey, value.href, true))
-                value.replaceWith(container)
-            })
+            for (const account of this._settings.accounts) {
+                const issueUrlElements: NodeListOf<HTMLAnchorElement> = el.querySelectorAll(`a.external-link[href^="${account.host}/browse/"]`)
+                issueUrlElements.forEach((value: HTMLAnchorElement) => {
+                    const issueKey = value.href.replace(`${account.host}/browse/`, '')
+                    const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': false } })
+                    container.appendChild(this._rc.renderLoadingItem(issueKey, true))
+                    value.replaceWith(container)
+                })
+            }
         }
     }
 }

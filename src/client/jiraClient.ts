@@ -1,6 +1,13 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraField, IJiraIssue, IJiraSearchResults } from './jiraInterfaces'
+import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
+
+interface RequestOptions {
+    method: string
+    path: string
+    queryParameters?: URLSearchParams
+    account?: IJiraIssueAccountSettings
+}
 
 function getMimeType(imageBuffer: ArrayBuffer): string {
     const imageBufferUint8 = new Uint8Array(imageBuffer.slice(0, 4))
@@ -51,8 +58,8 @@ export class JiraClient {
         this._settings = settings
     }
 
-    private buildUrl(path: string, queryParameters: URLSearchParams = null): string {
-        const url = new URL(`${this._settings.host}${this._settings.apiBasePath}${path}`)
+    private buildUrl(host: string, path: string, queryParameters: URLSearchParams = null): string {
+        const url = new URL(`${host}${this._settings.apiBasePath}${path}`)
         if (queryParameters) {
             url.search = queryParameters.toString()
         }
@@ -69,31 +76,59 @@ export class JiraClient {
         return requestHeaders
     }
 
-    private async sendRequest(options: RequestUrlParam): Promise<any> {
+    private async sendRequest(requestOptions: RequestOptions): Promise<any> {
         let response: RequestUrlResponse
-        try {
-            this._settings.logRequestsResponses && console.info('JiraIssue:Request:', options)
-            response = await requestUrl(options)
-        } catch (e) {
-            console.error('JiraIssue:response', e)
-            throw new Error('Request error')
-        }
-        this._settings.logRequestsResponses && console.info('JiraIssue:Response:', response)
+        if (requestOptions.account) {
+            response = await this.sendRequestWithAccount(requestOptions.account, requestOptions)
 
-        if (response.status !== 200) {
-            if (response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
-                throw new Error(response.json.errorMessages.join('\n'))
-            } else {
-                throw new Error(`HTTP status ${response.status}`)
+            if (response.status === 200) {
+                return { ...response.json, account: requestOptions.account }
+            }
+        } else {
+            for (let i = 0; i < this._settings.accounts.length; i++) {
+                const account = this._settings.accounts[i]
+                response = await this.sendRequestWithAccount(account, requestOptions)
+
+                if (response.status === 200) {
+                    return { ...response.json, account: account }
+                } else if (Math.floor(response.status / 100) !== 4) {
+                    break;
+                }
             }
         }
 
-        return response.json
+        if (response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
+            throw new Error(response.json.errorMessages.join('\n'))
+        } else if (response.status) {
+            throw new Error(`HTTP status ${response.status}`)
+        } else {
+            throw new Error(response as any)
+        }
+
+
     }
 
-    private async preFetchImage(url: string): Promise<string> {
+    private async sendRequestWithAccount(account: IJiraIssueAccountSettings, requestOptions: RequestOptions): Promise<RequestUrlResponse> {
+        let response
+        try {
+            const requestUrlParam: RequestUrlParam = {
+                method: requestOptions.method,
+                url: this.buildUrl(account.host, requestOptions.path, requestOptions.queryParameters),
+                headers: this.buildHeaders(),
+                contentType: 'application/json',
+            }
+            this._settings.logRequestsResponses && console.info('JiraIssue:Request:', requestUrlParam)
+            response = await requestUrl(requestUrlParam)
+        } catch (errorResponse) {
+            response = errorResponse
+        }
+        this._settings.logRequestsResponses && console.info('JiraIssue:Response:', response)
+        return response
+    }
+
+    private async preFetchImage(account: IJiraIssueAccountSettings, url: string): Promise<string> {
         // Pre fetch only images hosted on the Jira server
-        if (!url.startsWith(this._settings.host)) {
+        if (!url.startsWith(account.host)) {
             return url
         }
 
@@ -124,16 +159,16 @@ export class JiraClient {
     private async fetchIssueImages(issue: IJiraIssue) {
         if (issue.fields) {
             if (issue.fields.issuetype) {
-                issue.fields.issuetype.iconUrl = await this.preFetchImage(issue.fields.issuetype.iconUrl)
+                issue.fields.issuetype.iconUrl = await this.preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
             }
             if (issue.fields.reporter) {
-                issue.fields.reporter.avatarUrls['16x16'] = await this.preFetchImage(issue.fields.reporter.avatarUrls['16x16'])
+                issue.fields.reporter.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.reporter.avatarUrls['16x16'])
             }
             if (issue.fields.assignee) {
-                issue.fields.assignee.avatarUrls['16x16'] = await this.preFetchImage(issue.fields.assignee.avatarUrls['16x16'])
+                issue.fields.assignee.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.assignee.avatarUrls['16x16'])
             }
             if (issue.fields.priority) {
-                issue.fields.priority.iconUrl = await this.preFetchImage(issue.fields.priority.iconUrl)
+                issue.fields.priority.iconUrl = await this.preFetchImage(issue.account, issue.fields.priority.iconUrl)
             }
         }
     }
@@ -141,9 +176,8 @@ export class JiraClient {
     async getIssue(issueKey: string): Promise<IJiraIssue> {
         const issue = await this.sendRequest(
             {
-                url: this.buildUrl(`/issue/${issueKey}`),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/issue/${issueKey}`,
             }
         ) as IJiraIssue
         await this.fetchIssueImages(issue)
@@ -153,17 +187,18 @@ export class JiraClient {
     async getSearchResults(query: string, max: number): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
-            startAt: "0",
+            startAt: '0',
             maxResults: max > 0 ? max.toString() : '',
         })
         const searchResults = await this.sendRequest(
             {
-                url: this.buildUrl(`/search`, queryParameters),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/search`,
+                queryParameters: queryParameters,
             }
         ) as IJiraSearchResults
-        for (let issue of searchResults.issues) {
+        for (const issue of searchResults.issues) {
+            issue.account = searchResults.account
             await this.fetchIssueImages(issue)
         }
         return searchResults
@@ -175,26 +210,25 @@ export class JiraClient {
         }
         const response = await this.sendRequest(
             {
-                url: this.buildUrl(`/status/${status}`),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/status/${status}`,
             }
-        )
+        ) as IJiraStatus
         this._settings.cache.statusColor[status] = response.statusCategory.colorName
     }
 
     async updateCustomFieldsCache(): Promise<void> {
-        const response: IJiraField[] = await this.sendRequest(
+        const response = await this.sendRequest(
             {
-                url: this.buildUrl(`/field`),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/field`,
             }
-        )
+        ) as IJiraField[]
         this._settings.cache.customFieldsIdToName = {}
         this._settings.cache.customFieldsNameToId = {}
         this._settings.cache.customFieldsType = {}
-        for (const field of response) {
+        for (let i in response) {
+            const field = response[i]
             if (field.custom && field.schema && field.schema.customId) {
                 this._settings.cache.customFieldsIdToName[field.schema.customId] = field.name
                 this._settings.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
@@ -204,13 +238,12 @@ export class JiraClient {
     }
 
     async updateJQLAutoCompleteCache(): Promise<void> {
-        const response: IJiraAutocompleteData = await this.sendRequest(
+        const response = await this.sendRequest(
             {
-                url: this.buildUrl(`/jql/autocompletedata`),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/jql/autocompletedata`,
             }
-        )
+        ) as IJiraAutocompleteData
         this._settings.cache.jqlAutocomplete = { fields: [], functions: {} }
         for (const functionData of response.visibleFunctionNames) {
             for (const functionType of functionData.types) {
@@ -231,10 +264,31 @@ export class JiraClient {
         })
         return await this.sendRequest(
             {
-                url: this.buildUrl(`/jql/autocompletedata/suggestions`, queryParameters),
                 method: 'GET',
-                headers: this.buildHeaders(),
+                path: `/jql/autocompletedata/suggestions`,
+                queryParameters: queryParameters,
+            }
+        ) as IJiraAutocompleteField
+    }
+
+    async testConnection(account: IJiraIssueAccountSettings): Promise<boolean> {
+        await this.sendRequest(
+            {
+                method: 'GET',
+                path: `/project`,
+                account: account,
             }
         )
+        return true
+    }
+
+    async getLoggedUser(account: IJiraIssueAccountSettings): Promise<IJiraUser> {
+        return await this.sendRequest(
+            {
+                method: 'GET',
+                path: `/myself`,
+                account: account,
+            }
+        )as IJiraUser
     }
 }

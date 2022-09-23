@@ -29,7 +29,7 @@
     flex-grow: 1;
 }
 
-.jira-issue-container a.ji-tag:hover {
+.jira-issue-container a:hover {
     text-decoration: underline;
 }
 
@@ -100,6 +100,10 @@
     justify-content: flex-start;
     line-height: 1.5;
     padding: 0.2rem 0.75rem;
+}
+
+.jira-issue-container .ji-tag.ji-sm-tag {
+    padding: 0.2rem 0.4rem;
 }
 
 .jira-issue-container .ji-tags {
@@ -341,13 +345,16 @@ th {
     border-radius: 8px;
 }
 
-.letter-height {
-    height: 1em;
+.jira-issue-container .letter-height {
+    height: auto;
+    max-height: 1em;
 }
 
-.avatar-image {
-    width: 16px;
-    height: 16px;
+.jira-issue-container .avatar-image {
+    width: 100%;
+    max-width: 16px;
+    height: auto;
+    max-height: 16px;
 }
 
 .jira-issue-suggestion {
@@ -370,4 +377,15 @@ th {
 .jira-issue-inline-mark {
     display: inline-block;
     padding: 2px 5px;
+}
+
+.ji-inline-issue.jira-issue-container .ji-band,
+.jira-issue-container .ji-band {
+    width: 3px;
+    min-width: 3px;
+    padding: 0;
+}
+
+.HyperMD-task-line[data-task="x"] .ji-inline-issue.jira-issue-container{
+    text-decoration: line-through;
 }

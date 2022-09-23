@@ -70,9 +70,10 @@ export interface IJiraIssue {
         lastViewed: string
         [k: string]: any
     }
+    account: IJiraIssueAccountSettings
 }
 
-interface IJiraUser {
+export interface IJiraUser {
     active: boolean
     displayName: string
     self: string
@@ -89,6 +90,13 @@ export interface IJiraSearchResults {
     maxResults: number
     startAt: number
     total: number
+    account: IJiraIssueAccountSettings
+}
+
+export interface IJiraStatus {
+    statusCategory: {
+        colorName: string
+    }
 }
 
 export interface IJiraField {
@@ -131,6 +139,17 @@ export interface IJiraAutocompleteField {
         value: string
         displayName: string
     }]
+}
+
+export interface IJiraIssueAccountSettings {
+    alias: string // TODO: Add to documentation
+    host: string
+    authenticationType: EAuthenticationTypes
+    username?: string
+    password?: string
+    bareToken?: string
+    priority: number // TODO: Add to documentation
+    color: string // TODO: Add to documentation
 }
 
 export function createProxy<T extends object>(obj: T): T {

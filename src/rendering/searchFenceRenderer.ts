@@ -1,5 +1,5 @@
 import { MarkdownPostProcessorContext } from "obsidian"
-import { createProxy, IJiraSearchResults } from "../client/jiraInterfaces"
+import { createProxy, IJiraIssueAccountSettings, IJiraSearchResults } from "../client/jiraInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
@@ -34,7 +34,7 @@ export class SearchFenceRenderer {
                 }
             } else {
                 // console.log(`Search results not available in the cache`)
-                this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(searchView.query))
+                this._rc.renderLoadingItem('Loading...')
                 this._client.getSearchResults(searchView.query, parseInt(searchView.limit) || this._settings.searchResultsLimit)
                     .then(newSearchResults => {
                         const searchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults).data as IJiraSearchResults
@@ -50,6 +50,7 @@ export class SearchFenceRenderer {
     }
 
     private renderSearchResults(el: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+        searchView.account = searchResults.account
         if (searchView.type === ESearchResultsRenderingTypes.LIST) {
             this.renderSearchResultsList(el, searchResults)
         } else {
@@ -62,12 +63,18 @@ export class SearchFenceRenderer {
         const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${this._rc.getTheme()}` })
         this.renderSearchResultsTableHeader(table, searchView)
         this.renderSearchResultsTableBody(table, searchResults, searchView)
-        const statistics = createSpan({ cls: 'statistics', text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(searchView.query + searchView.limit)}` })
+        const statistics = createSpan({
+            cls: 'statistics',
+            text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(searchView.query + searchView.limit)} - ${searchResults.account.alias}`
+        })
         el.replaceChildren(this._rc.renderContainer([table, statistics]))
     }
 
     private renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchView): void {
-        const header = createEl('tr', { parent: createEl('thead', { parent: table }) })
+        const header = createEl('tr', {
+            parent:
+                createEl('thead', { attr: { style: this.getAccountBandStyle(searchView.account) }, parent: table })
+        })
         const columns = searchView.columns.length > 0 ? searchView.columns : this._settings.searchColumns
         for (const column of columns) {
             let name = SEARCH_COLUMNS_DESCRIPTION[column.type]
@@ -104,4 +111,12 @@ export class SearchFenceRenderer {
         }
         el.replaceChildren(this._rc.renderContainer(list))
     }
+
+    private getAccountBandStyle(account: IJiraIssueAccountSettings): string {
+        if (this._settings.showColorBand) {
+            return 'border-left: 3px solid ' + account.color
+        }
+        return ''
+    }
+
 }
