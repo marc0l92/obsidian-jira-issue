@@ -1,3 +1,5 @@
+import { EAuthenticationTypes } from "src/settings"
+
 export interface IJiraIssue {
     id: string
     key: string
