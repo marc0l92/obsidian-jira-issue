@@ -5,6 +5,16 @@ sidebar_position: 1
 
 The authentication section of the plugin settings allows you to configure how the plugin should authenticate when using the Jira Rest API.
 
+## Multi account support
+
+It is possible to configure multiple accounts in order to retrieve data from multiple sources. This feature as been designed to support consulting company employee that are usually interacting with more than one company.
+
+![inlineIssues](/img/multi-account.png)
+
+## Alias
+
+Mnemonic name of the account used to identify it.
+
 ## Host
 The host is the base URL of the Jira instance. No matter if you use Jira Cloud or Jira Server, the way to get the host is the same.
 
@@ -22,6 +32,7 @@ https://issues.apache.org/jira
 The plugin supports the following authentication types:
 - Open
 - Basic Authentication
+- Jira Cloud
 - Bearer Token
 
 ### Authentication Type: Open
@@ -40,13 +51,18 @@ This type of authentication don't allow to use function like `currentUser()` in 
 
 ### Authentication Type: Basic Authentication
 
-This is the most common authentication and it can be used for both Jira Server and Jira Cloud.
+This is the recommended authentication type when the plugin interacts with Jira Server.
 
-In case of **Jira Server**, the username and password are the same you use to login in the Jira website. If you are already logged in, you can try to open a browser incognito window and access to your Jira instance. The browser will ask you to login and you can try your credentials.
+The username and password are the same you use to login in the Jira website. If you are already logged in, you can try to open a browser incognito window and access to your Jira instance. The browser will ask you to login and you can try your credentials.
 
-In case of **Jira Cloud**, the username is your email address and the password is your API token. You can create a new API token in Jira Cloud from `Account Settings > Security > Create and manage API tokens` ([Official Documentation](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)). It is usually recommended to have generate a dedicated API token for this plugin.
+The specifications of this type of authentication can be found in the [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
 
-The specifications of this type  of authentication can be found in the [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+### Authentication Type: Jira Cloud
+
+This is the recommended authentication type when the plugin interacts with Jira Cloud.
+
+You can create a new API token in Jira Cloud from `Account Settings > Security > Create and manage API tokens` ([Official Documentation](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)). It is usually recommended to have generate a dedicated API token for this plugin.
+
 
 ### Authentication Type: Bearer Token
 
@@ -54,6 +70,15 @@ This authentication is used to access Jira instances that uses OAuth2.0.
 
 The specifications of this type  of authentication can be found in the [RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750).
 
+## Priority
+
+The priority defines the order in which the accounts should be used to retrieve the data. It is recommended to put an higher priority to the accounts that are used the most in the Obsidian.md notes.
+
+## Color band
+
+To help identify the Jira account used by each tag, it is possible to associate a color to each account. The color should be written in hexadecimal notation.
+
+![inlineIssues](/img/color-band.png)
 
 ## Security risks
 

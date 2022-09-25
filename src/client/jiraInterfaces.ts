@@ -144,14 +144,14 @@ export interface IJiraAutocompleteField {
 }
 
 export interface IJiraIssueAccountSettings {
-    alias: string // TODO: Add to documentation
+    alias: string
     host: string
     authenticationType: EAuthenticationTypes
     username?: string
     password?: string
     bareToken?: string
-    priority: number // TODO: Add to documentation
-    color: string // TODO: Add to documentation
+    priority: number
+    color: string
 }
 
 export function createProxy<T extends object>(obj: T): T {

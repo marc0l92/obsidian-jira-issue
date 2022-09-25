@@ -7,7 +7,7 @@ import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from '
 export enum EAuthenticationTypes {
     OPEN = 'OPEN',
     BASIC = 'BASIC',
-    CLOUD = 'CLOUD', // TODO: Add to documentation
+    CLOUD = 'CLOUD',
     BEARER_TOKEN = 'BEARER_TOKEN',
 }
 const AUTHENTICATION_TYPE_DESCRIPTION = {
@@ -352,14 +352,16 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 }))
         let colorTextComponent: TextComponent = null
         const colorInput = new Setting(containerEl)
-            .setName('Color')
-            .setDesc('Color of the tag border in hexadecimal format (Example: #000000).')
+            .setName('Color band')
+            .setDesc('Color of the tags border. Use colors in hexadecimal notation (Example: #000000).')
             .addText(text => {
                 text
                     .setPlaceholder('Example: #000000')
                     .setValue(newAccount.color)
                     .onChange(async value => {
-                        newAccount.color = value
+                        newAccount.color = value.replace(/[^#0-9A-Fa-f]/g, '')
+                        if (newAccount.color[0] != '#') newAccount.color = '#' + newAccount.color
+                        console.log(newAccount.color)
                         colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
                     })
                 colorTextComponent = text
