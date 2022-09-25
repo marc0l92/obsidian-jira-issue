@@ -165,16 +165,53 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
         // Clean the page
         this.containerEl.empty()
-
+        this.displayHeader()
         this.displayAccountsSettings()
         this.displayRenderingSettings()
         this.displaySearchColumnsSettings(isSearchColumnsDetailsOpen)
         this.displayExtraSettings()
+        this.displayFooter()
+    }
+
+    displayHeader() {
+        const { containerEl } = this
+        containerEl.createEl('h2', { text: 'Jira Issue' })
+        const description = containerEl.createEl('p')
+        description.appendText('Need help? Explore the ')
+        description.appendChild(createEl('a', {
+            text: 'Jira Issue documentation',
+            href: 'https://marc0l92.github.io/obsidian-jira-issue/',
+        }))
+        description.appendText('.')
+
+    }
+    displayFooter() {
+        const { containerEl } = this
+        containerEl.createEl('h3', { text: 'Support development' })
+        const description = containerEl.createEl('p')
+        description.appendText('If you enjoy JiraIssue, consider giving me your feedback on the ')
+        description.appendChild(createEl('a', {
+            text: 'github repository',
+            href: 'https://github.com/marc0l92/obsidian-jira-issue/issues',
+        }))
+        description.appendText(', and maybe ')
+        description.appendChild(createEl('a', {
+            text: 'buying me a coffee',
+            href: 'https://ko-fi.com/marc0l92',
+        }))
+        description.appendText(' ☕.')
+        const buyMeACoffee = containerEl.createEl('a', { href: 'https://ko-fi.com/marc0l92' })
+        buyMeACoffee.appendChild(createEl('img', {
+            attr: {
+                src: 'https://camo.githubusercontent.com/3c7d0ccc8f3d2f6071fbb1aae2dd2f755212d10bc37cd57cf7b3f53862a89d85/68747470733a2f2f617a3734333730322e766f2e6d7365636e642e6e65742f63646e2f6b6f6669332e706e67',
+                height: '50',
+            }
+        }))
     }
 
     displayAccountsSettings() {
         const { containerEl } = this
-        containerEl.createEl('h2', { text: 'Accounts' })
+        containerEl.createEl('h3', { text: 'Accounts' })
 
         for (const account of this._data.accounts) {
             const accountSetting = new Setting(containerEl)
@@ -217,7 +254,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         if (!newAccount) newAccount = Object.assign({}, prevAccount)
         const { containerEl } = this
         containerEl.empty()
-        containerEl.createEl('h2', { text: 'Modify account' })
+        containerEl.createEl('h3', { text: 'Modify account' })
 
         new Setting(containerEl)
             .setName('Alias')
@@ -277,19 +314,26 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     .onChange(async value => {
                         newAccount.username = value
                     }))
-            new Setting(containerEl)
+            const apiTokenDescription = new Setting(containerEl)
                 .setName('API Token')
-                .setDesc('API token of your Jira Cloud account.') // TODO: add link to create token
                 .addText(text => text
                     // .setPlaceholder('')
                     .setValue(DEFAULT_SETTINGS.password)
                     .onChange(async value => {
                         newAccount.password = value
                     }))
+                .descEl
+            apiTokenDescription.appendText('API token of your Jira Cloud account (')
+            apiTokenDescription
+                .appendChild(createEl('a', {
+                    text: 'Official Documentation',
+                    href: 'https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/'
+                }))
+            apiTokenDescription.appendText(').')
         } else if (newAccount.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             new Setting(containerEl)
                 .setName('Bearer token')
-                .setDesc('Token to access your Jira account using OAuth2 Bearer token authentication.')
+                .setDesc('Token to access your Jira account using OAuth3 Bearer token authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
                     .setValue(newAccount.bareToken)
@@ -374,7 +418,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     displayRenderingSettings() {
         const { containerEl } = this
-        containerEl.createEl('h2', { text: 'Rendering' })
+        containerEl.createEl('h3', { text: 'Rendering' })
 
         new Setting(containerEl)
             .setName('Default search results limit')
@@ -428,7 +472,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     displaySearchColumnsSettings(isSearchColumnsDetailsOpen: boolean) {
         const { containerEl } = this
-        containerEl.createEl('h2', { text: 'Search columns' })
+        containerEl.createEl('h3', { text: 'Search columns' })
 
         const desc = document.createDocumentFragment()
         desc.append(
@@ -529,7 +573,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     displayExtraSettings() {
         const { containerEl } = this
-        containerEl.createEl('h2', { text: 'Cache' })
+        containerEl.createEl('h3', { text: 'Cache' })
 
         new Setting(containerEl)
             .setName('Cache time')
@@ -542,7 +586,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     await this.saveSettings()
                 }))
 
-        containerEl.createEl('h2', { text: 'Troubleshooting' })
+        containerEl.createEl('h3', { text: 'Troubleshooting' })
         new Setting(containerEl)
             .setName('Log Request and Responses')
             .setDesc('Log in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
