@@ -72,6 +72,8 @@ export class JiraClient {
             requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
         } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             requestHeaders['Authorization'] = `Bearer ${account.bareToken}`
+        } else if (account.authenticationType === EAuthenticationTypes.CLOUD) {
+            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
         }
         return requestHeaders
     }
