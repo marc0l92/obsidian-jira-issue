@@ -66,12 +66,12 @@ export class JiraClient {
         return url.toString()
     }
 
-    private buildHeaders(): Record<string, string> {
+    private buildHeaders(account: IJiraIssueAccountSettings): Record<string, string> {
         const requestHeaders: Record<string, string> = {}
-        if (this._settings.authenticationType === EAuthenticationTypes.BASIC) {
-            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${this._settings.username}:${this._settings.password}`)
-        } else if (this._settings.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
-            requestHeaders['Authorization'] = `Bearer ${this._settings.bareToken}`
+        if (account.authenticationType === EAuthenticationTypes.BASIC) {
+            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
+        } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
+            requestHeaders['Authorization'] = `Bearer ${account.bareToken}`
         }
         return requestHeaders
     }
@@ -114,7 +114,7 @@ export class JiraClient {
             const requestUrlParam: RequestUrlParam = {
                 method: requestOptions.method,
                 url: this.buildUrl(account.host, requestOptions.path, requestOptions.queryParameters),
-                headers: this.buildHeaders(),
+                headers: this.buildHeaders(account),
                 contentType: 'application/json',
             }
             this._settings.logRequestsResponses && console.info('JiraIssue:Request:', requestUrlParam)
@@ -135,7 +135,7 @@ export class JiraClient {
         const options = {
             url: url,
             method: 'GET',
-            headers: this.buildHeaders(),
+            headers: this.buildHeaders(account),
         }
         let response: RequestUrlResponse
         try {
