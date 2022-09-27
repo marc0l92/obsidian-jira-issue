@@ -68,12 +68,10 @@ export class JiraClient {
 
     private buildHeaders(account: IJiraIssueAccountSettings): Record<string, string> {
         const requestHeaders: Record<string, string> = {}
-        if (account.authenticationType === EAuthenticationTypes.BASIC) {
+        if (account.authenticationType === EAuthenticationTypes.BASIC || account.authenticationType === EAuthenticationTypes.CLOUD) {
             requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
         } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
             requestHeaders['Authorization'] = `Bearer ${account.bareToken}`
-        } else if (account.authenticationType === EAuthenticationTypes.CLOUD) {
-            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
         }
         return requestHeaders
     }
@@ -291,6 +289,6 @@ export class JiraClient {
                 path: `/myself`,
                 account: account,
             }
-        )as IJiraUser
+        ) as IJiraUser
     }
 }

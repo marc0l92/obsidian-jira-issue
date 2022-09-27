@@ -56,7 +56,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     accounts: [
         {
             alias: 'Default',
-            host: 'https://your.company.com/jira',
+            host: 'https://mycompany.atlassian.net',
             authenticationType: EAuthenticationTypes.OPEN,
             password: '********',
             priority: 1,
@@ -128,7 +128,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         this._data.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
 
         // Legacy credentials migration
-        if (this._data.accounts.first() === null) {
+        if (this._data.accounts.first() === null || this._data.accounts.length === 0) {
             this._data.accounts = [
                 {
                     host: this._data.host,
@@ -185,6 +185,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         description.appendText('.')
 
     }
+
     displayFooter() {
         const { containerEl } = this
         containerEl.createEl('h3', { text: 'Support development' })
@@ -269,7 +270,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setName('Host')
             .setDesc('Hostname of your company Jira server.')
             .addText(text => text
-                .setPlaceholder('Example: ' + DEFAULT_SETTINGS.host)
+                .setPlaceholder('Example: ' + DEFAULT_SETTINGS.accounts.first().host)
                 .setValue(newAccount.host)
                 .onChange(async value => {
                     newAccount.host = value
@@ -300,7 +301,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setDesc('Password to access your Jira Server account using HTTP basic authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(DEFAULT_SETTINGS.password)
+                    .setValue(DEFAULT_SETTINGS.accounts.first().password)
                     .onChange(async value => {
                         newAccount.password = value
                     }))
@@ -318,7 +319,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setName('API Token')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(DEFAULT_SETTINGS.password)
+                    .setValue(DEFAULT_SETTINGS.accounts.first().password)
                     .onChange(async value => {
                         newAccount.password = value
                     }))
