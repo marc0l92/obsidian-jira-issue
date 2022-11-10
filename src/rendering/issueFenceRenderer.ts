@@ -74,7 +74,7 @@ export class IssueFenceRenderer {
     }
 
     private renderNoItems(): HTMLElement {
-        const tagsRow = createDiv('ji-tags has-addons')
+        const tagsRow = createDiv('ji-row')
         createSpan({ cls: 'ji-tag is-danger is-light', text: 'JiraIssue', parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger', text: 'No valid issues found', parent: tagsRow })
         return tagsRow

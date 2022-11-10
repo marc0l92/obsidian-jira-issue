@@ -74,7 +74,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('img', {
                     attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
                     title: column.compact ? issue.fields.issuetype.name : '',
-                    cls: 'letter-height',
+                    cls: 'image-16px',
                     parent: typeCell
                 })
                 if (!column.compact) {
@@ -101,7 +101,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('img', {
                         attr: { src: issue.fields.reporter.avatarUrls['16x16'], alt: reporterName },
                         title: reporterName,
-                        cls: 'avatar-image',
+                        cls: 'image-16px',
                         parent: createEl('td', { parent: row })
                     })
                 } else {
@@ -114,7 +114,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('img', {
                         attr: { src: issue.fields.assignee.avatarUrls['16x16'], alt: assigneeName },
                         title: assigneeName,
-                        cls: 'avatar-image',
+                        cls: 'image-16px',
                         parent: createEl('td', { parent: row })
                     })
                 } else {
@@ -126,7 +126,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('img', {
                     attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
                     title: column.compact ? issue.fields.priority.name : '',
-                    cls: 'letter-height',
+                    cls: 'image-16px',
                     parent: priorityCell
                 })
                 if (!column.compact) {
@@ -136,9 +136,9 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
             case ESearchColumnsTypes.STATUS:
                 const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
                 if (column.compact) {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, parent: createEl('td', { parent: row }) })
                 } else {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
                 }
                 break
             case ESearchColumnsTypes.DUE_DATE:

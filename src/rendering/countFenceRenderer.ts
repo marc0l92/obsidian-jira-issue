@@ -38,7 +38,7 @@ export class CountFenceRenderer {
     }
 
     private renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, query: string): void {
-        const tagsRow = createDiv('ji-tags has-addons')
+        const tagsRow = createDiv('ji-row')
         this._rc.renderAccountColorBand(searchResults.account, tagsRow)
         createSpan({ cls: `ji-tag is-link ${this._rc.getTheme()}`, text: `Count`, title: query, parent: tagsRow })
         createSpan({ cls: `ji-tag ${this._rc.getTheme()}`, text: searchResults.total.toString(), title: query, parent: tagsRow })
