@@ -5,6 +5,7 @@
     line-height: 1rem;
     flex-direction: column;
     margin-bottom: 10px;
+    vertical-align: middle;
 }
 
 /* Generic */
@@ -326,11 +327,12 @@ th {
 }
 
 /* Inline Issues */
-.ji-inline-issue.jira-issue-container {
+.jira-issue-container.ji-inline-issue {
     display: inline-block;
+    margin: 0;
 }
 
-.ji-inline-issue.jira-issue-container .ji-tag {
+.jira-issue-container.ji-inline-issue .ji-tag {
     padding: 0.1rem 0.3rem;
 }
 
