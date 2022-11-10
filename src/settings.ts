@@ -19,6 +19,7 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
 
 export const COMPACT_SYMBOL = '-'
 export const COMMENT_REGEX = /^\s*#/
+const HIDDEN_PASSWORD_PLACEHOLDER = '********'
 
 export interface IJiraIssueSettings {
     accounts: IJiraIssueAccountSettings[]
@@ -58,7 +59,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
             alias: 'Default',
             host: 'https://mycompany.atlassian.net',
             authenticationType: EAuthenticationTypes.OPEN,
-            password: '********',
+            password: HIDDEN_PASSWORD_PLACEHOLDER,
             priority: 1,
             color: '#000000',
         }
@@ -301,7 +302,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setDesc('Password to access your Jira Server account using HTTP basic authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(DEFAULT_SETTINGS.accounts.first().password)
+                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
                     .onChange(async value => {
                         newAccount.password = value
                     }))
@@ -319,7 +320,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setName('API Token')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(DEFAULT_SETTINGS.accounts.first().password)
+                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
                     .onChange(async value => {
                         newAccount.password = value
                     }))
@@ -337,7 +338,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setDesc('Token to access your Jira account using OAuth3 Bearer token authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(newAccount.bareToken)
+                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
                     .onChange(async value => {
                         newAccount.bareToken = value
                     }))
