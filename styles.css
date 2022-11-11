@@ -352,7 +352,7 @@ th {
     max-height: 1em;
 }
 
-.jira-issue-container .avatar-image {
+.jira-issue-container img.avatar-image {
     width: 100%;
     max-width: 16px;
     height: auto;
