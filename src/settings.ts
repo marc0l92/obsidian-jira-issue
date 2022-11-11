@@ -54,16 +54,7 @@ export interface IJiraIssueSettings {
 }
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
-    accounts: [
-        {
-            alias: 'Default',
-            host: 'https://mycompany.atlassian.net',
-            authenticationType: EAuthenticationTypes.OPEN,
-            password: HIDDEN_PASSWORD_PLACEHOLDER,
-            priority: 1,
-            color: '#000000',
-        }
-    ],
+    accounts: [],
     apiBasePath: '/rest/api/latest',
     cacheTime: '15m',
     searchResultsLimit: 10,
@@ -93,6 +84,15 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
         { type: ESearchColumnsTypes.STATUS, compact: false },
     ],
     logRequestsResponses: false,
+}
+
+const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
+    alias: 'Default',
+    host: 'https://mycompany.atlassian.net',
+    authenticationType: EAuthenticationTypes.OPEN,
+    password: HIDDEN_PASSWORD_PLACEHOLDER,
+    priority: 1,
+    color: '#000000',
 }
 
 function getRandomColor() {
@@ -128,18 +128,25 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
         this._data.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
 
-        // Legacy credentials migration
         if (this._data.accounts.first() === null || this._data.accounts.length === 0) {
-            this._data.accounts = [
-                {
-                    host: this._data.host,
-                    authenticationType: this._data.authenticationType,
-                    password: this._data.password,
-                    alias: 'Default',
-                    color: '#000000',
-                    priority: 1,
-                }
-            ]
+            if (this._data.host) {
+                // Legacy credentials migration
+                this._data.accounts = [
+                    {
+                        host: this._data.host,
+                        authenticationType: this._data.authenticationType,
+                        username: this._data.username,
+                        password: this._data.password,
+                        bareToken: this._data.bareToken,
+                        alias: 'Default',
+                        color: '#000000',
+                        priority: 1,
+                    }
+                ]
+            } else {
+                // First installation
+                this._data.accounts = [DEFAULT_ACCOUNT]
+            }
             this.saveSettings()
         }
         this.accountsConflictsFix()
@@ -271,7 +278,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setName('Host')
             .setDesc('Hostname of your company Jira server.')
             .addText(text => text
-                .setPlaceholder('Example: ' + DEFAULT_SETTINGS.accounts.first().host)
+                .setPlaceholder('Example: ' + DEFAULT_ACCOUNT.host)
                 .setValue(newAccount.host)
                 .onChange(async value => {
                     newAccount.host = value
@@ -603,7 +610,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     }
 
     createNewEmptyAccount() {
-        const newAccount = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.accounts.first()))
+        const newAccount = JSON.parse(JSON.stringify(DEFAULT_ACCOUNT))
         newAccount.priority = this._data.accounts.length + 1
         this.accountsConflictsFix()
         return newAccount
