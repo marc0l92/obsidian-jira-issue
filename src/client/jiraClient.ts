@@ -158,16 +158,16 @@ export class JiraClient {
 
     private async fetchIssueImages(issue: IJiraIssue) {
         if (issue.fields) {
-            if (issue.fields.issuetype) {
+            if (issue.fields.issuetype && issue.fields.issuetype.iconUrl) {
                 issue.fields.issuetype.iconUrl = await this.preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
             }
             if (issue.fields.reporter) {
                 issue.fields.reporter.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.reporter.avatarUrls['16x16'])
             }
-            if (issue.fields.assignee) {
+            if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls['16x16']) {
                 issue.fields.assignee.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.assignee.avatarUrls['16x16'])
             }
-            if (issue.fields.priority) {
+            if (issue.fields.priority && issue.fields.priority.iconUrl) {
                 issue.fields.priority.iconUrl = await this.preFetchImage(issue.account, issue.fields.priority.iconUrl)
             }
         }

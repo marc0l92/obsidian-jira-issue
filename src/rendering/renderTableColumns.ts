@@ -123,14 +123,18 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 break
             case ESearchColumnsTypes.PRIORITY:
                 const priorityCell = createEl('td', { parent: row })
-                createEl('img', {
-                    attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
-                    title: column.compact ? issue.fields.priority.name : '',
-                    cls: 'letter-height',
-                    parent: priorityCell
-                })
-                if (!column.compact) {
-                    createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
+                if (issue.fields.priority) {
+                    createEl('img', {
+                        attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
+                        title: column.compact ? issue.fields.priority.name : '',
+                        cls: 'letter-height',
+                        parent: priorityCell
+                    })
+                    if (!column.compact) {
+                        createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
+                    }
+                } else {
+                    priorityCell.setText('-')
                 }
                 break
             case ESearchColumnsTypes.STATUS:
