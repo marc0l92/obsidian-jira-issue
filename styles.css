@@ -63,10 +63,29 @@
     }
 }
 
-/* statistics */
-.jira-issue-container .statistics {
+/* search-footer */
+.jira-issue-container .search-footer {
     margin-top: 3px;
     font-size: x-small;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+.jira-issue-container .search-footer button {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    box-shadow: none;
+    height: 1em;
+    max-height: fit-content;
+    cursor: pointer;
+    font-size: x-small;
+    vertical-align: middle;
+    margin-left: 3px;
+}
+.jira-issue-container .search-footer button:hover {
+    opacity: 0.8;
 }
 
 /* ji-tags */

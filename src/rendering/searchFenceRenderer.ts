@@ -1,4 +1,4 @@
-import { MarkdownPostProcessorContext } from "obsidian"
+import { MarkdownPostProcessorContext, setIcon } from "obsidian"
 import { createProxy, IJiraIssueAccountSettings, IJiraSearchResults } from "../client/jiraInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
@@ -20,54 +20,52 @@ export class SearchFenceRenderer {
         this._cache = cache
     }
 
-    async render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+    async render(source: string, rootEl: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
         // console.log(`Search query: ${source}`)
         try {
             const searchView = new SearchView(this._settings).fromString(source)
 
-            const cachedSearchResults = this._cache.get(searchView.query + searchView.limit)
+            const cachedSearchResults = this._cache.get(searchView.getCacheKey())
             if (cachedSearchResults) {
                 if (cachedSearchResults.isError) {
-                    this._rc.renderSearchError(el, cachedSearchResults.data as string, searchView)
+                    this._rc.renderSearchError(rootEl, cachedSearchResults.data as string, searchView)
                 } else {
-                    this.renderSearchResults(el, searchView, cachedSearchResults.data as IJiraSearchResults)
+                    this.renderSearchResults(rootEl, searchView, cachedSearchResults.data as IJiraSearchResults)
                 }
             } else {
                 // console.log(`Search results not available in the cache`)
                 this._rc.renderLoadingItem('Loading...')
                 this._client.getSearchResults(searchView.query, parseInt(searchView.limit) || this._settings.searchResultsLimit)
                     .then(newSearchResults => {
-                        const searchResults = this._cache.add(searchView.query + searchView.limit, newSearchResults).data as IJiraSearchResults
-                        this.renderSearchResults(el, searchView, searchResults)
+                        const searchResults = this._cache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults
+                        this.renderSearchResults(rootEl, searchView, searchResults)
                     }).catch(err => {
-                        this._cache.add(searchView.query + searchView.limit, err, true)
-                        this._rc.renderSearchError(el, err, searchView)
+                        this._cache.add(searchView.getCacheKey(), err, true)
+                        this._rc.renderSearchError(rootEl, err, searchView)
                     })
             }
         } catch (err) {
-            this._rc.renderSearchError(el, err, null)
+            this._rc.renderSearchError(rootEl, err, null)
         }
     }
 
-    private renderSearchResults(el: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+    private renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
         searchView.account = searchResults.account
         if (searchView.type === ESearchResultsRenderingTypes.LIST) {
-            this.renderSearchResultsList(el, searchResults)
+            this.renderSearchResultsList(rootEl, searchResults)
         } else {
-            this.renderSearchResultsTable(el, searchView, searchResults)
+            this.renderSearchResultsTable(rootEl, searchView, searchResults)
         }
     }
 
 
-    private renderSearchResultsTable(el: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+    private renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
         const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${this._rc.getTheme()}` })
         this.renderSearchResultsTableHeader(table, searchView)
-        this.renderSearchResultsTableBody(table, searchResults, searchView)
-        const statistics = createSpan({
-            cls: 'statistics',
-            text: `Total results: ${searchResults.total.toString()} - Last update: ${this._cache.getTime(searchView.query + searchView.limit)} - ${searchResults.account.alias}`
-        })
-        el.replaceChildren(this._rc.renderContainer([table, statistics]))
+        this.renderSearchResultsTableBody(table, searchView, searchResults)
+
+        const footer = this.renderSearchFooter(rootEl, searchView, searchResults)
+        rootEl.replaceChildren(this._rc.renderContainer([table, footer]))
     }
 
     private renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchView): void {
@@ -94,7 +92,7 @@ export class SearchFenceRenderer {
         }
     }
 
-    private renderSearchResultsTableBody(table: HTMLElement, searchResults: IJiraSearchResults, searchView: SearchView): void {
+    private renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
         const tbody = createEl('tbody', { parent: table })
         for (let issue of searchResults.issues) {
             issue = createProxy(issue)
@@ -104,12 +102,12 @@ export class SearchFenceRenderer {
         }
     }
 
-    private renderSearchResultsList(el: HTMLElement, searchResults: IJiraSearchResults): void {
+    private renderSearchResultsList(rootEl: HTMLElement, searchResults: IJiraSearchResults): void {
         const list: HTMLElement[] = []
         for (const issue of searchResults.issues) {
             list.push(this._rc.renderIssue(issue))
         }
-        el.replaceChildren(this._rc.renderContainer(list))
+        rootEl.replaceChildren(this._rc.renderContainer(list))
     }
 
     private getAccountBandStyle(account: IJiraIssueAccountSettings): string {
@@ -119,4 +117,24 @@ export class SearchFenceRenderer {
         return ''
     }
 
+    private renderSearchFooter(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): HTMLElement {
+        const searchFooter = createDiv({ cls: 'search-footer' })
+        createDiv({
+            text: `Total results: ${searchResults.total.toString()} - ${searchResults.account.alias}`,
+            parent: searchFooter,
+        })
+        const lastUpdateContainer = createDiv({ parent: searchFooter })
+        const lastUpdateText = createSpan({
+            text: `Last update: ${this._cache.getTime(searchView.getCacheKey())}`,
+            parent: lastUpdateContainer,
+        })
+        const refreshButton = createEl('button', { parent: lastUpdateContainer, title: 'Refresh' })
+        setIcon(refreshButton, 'sync-small')
+        refreshButton.on('click', '.search-footer>button', () => {
+            rootEl.empty()
+            this._cache.delete(searchView.getCacheKey())
+            this.render(searchView.toRawString(), rootEl, null)
+        })
+        return searchFooter
+    }
 }

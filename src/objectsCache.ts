@@ -43,6 +43,12 @@ export class ObjectsCache {
         return null
     }
 
+    delete(key: string) {
+        if (key in this._cache) {
+            delete this._cache[key]
+        }
+    }
+
     clear() {
         this._cache = {}
     }

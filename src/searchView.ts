@@ -186,7 +186,11 @@ export class SearchView {
     }
 
     toString(): string {
-        let result = '```jira-search\n'
+        return '```jira-search\n' + this.toRawString() + '```'
+    }
+
+    toRawString(): string {
+        let result = ''
         result += `type: ${this.type}\n`
         result += `query: ${this.query}\n`
         if (this.limit) {
@@ -195,6 +199,10 @@ export class SearchView {
         if (this.columns.length > 0) {
             result += `columns: ${this.columns.map(c => (c.compact ? COMPACT_SYMBOL : '') + c.type).join(', ')}\n`
         }
-        return result + '```'
+        return result
+    }
+
+    getCacheKey(): string {
+        return this.query + this.limit
     }
 }
