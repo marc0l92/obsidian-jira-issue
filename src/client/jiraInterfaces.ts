@@ -154,6 +154,47 @@ export interface IJiraIssueAccountSettings {
     color: string
 }
 
+export interface IJiraDevStatus {
+    errors: []
+    configErrors: []
+    summary: {
+        pullrequest: {
+            overall: {
+                count: number
+                lastUpdated: string
+                stateCount: number
+                state: string
+                details: {
+                    openCount: number
+                    mergedCount: number
+                    declinedCount: number
+                }
+                open: boolean
+            }
+        }
+        build: {
+            overall: {
+                count: number
+            }
+        }
+        review: {
+            overall: {
+                count: number
+            }
+        }
+        repository: {
+            overall: {
+                count: number
+            }
+        }
+        branch: {
+            overall: {
+                count: number
+            }
+        }
+    }
+}
+
 export function createProxy<T extends object>(obj: T): T {
     const proxy = new Proxy<T>(obj, {
         get: (target: T, p: string, receiver: any) => {

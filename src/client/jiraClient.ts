@@ -1,5 +1,5 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
+import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraDevStatus, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
 import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
 
 interface RequestOptions {
@@ -7,6 +7,7 @@ interface RequestOptions {
     path: string
     queryParameters?: URLSearchParams
     account?: IJiraIssueAccountSettings
+    noBasePath?: boolean
 }
 
 function getMimeType(imageBuffer: ArrayBuffer): string {
@@ -58,10 +59,11 @@ export class JiraClient {
         this._settings = settings
     }
 
-    private buildUrl(host: string, path: string, queryParameters: URLSearchParams = null): string {
-        const url = new URL(`${host}${this._settings.apiBasePath}${path}`)
-        if (queryParameters) {
-            url.search = queryParameters.toString()
+    private buildUrl(host: string, requestOptions: RequestOptions): string {
+        const basePath = requestOptions.noBasePath ? '' : this._settings.apiBasePath
+        const url = new URL(`${host}${basePath}${requestOptions.path}`)
+        if (requestOptions.queryParameters) {
+            url.search = requestOptions.queryParameters.toString()
         }
         return url.toString()
     }
@@ -104,25 +106,23 @@ export class JiraClient {
         } else {
             throw new Error(response as any)
         }
-
-
     }
 
     private async sendRequestWithAccount(account: IJiraIssueAccountSettings, requestOptions: RequestOptions): Promise<RequestUrlResponse> {
         let response
+        const requestUrlParam: RequestUrlParam = {
+            method: requestOptions.method,
+            url: this.buildUrl(account.host, requestOptions),
+            headers: this.buildHeaders(account),
+            contentType: 'application/json',
+        }
         try {
-            const requestUrlParam: RequestUrlParam = {
-                method: requestOptions.method,
-                url: this.buildUrl(account.host, requestOptions.path, requestOptions.queryParameters),
-                headers: this.buildHeaders(account),
-                contentType: 'application/json',
-            }
-            this._settings.logRequestsResponses && console.info('JiraIssue:Request:', requestUrlParam)
             response = await requestUrl(requestUrlParam)
+            this._settings.logRequestsResponses && console.info('JiraIssue:Fetch:', { request: requestUrlParam, response })
         } catch (errorResponse) {
+            this._settings.logRequestsResponses && console.warn('JiraIssue:Fetch:', { request: requestUrlParam, response: errorResponse })
             response = errorResponse
         }
-        this._settings.logRequestsResponses && console.info('JiraIssue:Response:', response)
         return response
     }
 
@@ -139,18 +139,17 @@ export class JiraClient {
         }
         let response: RequestUrlResponse
         try {
-            this._settings.logRequestsResponses && console.info('JiraIssue:RequestImage:', options)
             response = await requestUrl(options)
-        } catch (e) {
-            console.error('JiraIssue:ResponseImage', e)
-            return url
+            this._settings.logRequestsResponses && console.info('JiraIssue:FetchImage:', { request: options, response })
+        } catch (errorResponse) {
+            this._settings.logRequestsResponses && console.warn('JiraIssue:FetchImage:', { request: options, response: errorResponse })
+            response = errorResponse
         }
-        this._settings.logRequestsResponses && console.info('JiraIssue:ResponseImage:', response)
 
         if (response.status === 200) {
             const mimeType = getMimeType(response.arrayBuffer)
             if (mimeType) {
-                return `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
+                url = `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
             }
         }
         return url
@@ -218,58 +217,66 @@ export class JiraClient {
     }
 
     async updateCustomFieldsCache(): Promise<void> {
-        const response = await this.sendRequest(
-            {
-                method: 'GET',
-                path: `/field`,
-            }
-        ) as IJiraField[]
-        this._settings.cache.customFieldsIdToName = {}
-        this._settings.cache.customFieldsNameToId = {}
-        this._settings.cache.customFieldsType = {}
-        for (let i in response) {
-            const field = response[i]
-            if (field.custom && field.schema && field.schema.customId) {
-                this._settings.cache.customFieldsIdToName[field.schema.customId] = field.name
-                this._settings.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
-                this._settings.cache.customFieldsType[field.schema.customId] = field.schema
-            }
-        }
-    }
-
-    async updateJQLAutoCompleteCache(): Promise<void> {
-        const response = await this.sendRequest(
-            {
-                method: 'GET',
-                path: `/jql/autocompletedata`,
-            }
-        ) as IJiraAutocompleteData
-        this._settings.cache.jqlAutocomplete = { fields: [], functions: {} }
-        for (const functionData of response.visibleFunctionNames) {
-            for (const functionType of functionData.types) {
-                if (functionType in this._settings.cache.jqlAutocomplete.functions) {
-                    this._settings.cache.jqlAutocomplete.functions[functionType].push(functionData.value)
-                } else {
-                    this._settings.cache.jqlAutocomplete.functions[functionType] = [functionData.value]
+        for (const account of this._settings.accounts) {
+            let response
+            try {
+                response = await this.sendRequest(
+                    {
+                        method: 'GET',
+                        path: `/field`,
+                        account: account,
+                    }
+                ) as IJiraField[]
+                this._settings.cache.customFieldsIdToName = {}
+                this._settings.cache.customFieldsNameToId = {}
+                this._settings.cache.customFieldsType = {}
+                for (let i in response) {
+                    const field = response[i]
+                    if (field.custom && field.schema && field.schema.customId) {
+                        this._settings.cache.customFieldsIdToName[field.schema.customId] = field.name
+                        this._settings.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
+                        this._settings.cache.customFieldsType[field.schema.customId] = field.schema
+                    }
                 }
+            } catch (e) {
+                console.error('Error while retrieving custom fields list of account:', account.alias)
             }
         }
-        this._settings.cache.jqlAutocomplete.fields = response.visibleFieldNames
     }
 
-    async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
-        const queryParameters = new URLSearchParams({
-            fieldName: fieldName,
-            fieldValue: fieldValue,
-        })
-        return await this.sendRequest(
-            {
-                method: 'GET',
-                path: `/jql/autocompletedata/suggestions`,
-                queryParameters: queryParameters,
-            }
-        ) as IJiraAutocompleteField
-    }
+    // async updateJQLAutoCompleteCache(): Promise<void> {
+    // const response = await this.sendRequest(
+    //     {
+    //         method: 'GET',
+    //         path: `/jql/autocompletedata`,
+    //     }
+    // ) as IJiraAutocompleteData
+    // this._settings.cache.jqlAutocomplete = { fields: [], functions: {} }
+    // for (const functionData of response.visibleFunctionNames) {
+    //     for (const functionType of functionData.types) {
+    //         if (functionType in this._settings.cache.jqlAutocomplete.functions) {
+    //             this._settings.cache.jqlAutocomplete.functions[functionType].push(functionData.value)
+    //         } else {
+    //             this._settings.cache.jqlAutocomplete.functions[functionType] = [functionData.value]
+    //         }
+    //     }
+    // }
+    // this._settings.cache.jqlAutocomplete.fields = response.visibleFieldNames
+    // }
+
+    // async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
+    //     const queryParameters = new URLSearchParams({
+    //         fieldName: fieldName,
+    //         fieldValue: fieldValue,
+    //     })
+    //     return await this.sendRequest(
+    //         {
+    //             method: 'GET',
+    //             path: `/jql/autocompletedata/suggestions`,
+    //             queryParameters: queryParameters,
+    //         }
+    //     ) as IJiraAutocompleteField
+    // }
 
     async testConnection(account: IJiraIssueAccountSettings): Promise<boolean> {
         await this.sendRequest(
@@ -290,5 +297,19 @@ export class JiraClient {
                 account: account,
             }
         ) as IJiraUser
+    }
+
+    async getDevStatus(issueId: string): Promise<IJiraDevStatus> {
+        const queryParameters = new URLSearchParams({
+            issueId: issueId,
+        })
+        return await this.sendRequest(
+            {
+                method: 'GET',
+                path: `/rest/dev-status/latest/issue/summary?issueId=`,
+                queryParameters: queryParameters,
+                noBasePath: true
+            }
+        ) as IJiraDevStatus
     }
 }

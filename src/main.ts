@@ -34,7 +34,6 @@ export default class JiraIssuePlugin extends Plugin {
         this._cache = new ObjectsCache(this._settings.getData())
         this._client = new JiraClient(this._settings.getData())
         this._client.updateCustomFieldsCache()
-        this._client.updateJQLAutoCompleteCache()
         this._settings.setJiraClient(this._client)
         this._renderingCommon = new RenderingCommon(this._settings.getData(), this.app)
         // Fence rendering
@@ -65,7 +64,6 @@ export default class JiraIssuePlugin extends Plugin {
         this._settings.onChange(() => {
             this._cache.clear()
             this._client.updateCustomFieldsCache()
-            this._client.updateJQLAutoCompleteCache()
             this._inlineIssueViewPlugin.update()
         })
 
@@ -76,7 +74,6 @@ export default class JiraIssuePlugin extends Plugin {
             callback: () => {
                 this._cache.clear()
                 this._client.updateCustomFieldsCache()
-                this._client.updateJQLAutoCompleteCache()
                 new Notice('JiraIssue: Cache cleaned')
             }
         })

@@ -257,6 +257,10 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('td', { text: dateToStr(issue.fields.lastViewed), parent: row })
                 }
                 break
+            case ESearchColumnsTypes.DEV_STATUS:
+                issue.id
+                createEl('td', { text: ``, parent: row })
+                break
         }
     }
 }
