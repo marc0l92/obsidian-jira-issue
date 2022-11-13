@@ -1,7 +1,8 @@
-import { App, FrontMatterCache, TFile } from "obsidian"
+import { FrontMatterCache, TFile } from "obsidian"
 import { IJiraIssue, IJiraIssueAccountSettings } from "src/client/jiraInterfaces"
+import { ObsidianApp } from "src/main"
 import { SearchView } from "src/searchView"
-import { IJiraIssueSettings } from "src/settings"
+import { SettingsData } from "src/settings"
 
 export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'blue-gray': 'is-info',
@@ -11,48 +12,40 @@ export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'medium-gray': 'is-dark',
 }
 
-export class RenderingCommon {
-    private _settings: IJiraIssueSettings
-    private _app: App
-
-    constructor(settings: IJiraIssueSettings, app: App) {
-        this._settings = settings
-        this._app = app
-    }
-
-    public issueUrl(account: IJiraIssueAccountSettings, issueKey: string): string {
+export const RenderingCommon = {
+    issueUrl(account: IJiraIssueAccountSettings, issueKey: string): string {
         try {
             return (new URL(`${account.host}/browse/${issueKey}`)).toString()
         } catch (e) { return '' }
-    }
+    },
 
-    public searchUrl(account: IJiraIssueAccountSettings, searchQuery: string): string {
+    searchUrl(account: IJiraIssueAccountSettings, searchQuery: string): string {
         try {
             return (new URL(`${account.host}/issues?filter=-4&jql=${searchQuery}`)).toString()
         } catch (e) { return '' }
-    }
+    },
 
-    public getTheme(): string {
-        return this._settings.darkMode ? 'is-dark' : 'is-light'
-    }
+    getTheme(): string {
+        return SettingsData.darkMode ? 'is-dark' : 'is-light'
+    },
 
-    public getNotes(): TFile[] {
-        return this._app.vault.getMarkdownFiles()
-    }
+    getNotes(): TFile[] {
+        return ObsidianApp.vault.getMarkdownFiles()
+    },
 
-    public getFrontMatter(file: TFile): FrontMatterCache {
-        return this._app.metadataCache.getFileCache(file).frontmatter
-    }
+    getFrontMatter(file: TFile): FrontMatterCache {
+        return ObsidianApp.metadataCache.getFileCache(file).frontmatter
+    },
 
-    public renderContainer(children: HTMLElement[]): HTMLElement {
+    renderContainer(children: HTMLElement[]): HTMLElement {
         const container = createDiv({ cls: 'jira-issue-container' })
         for (const child of children) {
             container.appendChild(child)
         }
         return container
-    }
+    },
 
-    public renderLoadingItem(item: string, inline = false): HTMLElement {
+    renderLoadingItem(item: string, inline = false): HTMLElement {
         let tagsRow
         if (inline) {
             tagsRow = createSpan({ cls: 'ji-tags has-addons' })
@@ -63,9 +56,9 @@ export class RenderingCommon {
         createEl('a', { cls: `ji-tag is-link ${this.getTheme()}`, text: item, parent: tagsRow })
         createSpan({ cls: `ji-tag ${this.getTheme()}`, text: 'Loading ...', parent: tagsRow })
         return tagsRow
-    }
+    },
 
-    public renderSearchError(el: HTMLElement, message: string, searchView: SearchView): void {
+    renderSearchError(el: HTMLElement, message: string, searchView: SearchView): void {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
         if (searchView) {
@@ -75,9 +68,9 @@ export class RenderingCommon {
         }
         createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         el.replaceChildren(this.renderContainer([tagsRow]))
-    }
+    },
 
-    public renderIssue(issue: IJiraIssue, compact = false): HTMLElement {
+    renderIssue(issue: IJiraIssue, compact = false): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         this.renderAccountColorBand(issue.account, tagsRow)
         createEl('img', {
@@ -93,19 +86,19 @@ export class RenderingCommon {
         const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: tagsRow })
         return tagsRow
-    }
+    },
 
-    public renderIssueError(issueKey: string, message: string): HTMLElement {
+    renderIssueError(issueKey: string, message: string): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         createSpan({ cls: 'ji-tag is-delete is-danger', parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger is-light', text: issueKey, parent: tagsRow })
         createSpan({ cls: 'ji-tag is-danger', text: message, parent: tagsRow })
         return tagsRow
-    }
+    },
 
-    public renderAccountColorBand(account: IJiraIssueAccountSettings, parent: HTMLDivElement) {
-        if (this._settings.showColorBand) {
+    renderAccountColorBand(account: IJiraIssueAccountSettings, parent: HTMLDivElement) {
+        if (SettingsData.showColorBand) {
             createSpan({ cls: `ji-tag ${this.getTheme()} ji-band`, attr: { style: `background-color: ${account.color}` }, title: account.alias, parent: parent })
         }
-    }
+    },
 }

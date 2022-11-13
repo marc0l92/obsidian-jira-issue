@@ -1,6 +1,6 @@
 import { App, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from "obsidian"
 import { ESearchColumnsTypes } from "src/searchView"
-import { COMPACT_SYMBOL, IJiraIssueSettings } from "src/settings"
+import { COMPACT_SYMBOL, SettingsData } from "src/settings"
 
 interface SuggestionEntry {
     name: string
@@ -9,11 +9,9 @@ interface SuggestionEntry {
 }
 
 export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
-    private _settings: IJiraIssueSettings
 
-    constructor(app: App, settings: IJiraIssueSettings) {
+    constructor(app: App) {
         super(app)
-        this._settings = settings
     }
 
     onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null {
@@ -74,9 +72,9 @@ export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
         query = query.replace(/^\$/, '')
         let customFieldsOptions = []
         if (Number(query)) {
-            customFieldsOptions = Object.keys(this._settings.cache.customFieldsIdToName)
+            customFieldsOptions = Object.keys(SettingsData.cache.customFieldsIdToName)
         } else {
-            customFieldsOptions = Object.keys(this._settings.cache.customFieldsNameToId)
+            customFieldsOptions = Object.keys(SettingsData.cache.customFieldsNameToId)
         }
         for (const column of customFieldsOptions) {
             if (suggestions.length >= this.limit) break

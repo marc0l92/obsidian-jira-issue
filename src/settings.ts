@@ -104,10 +104,9 @@ function getRandomColor() {
     return color;
 }
 
-export class JiraIssueSettingsTab extends PluginSettingTab {
+
+export class JiraIssueSettingTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
-    private _data: IJiraIssueSettings = DEFAULT_SETTINGS
-    private _jiraClient: JiraClient = null
     private _onChangeListener: (() => void) | null = null
     private _searchColumnsDetails: HTMLDetailsElement = null
 
@@ -116,28 +115,20 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         this._plugin = plugin
     }
 
-    setJiraClient(client: JiraClient) {
-        this._jiraClient = client
-    }
-
-    getData(): IJiraIssueSettings {
-        return this._data
-    }
-
     async loadSettings() {
-        this._data = Object.assign({}, DEFAULT_SETTINGS, await this._plugin.loadData())
-        this._data.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
+        Object.assign(SettingsData, DEFAULT_SETTINGS, await this._plugin.loadData())
+        SettingsData.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
 
-        if (this._data.accounts.first() === null || this._data.accounts.length === 0) {
-            if (this._data.host) {
+        if (SettingsData.accounts.first() === null || SettingsData.accounts.length === 0) {
+            if (SettingsData.host) {
                 // Legacy credentials migration
-                this._data.accounts = [
+                SettingsData.accounts = [
                     {
-                        host: this._data.host,
-                        authenticationType: this._data.authenticationType,
-                        username: this._data.username,
-                        password: this._data.password,
-                        bareToken: this._data.bareToken,
+                        host: SettingsData.host,
+                        authenticationType: SettingsData.authenticationType,
+                        username: SettingsData.username,
+                        password: SettingsData.password,
+                        bareToken: SettingsData.bareToken,
                         alias: 'Default',
                         color: '#000000',
                         priority: 1,
@@ -145,7 +136,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 ]
             } else {
                 // First installation
-                this._data.accounts = [DEFAULT_ACCOUNT]
+                SettingsData.accounts = [DEFAULT_ACCOUNT]
             }
             this.saveSettings()
         }
@@ -153,7 +144,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
     }
 
     async saveSettings() {
-        await this._plugin.saveData(Object.assign({}, this._data, {
+        await this._plugin.saveData(Object.assign({}, SettingsData, {
             // Cache settings cleanup
             cache: {}, jqlAutocomplete: {}, customFieldsIdToName: {}, customFieldsNameToId: {},
         }))
@@ -222,7 +213,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
         const { containerEl } = this
         containerEl.createEl('h3', { text: 'Accounts' })
 
-        for (const account of this._data.accounts) {
+        for (const account of SettingsData.accounts) {
             const accountSetting = new Setting(containerEl)
                 .setName(`${account.priority}: ${account.alias}`)
                 .setDesc(account.host)
@@ -236,9 +227,9 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .addExtraButton(button => button
                     .setIcon('trash')
                     .setTooltip('Delete')
-                    .setDisabled(this._data.accounts.length <= 1)
+                    .setDisabled(SettingsData.accounts.length <= 1)
                     .onClick(async () => {
-                        this._data.accounts.remove(account)
+                        SettingsData.accounts.remove(account)
                         this.accountsConflictsFix()
                         await this.saveSettings()
                         // Force refresh
@@ -251,7 +242,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setButtonText("Add account")
                 .setCta()
                 .onClick(async value => {
-                    this._data.accounts.push(this.createNewEmptyAccount())
+                    SettingsData.accounts.push(this.createNewEmptyAccount())
                     this.accountsConflictsFix()
                     await this.saveSettings()
                     // Force refresh
@@ -398,10 +389,10 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                     button.setDisabled(true)
                     button.setButtonText("Testing...")
                     try {
-                        await this._jiraClient.testConnection(newAccount)
+                        await JiraClient.testConnection(newAccount)
                         new Notice('JiraIssue: Connection established!')
                         try {
-                            const loggedUser = await this._jiraClient.getLoggedUser(newAccount)
+                            const loggedUser = await JiraClient.getLoggedUser(newAccount)
                             new Notice(`JiraIssue: Logged as ${loggedUser.displayName}`)
                         } catch (e) {
                             new Notice('JiraIssue: Logged as Guest')
@@ -419,7 +410,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setCta()
                 .onClick(async value => {
                     // Swap priority with another existing account
-                    this._data.accounts.find(a => a.priority === newAccount.priority).priority = prevAccount.priority
+                    SettingsData.accounts.find(a => a.priority === newAccount.priority).priority = prevAccount.priority
                     Object.assign(prevAccount, newAccount)
                     this.accountsConflictsFix()
                     await this.saveSettings()
@@ -436,47 +427,47 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setDesc('Maximum number of search results to retrieve when using jira-search without specifying a limit.')
             .addText(text => text
                 // .setPlaceholder('Insert a number')
-                .setValue(this._data.searchResultsLimit.toString())
+                .setValue(SettingsData.searchResultsLimit.toString())
                 .onChange(async value => {
-                    this._data.searchResultsLimit = parseInt(value) || DEFAULT_SETTINGS.searchResultsLimit
+                    SettingsData.searchResultsLimit = parseInt(value) || DEFAULT_SETTINGS.searchResultsLimit
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
             .setName('Dark mode')
             // .setDesc('')
             .addToggle(toggle => toggle
-                .setValue(this._data.darkMode)
+                .setValue(SettingsData.darkMode)
                 .onChange(async value => {
-                    this._data.darkMode = value
+                    SettingsData.darkMode = value
                     await this.saveSettings()
                 }))
 
         new Setting(containerEl)
             .setName('Issue url to tags')
-            .setDesc(`Convert links to issues to tags. Example: ${this._data.accounts[0].host}/browse/AAA-123`)
+            .setDesc(`Convert links to issues to tags. Example: ${SettingsData.accounts[0].host}/browse/AAA-123`)
             .addToggle(toggle => toggle
-                .setValue(this._data.inlineIssueUrlToTag)
+                .setValue(SettingsData.inlineIssueUrlToTag)
                 .onChange(async value => {
-                    this._data.inlineIssueUrlToTag = value
+                    SettingsData.inlineIssueUrlToTag = value
                     await this.saveSettings()
                 }))
 
         new Setting(containerEl)
             .setName('Inline issue prefix')
-            .setDesc(`Prefix to use when rendering inline issues. Keep this field empty to disable this feature. Example: ${this._data.inlineIssuePrefix}AAA-123`)
+            .setDesc(`Prefix to use when rendering inline issues. Keep this field empty to disable this feature. Example: ${SettingsData.inlineIssuePrefix}AAA-123`)
             .addText(text => text
-                .setValue(this._data.inlineIssuePrefix)
+                .setValue(SettingsData.inlineIssuePrefix)
                 .onChange(async value => {
-                    this._data.inlineIssuePrefix = value
+                    SettingsData.inlineIssuePrefix = value
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
             .setName('Show color band')
             .setDesc('Display color band near by inline issue to simplify the account identification.')
             .addToggle(toggle => toggle
-                .setValue(this._data.showColorBand)
+                .setValue(SettingsData.showColorBand)
                 .onChange(async value => {
-                    this._data.showColorBand = value
+                    SettingsData.showColorBand = value
                     await this.saveSettings()
                 }))
     }
@@ -494,13 +485,13 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             { attr: isSearchColumnsDetailsOpen ? { open: true } : {} }
         )
         this._searchColumnsDetails.createEl('summary', { text: 'Show/Hide columns' })
-        this._data.searchColumns.forEach((column, index) => {
+        SettingsData.searchColumns.forEach((column, index) => {
             const setting = new Setting(this._searchColumnsDetails)
                 .addDropdown(dropdown => dropdown
                     .addOptions(SEARCH_COLUMNS_DESCRIPTION)
                     .setValue(column.type)
                     .onChange(async value => {
-                        this._data.searchColumns[index].type = value as ESearchColumnsTypes
+                        SettingsData.searchColumns[index].type = value as ESearchColumnsTypes
                         await this.saveSettings()
                         // Force refresh
                         this.display()
@@ -512,16 +503,16 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             //         .setPlaceholder('Custom field name')
             //         .setValue(column.customField)
             //         .onChange(async value => {
-            //             this._data.searchColumns[index].customField = value
+            //             settingData.searchColumns[index].customField = value
             //             await this.saveSettings()
             //         }).inputEl.addClass('custom-field-text')
             //     )
             // }
             setting.addExtraButton(button => button
-                .setIcon(this._data.searchColumns[index].compact ? 'compress-glyph' : 'enlarge-glyph')
-                .setTooltip(this._data.searchColumns[index].compact ? 'Compact' : 'Full width')
+                .setIcon(SettingsData.searchColumns[index].compact ? 'compress-glyph' : 'enlarge-glyph')
+                .setTooltip(SettingsData.searchColumns[index].compact ? 'Compact' : 'Full width')
                 .onClick(async () => {
-                    this._data.searchColumns[index].compact = !this._data.searchColumns[index].compact
+                    SettingsData.searchColumns[index].compact = !SettingsData.searchColumns[index].compact
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -531,9 +522,9 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setTooltip('Move up')
                 .setDisabled(index === 0)
                 .onClick(async () => {
-                    const tmp = this._data.searchColumns[index]
-                    this._data.searchColumns[index] = this._data.searchColumns[index - 1]
-                    this._data.searchColumns[index - 1] = tmp
+                    const tmp = SettingsData.searchColumns[index]
+                    SettingsData.searchColumns[index] = SettingsData.searchColumns[index - 1]
+                    SettingsData.searchColumns[index - 1] = tmp
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -541,11 +532,11 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             setting.addExtraButton(button => button
                 .setIcon('down-chevron-glyph')
                 .setTooltip('Move down')
-                .setDisabled(index === this._data.searchColumns.length - 1)
+                .setDisabled(index === SettingsData.searchColumns.length - 1)
                 .onClick(async () => {
-                    const tmp = this._data.searchColumns[index]
-                    this._data.searchColumns[index] = this._data.searchColumns[index + 1]
-                    this._data.searchColumns[index + 1] = tmp
+                    const tmp = SettingsData.searchColumns[index]
+                    SettingsData.searchColumns[index] = SettingsData.searchColumns[index + 1]
+                    SettingsData.searchColumns[index + 1] = tmp
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -554,7 +545,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setIcon('trash')
                 .setTooltip('Delete')
                 .onClick(async () => {
-                    this._data.searchColumns.splice(index, 1)
+                    SettingsData.searchColumns.splice(index, 1)
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -566,7 +557,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setButtonText("Reset columns")
                 .setWarning()
                 .onClick(async value => {
-                    this._data.searchColumns = DEFAULT_SETTINGS.searchColumns
+                    SettingsData.searchColumns = DEFAULT_SETTINGS.searchColumns
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -575,7 +566,7 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
                 .setButtonText("Add Column")
                 .setCta()
                 .onClick(async value => {
-                    this._data.searchColumns.push({ type: ESearchColumnsTypes.KEY, compact: false })
+                    SettingsData.searchColumns.push({ type: ESearchColumnsTypes.KEY, compact: false })
                     await this.saveSettings()
                     // Force refresh
                     this.display()
@@ -591,9 +582,9 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
             .addText(text => text
                 .setPlaceholder('Example: 15m, 24h, 5s')
-                .setValue(this._data.cacheTime)
+                .setValue(SettingsData.cacheTime)
                 .onChange(async value => {
-                    this._data.cacheTime = value
+                    SettingsData.cacheTime = value
                     await this.saveSettings()
                 }))
 
@@ -602,25 +593,25 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
             .setName('Log Request and Responses')
             .setDesc('Log in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
             .addToggle(toggle => toggle
-                .setValue(this._data.logRequestsResponses)
+                .setValue(SettingsData.logRequestsResponses)
                 .onChange(async value => {
-                    this._data.logRequestsResponses = value
+                    SettingsData.logRequestsResponses = value
                     await this.saveSettings()
                 }))
     }
 
     createNewEmptyAccount() {
         const newAccount = JSON.parse(JSON.stringify(DEFAULT_ACCOUNT))
-        newAccount.priority = this._data.accounts.length + 1
+        newAccount.priority = SettingsData.accounts.length + 1
         this.accountsConflictsFix()
         return newAccount
     }
 
     accountsConflictsFix() {
         const aliases: string[] = []
-        this._data.accounts.sort((a, b) => a.priority - b.priority)
+        SettingsData.accounts.sort((a, b) => a.priority - b.priority)
         let priority = 1
-        for (const account of this._data.accounts) {
+        for (const account of SettingsData.accounts) {
             while (aliases.indexOf(account.alias) >= 0) account.alias += '1'
             aliases.push(account.alias)
 
@@ -631,9 +622,10 @@ export class JiraIssueSettingsTab extends PluginSettingTab {
 
     createPriorityOptions(): Record<string, string> {
         const options: Record<string, string> = {}
-        for (let i = 1; i <= this._data.accounts.length; i++) {
+        for (let i = 1; i <= SettingsData.accounts.length; i++) {
             options[i.toString()] = i.toString()
         }
         return options
     }
 }
+export const SettingsData: IJiraIssueSettings = DEFAULT_SETTINGS

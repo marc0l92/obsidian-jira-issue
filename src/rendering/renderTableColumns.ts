@@ -1,6 +1,6 @@
 import { TFile } from "obsidian"
 import { IJiraIssue } from "../client/jiraInterfaces"
-import { JIRA_STATUS_COLOR_MAP, RenderingCommon } from "./renderingCommon"
+import { JIRA_STATUS_COLOR_MAP, RenderingCommon as RC } from "./renderingCommon"
 import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
 import * as jsonpath from 'jsonpath'
 
@@ -34,16 +34,16 @@ function deltaToStr(delta: number): string {
     return ''
 }
 
-export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement, renderingCommon: RenderingCommon): void => {
+export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement): void => {
     let markdownNotes: TFile[] = null
     for (const column of columns) {
         switch (column.type) {
             case ESearchColumnsTypes.KEY:
                 createEl('a', {
                     cls: 'no-wrap',
-                    href: renderingCommon.issueUrl(issue.account, issue.key),
+                    href: RC.issueUrl(issue.account, issue.key),
                     text: column.compact ? '🔗' : issue.key,
-                    title: column.compact ? issue.key : renderingCommon.issueUrl(issue.account, issue.key),
+                    title: column.compact ? issue.key : RC.issueUrl(issue.account, issue.key),
                     parent: createEl('td', { parent: row })
                 })
                 break
@@ -233,7 +233,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
-                    markdownNotes = renderingCommon.getNotes()
+                    markdownNotes = RC.getNotes()
                 }
                 const noteCell = createEl('td', { parent: row })
                 const noteRegex = new RegExp('^' + issue.key + '[^0-9]')
@@ -241,7 +241,7 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 if (connectedNotes.length > 0) {
                     for (const note of connectedNotes) {
                         if (column.extra) {
-                            renderNoteFrontMatter(column, note, noteCell, renderingCommon)
+                            renderNoteFrontMatter(column, note, noteCell)
                         } else {
                             renderNoteFile(column, note, noteCell)
                         }
@@ -276,8 +276,8 @@ function renderNoteFile(column: ISearchColumn, note: TFile, noteCell: HTMLTableC
     }
 }
 
-function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement, renderingCommon: RenderingCommon) {
-    const frontMatter = renderingCommon.getFrontMatter(note)
+function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement) {
+    const frontMatter = RC.getFrontMatter(note)
     const values = jsonpath.query(frontMatter, '$.' + column.extra)
     for (let value of values) {
         value = typeof value === 'object' ? JSON.stringify(value) : value.toString()

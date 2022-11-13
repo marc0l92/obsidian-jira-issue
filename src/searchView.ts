@@ -1,5 +1,5 @@
 import { IJiraIssueAccountSettings } from "./client/jiraInterfaces"
-import { COMMENT_REGEX, COMPACT_SYMBOL, IJiraIssueSettings } from "./settings"
+import { COMMENT_REGEX, COMPACT_SYMBOL, SettingsData } from "./settings"
 
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
@@ -92,12 +92,7 @@ export class SearchView {
     query = ''
     limit = ''
     columns: ISearchColumn[] = []
-    account: IJiraIssueAccountSettings // TODO: support explicit accounts
-    private _settings: IJiraIssueSettings
-
-    constructor(settings: IJiraIssueSettings) {
-        this._settings = settings
-    }
+    account: IJiraIssueAccountSettings
 
     fromString(str: string): SearchView {
         for (const line of str.split('\n')) {
@@ -148,13 +143,13 @@ export class SearchView {
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
                                         if (Number(customFieldInput)) {
                                             // Custom field provided as number
-                                            if (!(customFieldInput in this._settings.cache.customFieldsIdToName)) {
+                                            if (!(customFieldInput in SettingsData.cache.customFieldsIdToName)) {
                                                 throw new Error(`Custom field with id ${customFieldInput} not found`)
                                             }
                                             columnExtra = customFieldInput
                                         } else {
                                             // Custom field provided as name
-                                            columnExtra = this._settings.cache.customFieldsNameToId[customFieldInput]
+                                            columnExtra = SettingsData.cache.customFieldsNameToId[customFieldInput]
                                             if (!columnExtra) {
                                                 throw new Error(`Custom field with name "${customFieldInput}" not found`)
                                             }

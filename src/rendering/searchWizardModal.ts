@@ -1,18 +1,16 @@
 import { App, Modal, Setting } from "obsidian"
 import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION, SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION } from "../searchView"
-import { IJiraIssueSettings } from "../settings"
+import { SettingsData } from "../settings"
 
 
 export class SearchWizardModal extends Modal {
     private _searchView: SearchView
-    private _settings: IJiraIssueSettings
     private _onSubmit: (result: string) => void
 
-    constructor(app: App, settings: IJiraIssueSettings, onSubmit: (result: string) => void) {
+    constructor(app: App, onSubmit: (result: string) => void) {
         super(app)
-        this._settings = settings
         this._onSubmit = onSubmit
-        this._searchView = new SearchView(this._settings)
+        this._searchView = new SearchView()
     }
 
     onOpen() {
@@ -38,7 +36,7 @@ export class SearchWizardModal extends Modal {
         new Setting(contentEl)
             .setName('Search results limit')
             .addText(text => text
-                .setPlaceholder(`Use default value: ${this._settings.searchResultsLimit}`)
+                .setPlaceholder(`Use default value: ${SettingsData.searchResultsLimit}`)
                 .setValue(this._searchView.limit)
                 .onChange(async value => {
                     this._searchView.limit = value ? (parseInt(value).toString() || '') : ''

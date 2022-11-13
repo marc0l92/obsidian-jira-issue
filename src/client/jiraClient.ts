@@ -1,6 +1,6 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraAutocompleteData, IJiraAutocompleteField, IJiraDevStatus, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
-import { EAuthenticationTypes, IJiraIssueSettings } from "../settings"
+import { IJiraDevStatus, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
+import { EAuthenticationTypes, SettingsData } from "../settings"
 
 interface RequestOptions {
     method: string
@@ -52,136 +52,131 @@ function base64Encode(s: string) {
     }
 }
 
-export class JiraClient {
-    private _settings: IJiraIssueSettings
-
-    constructor(settings: IJiraIssueSettings) {
-        this._settings = settings
+function buildUrl(host: string, requestOptions: RequestOptions): string {
+    const basePath = requestOptions.noBasePath ? '' : SettingsData.apiBasePath
+    const url = new URL(`${host}${basePath}${requestOptions.path}`)
+    if (requestOptions.queryParameters) {
+        url.search = requestOptions.queryParameters.toString()
     }
+    return url.toString()
+}
 
-    private buildUrl(host: string, requestOptions: RequestOptions): string {
-        const basePath = requestOptions.noBasePath ? '' : this._settings.apiBasePath
-        const url = new URL(`${host}${basePath}${requestOptions.path}`)
-        if (requestOptions.queryParameters) {
-            url.search = requestOptions.queryParameters.toString()
-        }
-        return url.toString()
+function buildHeaders(account: IJiraIssueAccountSettings): Record<string, string> {
+    const requestHeaders: Record<string, string> = {}
+    if (account.authenticationType === EAuthenticationTypes.BASIC || account.authenticationType === EAuthenticationTypes.CLOUD) {
+        requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
+    } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
+        requestHeaders['Authorization'] = `Bearer ${account.bareToken}`
     }
+    return requestHeaders
+}
 
-    private buildHeaders(account: IJiraIssueAccountSettings): Record<string, string> {
-        const requestHeaders: Record<string, string> = {}
-        if (account.authenticationType === EAuthenticationTypes.BASIC || account.authenticationType === EAuthenticationTypes.CLOUD) {
-            requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
-        } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
-            requestHeaders['Authorization'] = `Bearer ${account.bareToken}`
-        }
-        return requestHeaders
-    }
-
-    private async sendRequest(requestOptions: RequestOptions): Promise<any> {
-        let response: RequestUrlResponse
-        if (requestOptions.account) {
-            response = await this.sendRequestWithAccount(requestOptions.account, requestOptions)
-
-            if (response.status === 200) {
-                return { ...response.json, account: requestOptions.account }
-            }
-        } else {
-            for (let i = 0; i < this._settings.accounts.length; i++) {
-                const account = this._settings.accounts[i]
-                response = await this.sendRequestWithAccount(account, requestOptions)
-
-                if (response.status === 200) {
-                    return { ...response.json, account: account }
-                } else if (Math.floor(response.status / 100) !== 4) {
-                    break;
-                }
-            }
-        }
-
-        if (response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
-            throw new Error(response.json.errorMessages.join('\n'))
-        } else if (response.status) {
-            throw new Error(`HTTP status ${response.status}`)
-        } else {
-            throw new Error(response as any)
-        }
-    }
-
-    private async sendRequestWithAccount(account: IJiraIssueAccountSettings, requestOptions: RequestOptions): Promise<RequestUrlResponse> {
-        let response
-        const requestUrlParam: RequestUrlParam = {
-            method: requestOptions.method,
-            url: this.buildUrl(account.host, requestOptions),
-            headers: this.buildHeaders(account),
-            contentType: 'application/json',
-        }
-        try {
-            response = await requestUrl(requestUrlParam)
-            this._settings.logRequestsResponses && console.info('JiraIssue:Fetch:', { request: requestUrlParam, response })
-        } catch (errorResponse) {
-            this._settings.logRequestsResponses && console.warn('JiraIssue:Fetch:', { request: requestUrlParam, response: errorResponse })
-            response = errorResponse
-        }
-        return response
-    }
-
-    private async preFetchImage(account: IJiraIssueAccountSettings, url: string): Promise<string> {
-        // Pre fetch only images hosted on the Jira server
-        if (!url.startsWith(account.host)) {
-            return url
-        }
-
-        const options = {
-            url: url,
-            method: 'GET',
-            headers: this.buildHeaders(account),
-        }
-        let response: RequestUrlResponse
-        try {
-            response = await requestUrl(options)
-            this._settings.logRequestsResponses && console.info('JiraIssue:FetchImage:', { request: options, response })
-        } catch (errorResponse) {
-            this._settings.logRequestsResponses && console.warn('JiraIssue:FetchImage:', { request: options, response: errorResponse })
-            response = errorResponse
-        }
+async function sendRequest(requestOptions: RequestOptions): Promise<any> {
+    let response: RequestUrlResponse
+    if (requestOptions.account) {
+        response = await sendRequestWithAccount(requestOptions.account, requestOptions)
 
         if (response.status === 200) {
-            const mimeType = getMimeType(response.arrayBuffer)
-            if (mimeType) {
-                url = `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
+            return { ...response.json, account: requestOptions.account }
+        }
+    } else {
+        for (let i = 0; i < SettingsData.accounts.length; i++) {
+            const account = SettingsData.accounts[i]
+            response = await sendRequestWithAccount(account, requestOptions)
+
+            if (response.status === 200) {
+                return { ...response.json, account: account }
+            } else if (Math.floor(response.status / 100) !== 4) {
+                break;
             }
         }
+    }
+
+    if (response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
+        throw new Error(response.json.errorMessages.join('\n'))
+    } else if (response.status) {
+        throw new Error(`HTTP status ${response.status}`)
+    } else {
+        throw new Error(response as any)
+    }
+}
+
+async function sendRequestWithAccount(account: IJiraIssueAccountSettings, requestOptions: RequestOptions): Promise<RequestUrlResponse> {
+    let response
+    const requestUrlParam: RequestUrlParam = {
+        method: requestOptions.method,
+        url: buildUrl(account.host, requestOptions),
+        headers: buildHeaders(account),
+        contentType: 'application/json',
+    }
+    try {
+        response = await requestUrl(requestUrlParam)
+        SettingsData.logRequestsResponses && console.info('JiraIssue:Fetch:', { request: requestUrlParam, response })
+    } catch (errorResponse) {
+        SettingsData.logRequestsResponses && console.warn('JiraIssue:Fetch:', { request: requestUrlParam, response: errorResponse })
+        response = errorResponse
+    }
+    return response
+}
+
+async function preFetchImage(account: IJiraIssueAccountSettings, url: string): Promise<string> {
+    // Pre fetch only images hosted on the Jira server
+    if (!url.startsWith(account.host)) {
         return url
     }
 
-    private async fetchIssueImages(issue: IJiraIssue) {
-        if (issue.fields) {
-            if (issue.fields.issuetype && issue.fields.issuetype.iconUrl) {
-                issue.fields.issuetype.iconUrl = await this.preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
-            }
-            if (issue.fields.reporter) {
-                issue.fields.reporter.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.reporter.avatarUrls['16x16'])
-            }
-            if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls['16x16']) {
-                issue.fields.assignee.avatarUrls['16x16'] = await this.preFetchImage(issue.account, issue.fields.assignee.avatarUrls['16x16'])
-            }
-            if (issue.fields.priority && issue.fields.priority.iconUrl) {
-                issue.fields.priority.iconUrl = await this.preFetchImage(issue.account, issue.fields.priority.iconUrl)
-            }
-        }
+    const options = {
+        url: url,
+        method: 'GET',
+        headers: buildHeaders(account),
+    }
+    let response: RequestUrlResponse
+    try {
+        response = await requestUrl(options)
+        SettingsData.logRequestsResponses && console.info('JiraIssue:FetchImage:', { request: options, response })
+    } catch (errorResponse) {
+        SettingsData.logRequestsResponses && console.warn('JiraIssue:FetchImage:', { request: options, response: errorResponse })
+        response = errorResponse
     }
 
+    if (response.status === 200) {
+        const mimeType = getMimeType(response.arrayBuffer)
+        if (mimeType) {
+            url = `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
+        }
+    }
+    return url
+}
+
+async function fetchIssueImages(issue: IJiraIssue) {
+    if (issue.fields) {
+        if (issue.fields.issuetype && issue.fields.issuetype.iconUrl) {
+            issue.fields.issuetype.iconUrl = await preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
+        }
+        if (issue.fields.reporter) {
+            issue.fields.reporter.avatarUrls['16x16'] = await preFetchImage(issue.account, issue.fields.reporter.avatarUrls['16x16'])
+        }
+        if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls['16x16']) {
+            issue.fields.assignee.avatarUrls['16x16'] = await preFetchImage(issue.account, issue.fields.assignee.avatarUrls['16x16'])
+        }
+        if (issue.fields.priority && issue.fields.priority.iconUrl) {
+            issue.fields.priority.iconUrl = await preFetchImage(issue.account, issue.fields.priority.iconUrl)
+        }
+    }
+}
+
+export const JiraClient = {
+
     async getIssue(issueKey: string): Promise<IJiraIssue> {
-        const issue = await this.sendRequest(
+        const issue = await sendRequest(
             {
                 method: 'GET',
                 path: `/issue/${issueKey}`,
             }
         ) as IJiraIssue
-        await this.fetchIssueImages(issue)
+        await fetchIssueImages(issue)
         return issue
-    }
+    },
 
     async getSearchResults(query: string, max: number): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
@@ -189,7 +184,7 @@ export class JiraClient {
             startAt: '0',
             maxResults: max > 0 ? max.toString() : '',
         })
-        const searchResults = await this.sendRequest(
+        const searchResults = await sendRequest(
             {
                 method: 'GET',
                 path: `/search`,
@@ -198,88 +193,88 @@ export class JiraClient {
         ) as IJiraSearchResults
         for (const issue of searchResults.issues) {
             issue.account = searchResults.account
-            await this.fetchIssueImages(issue)
+            await fetchIssueImages(issue)
         }
         return searchResults
-    }
+    },
 
     async updateStatusColorCache(status: string): Promise<void> {
-        if (status in this._settings.cache.statusColor) {
+        if (status in SettingsData.cache.statusColor) {
             return
         }
-        const response = await this.sendRequest(
+        const response = await sendRequest(
             {
                 method: 'GET',
                 path: `/status/${status}`,
             }
         ) as IJiraStatus
-        this._settings.cache.statusColor[status] = response.statusCategory.colorName
-    }
+        SettingsData.cache.statusColor[status] = response.statusCategory.colorName
+    },
 
     async updateCustomFieldsCache(): Promise<void> {
-        for (const account of this._settings.accounts) {
+        for (const account of SettingsData.accounts) {
             let response
             try {
-                response = await this.sendRequest(
+                response = await sendRequest(
                     {
                         method: 'GET',
                         path: `/field`,
                         account: account,
                     }
                 ) as IJiraField[]
-                this._settings.cache.customFieldsIdToName = {}
-                this._settings.cache.customFieldsNameToId = {}
-                this._settings.cache.customFieldsType = {}
+                SettingsData.cache.customFieldsIdToName = {}
+                SettingsData.cache.customFieldsNameToId = {}
+                SettingsData.cache.customFieldsType = {}
                 for (let i in response) {
                     const field = response[i]
                     if (field.custom && field.schema && field.schema.customId) {
-                        this._settings.cache.customFieldsIdToName[field.schema.customId] = field.name
-                        this._settings.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
-                        this._settings.cache.customFieldsType[field.schema.customId] = field.schema
+                        SettingsData.cache.customFieldsIdToName[field.schema.customId] = field.name
+                        SettingsData.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
+                        SettingsData.cache.customFieldsType[field.schema.customId] = field.schema
                     }
                 }
             } catch (e) {
                 console.error('Error while retrieving custom fields list of account:', account.alias)
             }
         }
-    }
+    },
 
     // async updateJQLAutoCompleteCache(): Promise<void> {
-    // const response = await this.sendRequest(
+    // const response = await sendRequest(
     //     {
     //         method: 'GET',
     //         path: `/jql/autocompletedata`,
     //     }
     // ) as IJiraAutocompleteData
-    // this._settings.cache.jqlAutocomplete = { fields: [], functions: {} }
+    // settingData.cache.jqlAutocomplete = { fields: [], functions: {} }
     // for (const functionData of response.visibleFunctionNames) {
     //     for (const functionType of functionData.types) {
-    //         if (functionType in this._settings.cache.jqlAutocomplete.functions) {
-    //             this._settings.cache.jqlAutocomplete.functions[functionType].push(functionData.value)
+    //         if (functionType in settingData.cache.jqlAutocomplete.functions) {
+    //             settingData.cache.jqlAutocomplete.functions[functionType].push(functionData.value)
     //         } else {
-    //             this._settings.cache.jqlAutocomplete.functions[functionType] = [functionData.value]
+    //             settingData.cache.jqlAutocomplete.functions[functionType] = [functionData.value]
     //         }
     //     }
     // }
-    // this._settings.cache.jqlAutocomplete.fields = response.visibleFieldNames
-    // }
+    // settingData.cache.jqlAutocomplete.fields = response.visibleFieldNames
+    // },
 
     // async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
     //     const queryParameters = new URLSearchParams({
     //         fieldName: fieldName,
     //         fieldValue: fieldValue,
     //     })
-    //     return await this.sendRequest(
+    //     return await sendRequest(
     //         {
     //             method: 'GET',
     //             path: `/jql/autocompletedata/suggestions`,
     //             queryParameters: queryParameters,
     //         }
     //     ) as IJiraAutocompleteField
-    // }
+    // },
 
     async testConnection(account: IJiraIssueAccountSettings): Promise<boolean> {
-        await this.sendRequest(
+        await sendRequest(
             {
                 method: 'GET',
                 path: `/project`,
@@ -287,23 +282,23 @@ export class JiraClient {
             }
         )
         return true
-    }
+    },
 
     async getLoggedUser(account: IJiraIssueAccountSettings): Promise<IJiraUser> {
-        return await this.sendRequest(
+        return await sendRequest(
             {
                 method: 'GET',
                 path: `/myself`,
                 account: account,
             }
         ) as IJiraUser
-    }
+    },
 
     async getDevStatus(issueId: string): Promise<IJiraDevStatus> {
         const queryParameters = new URLSearchParams({
             issueId: issueId,
         })
-        return await this.sendRequest(
+        return await sendRequest(
             {
                 method: 'GET',
                 path: `/rest/dev-status/latest/issue/summary?issueId=`,
@@ -311,5 +306,5 @@ export class JiraClient {
                 noBasePath: true
             }
         ) as IJiraDevStatus
-    }
+    },
 }

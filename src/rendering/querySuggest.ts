@@ -1,5 +1,4 @@
 import { App, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from "obsidian"
-import { IJiraIssueSettings } from "src/settings"
 
 interface SuggestionEntry {
     name: string
@@ -7,11 +6,9 @@ interface SuggestionEntry {
 }
 
 export class QuerySuggest extends EditorSuggest<SuggestionEntry> {
-    private _settings: IJiraIssueSettings
 
-    constructor(app: App, settings: IJiraIssueSettings) {
+    constructor(app: App) {
         super(app)
-        this._settings = settings
     }
 
     onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null {
