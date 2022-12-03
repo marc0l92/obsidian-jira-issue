@@ -77,7 +77,7 @@
     margin: 0;
     outline: 0;
     box-shadow: none;
-    height: 1em;
+    height: 1.5em;
     max-height: fit-content;
     cursor: pointer;
     font-size: x-small;
@@ -86,6 +86,11 @@
 }
 .jira-issue-container .search-footer button:hover {
     opacity: 0.8;
+}
+
+.jira-issue-container .search-footer button > svg {
+    height: 1.5em;
+    width: 1.5em;
 }
 
 /* ji-tags */
@@ -440,4 +445,14 @@ th {
 .jira-issue-container .pull-request-tag>svg {
     height: 1em;
     width: 1em;
+}
+
+.jira-issue-container .rotate-animation {
+    animation-name: rotate-keyframes;
+    animation-duration: 2s;
+}
+  
+@keyframes rotate-keyframes {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
 }

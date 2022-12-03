@@ -87,9 +87,9 @@ function renderSearchFooter(rootEl: HTMLElement, searchView: SearchView, searchR
         text: `Last update: ${ObjectsCache.getTime(searchView.getCacheKey())}`,
         parent: lastUpdateContainer,
     })
-    const refreshButton = createEl('button', { parent: lastUpdateContainer, title: 'Refresh' })
+    const refreshButton = createEl('button', { parent: lastUpdateContainer, title: 'Refresh', cls: 'rotate-animation' })
     setIcon(refreshButton, 'sync-small')
-    refreshButton.on('click', '.search-footer>button', () => {
+    refreshButton.onClickEvent(() => {
         rootEl.empty()
         ObjectsCache.delete(searchView.getCacheKey())
         SearchFenceRenderer(searchView.toRawString(), rootEl, null)
