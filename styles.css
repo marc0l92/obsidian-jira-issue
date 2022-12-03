@@ -410,3 +410,34 @@ th {
 .HyperMD-task-line[data-task="x"] .ji-inline-issue.jira-issue-container{
     text-decoration: line-through;
 }
+
+.jira-issue-container table svg{
+    fill: #363636
+}
+
+.jira-issue-container table.is-dark svg{
+    fill: #dadada
+}
+
+.jira-issue-container span.pull-request-tag {
+    padding: 1px 3px;
+}
+.jira-issue-container span.pull-request-tag:last-child {
+    border-radius: 0px 2px 2px 0px;
+}
+.jira-issue-container span.pull-request-tag:first-child {
+    border-radius: 2px 0px 0px 2px;
+}
+.jira-issue-container span.pull-request-open{
+    background-color: #325186;
+}
+.jira-issue-container span.pull-request-merged{
+    background-color: #25570F;
+}
+.jira-issue-container span.pull-request-delete{
+    background-color: #984447;
+}
+.jira-issue-container .pull-request-tag>svg {
+    height: 1em;
+    width: 1em;
+}

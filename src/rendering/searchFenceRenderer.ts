@@ -8,20 +8,20 @@ import { SettingsData } from "../settings"
 import { RenderingCommon as RC } from "./renderingCommon"
 
 
-function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
     searchView.account = searchResults.account
     if (searchView.type === ESearchResultsRenderingTypes.LIST) {
         renderSearchResultsList(rootEl, searchResults)
     } else {
-        renderSearchResultsTable(rootEl, searchView, searchResults)
+        await renderSearchResultsTable(rootEl, searchView, searchResults)
     }
 }
 
 
-function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
     const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${RC.getTheme()}` })
     renderSearchResultsTableHeader(table, searchView)
-    renderSearchResultsTableBody(table, searchView, searchResults)
+    await renderSearchResultsTableBody(table, searchView, searchResults)
 
     const footer = renderSearchFooter(rootEl, searchView, searchResults)
     rootEl.replaceChildren(RC.renderContainer([table, footer]))
@@ -51,13 +51,13 @@ function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchVi
     }
 }
 
-function renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
     const tbody = createEl('tbody', { parent: table })
     for (let issue of searchResults.issues) {
         issue = createProxy(issue)
         const row = createEl('tr', { parent: tbody })
         const columns = searchView.columns.length > 0 ? searchView.columns : SettingsData.searchColumns
-        renderTableColumn(columns, issue, row)
+        await renderTableColumn(columns, issue, row)
     }
 }
 
@@ -107,7 +107,7 @@ export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, c
             if (cachedSearchResults.isError) {
                 RC.renderSearchError(rootEl, cachedSearchResults.data as string, searchView)
             } else {
-                renderSearchResults(rootEl, searchView, cachedSearchResults.data as IJiraSearchResults)
+                await renderSearchResults(rootEl, searchView, cachedSearchResults.data as IJiraSearchResults)
             }
         } else {
             // console.log(`Search results not available in the cache`)

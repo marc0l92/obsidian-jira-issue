@@ -294,7 +294,7 @@ export const JiraClient = {
         ) as IJiraUser
     },
 
-    async getDevStatus(issueId: string): Promise<IJiraDevStatus> {
+    async getDevStatus(issueId: string, account: IJiraIssueAccountSettings): Promise<IJiraDevStatus> {
         const queryParameters = new URLSearchParams({
             issueId: issueId,
         })
@@ -303,7 +303,8 @@ export const JiraClient = {
                 method: 'GET',
                 path: `/rest/dev-status/latest/issue/summary?issueId=`,
                 queryParameters: queryParameters,
-                noBasePath: true
+                noBasePath: true,
+                account: account,
             }
         ) as IJiraDevStatus
     },

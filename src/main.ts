@@ -10,6 +10,7 @@ import { SearchFenceRenderer } from './rendering/searchFenceRenderer'
 import { SearchWizardModal } from './rendering/searchWizardModal'
 import { ViewPluginManager } from './rendering/inlineIssueViewPlugin'
 import { QuerySuggest } from './rendering/querySuggest'
+import { setupIcons } from './icons/icons'
 
 // TODO: text on mobile and implement horizontal scrolling
 
@@ -27,6 +28,8 @@ export default class JiraIssuePlugin extends Plugin {
         await this._settingTab.loadSettings()
         this.addSettingTab(this._settingTab)
         JiraClient.updateCustomFieldsCache()
+        // Load icons
+        setupIcons()
         // Fence rendering
         this.registerMarkdownCodeBlockProcessor('jira-issue', IssueFenceRenderer)
         this.registerMarkdownCodeBlockProcessor('jira-search', SearchFenceRenderer)

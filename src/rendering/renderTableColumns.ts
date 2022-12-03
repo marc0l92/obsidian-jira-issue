@@ -1,8 +1,10 @@
-import { TFile } from "obsidian"
-import { IJiraIssue } from "../client/jiraInterfaces"
+import { setIcon, TFile } from "obsidian"
+import { IJiraDevStatus, IJiraIssue } from "../client/jiraInterfaces"
 import { JIRA_STATUS_COLOR_MAP, RenderingCommon as RC } from "./renderingCommon"
 import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
 import * as jsonpath from 'jsonpath'
+import { ObjectsCache } from "src/objectsCache"
+import { JiraClient } from "src/client/jiraClient"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -34,7 +36,7 @@ function deltaToStr(delta: number): string {
     return ''
 }
 
-export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement): void => {
+export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement): Promise<void> => {
     let markdownNotes: TFile[] = null
     for (const column of columns) {
         switch (column.type) {
@@ -258,8 +260,36 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 }
                 break
             case ESearchColumnsTypes.DEV_STATUS:
-                issue.id
-                createEl('td', { text: ``, parent: row })
+                const cacheKey = 'dev-status-' + issue.id
+                let devStatus: IJiraDevStatus = null
+                const devStatusCacheItem = ObjectsCache.get(cacheKey)
+                if (devStatusCacheItem) {
+                    devStatus = devStatusCacheItem.data as IJiraDevStatus
+                } else {
+                    devStatus = await JiraClient.getDevStatus(issue.id, issue.account)
+                    ObjectsCache.add(cacheKey, devStatus)
+                }
+                const cell = createEl('td', { parent: row })
+                const prDetails = devStatus.summary.pullrequest.overall.details
+                if (prDetails.openCount + prDetails.mergedCount + prDetails.declinedCount > 0) {
+                    if (prDetails.openCount > 0) {
+                        const prOpen = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-open', title: 'Open pull-request' })
+                        setIcon(prOpen, 'git-pull-request')
+                        prOpen.appendText(`${prDetails.openCount}`)
+                    }
+                    if (prDetails.mergedCount > 0) {
+                        const prMerged = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-merged', title: 'Merged pull-request' })
+                        setIcon(prMerged, 'git-merge')
+                        prMerged.appendText(`${prDetails.mergedCount}`)
+                    }
+                    if (prDetails.declinedCount > 0) {
+                        const prDeclined = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-delete', title: 'Declined pull-request' })
+                        setIcon(prDeclined, 'git-delete')
+                        prDeclined.appendText(`${prDetails.declinedCount}`)
+                    }
+                } else {
+                    createSpan({ parent: cell, title: 'No data available', text: '-' })
+                }
                 break
         }
     }
