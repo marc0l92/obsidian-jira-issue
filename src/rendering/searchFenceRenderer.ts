@@ -8,7 +8,7 @@ import { SettingsData } from "../settings"
 import { RenderingCommon as RC } from "./renderingCommon"
 
 
-async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     searchView.account = searchResults.account
     if (searchView.type === ESearchResultsRenderingTypes.LIST) {
         renderSearchResultsList(rootEl, searchResults)
@@ -18,7 +18,7 @@ async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, 
 }
 
 
-async function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${RC.getTheme()}` })
     renderSearchResultsTableHeader(table, searchView)
     await renderSearchResultsTableBody(table, searchView, searchResults)
@@ -51,7 +51,7 @@ function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchVi
     }
 }
 
-async function renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): void {
+async function renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     const tbody = createEl('tbody', { parent: table })
     for (let issue of searchResults.issues) {
         issue = createProxy(issue)
