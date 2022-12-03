@@ -5,6 +5,9 @@ import builtins from 'builtin-modules'
 const prod = (process.argv[2] === 'production')
 
 esbuild.build({
+    banner:{
+        js: 'Project: https://github.com/marc0l92/obsidian-jira-issue',
+    },
     entryPoints: ['src/main.ts'],
     bundle: true,
     external: [
@@ -34,7 +37,7 @@ esbuild.build({
         ...builtins],
     format: 'cjs',
     watch: !prod,
-    target: 'es2016',
+    target: 'es2020',
     logLevel: "info",
     sourcemap: prod ? false : 'inline',
     treeShaking: true,
