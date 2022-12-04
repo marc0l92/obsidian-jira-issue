@@ -92,9 +92,10 @@ export class SearchView {
     query = ''
     limit = ''
     columns: ISearchColumn[] = []
-    account: IJiraIssueAccountSettings
+    account: IJiraIssueAccountSettings = null
 
-    fromString(str: string): SearchView {
+    static fromString(str: string): SearchView {
+        const sv = new SearchView()
         for (const line of str.split('\n')) {
             if (line.trim() && !COMMENT_REGEX.test(line)) {
                 const [key, ...values] = line.split(':')
@@ -102,29 +103,29 @@ export class SearchView {
 
                 if (!value) {
                     // Basic mode with only the query
-                    this.query = line
+                    sv.query = line
                 } else {
                     // Advanced mode with key value structure
                     switch (key.trim().toLowerCase()) {
                         case 'type':
                             if (value.toUpperCase() in ESearchResultsRenderingTypes) {
-                                this.type = value.toUpperCase() as ESearchResultsRenderingTypes
+                                sv.type = value.toUpperCase() as ESearchResultsRenderingTypes
                             } else {
                                 throw new Error(`Invalid type: ${value}`)
                             }
                             break
                         case 'query':
-                            this.query = value
+                            sv.query = value
                             break
                         case 'limit':
                             if (parseInt(value)) {
-                                this.limit = parseInt(value).toString()
+                                sv.limit = parseInt(value).toString()
                             } else {
                                 throw new Error(`Invalid limit: ${value}`)
                             }
                             break
                         case 'columns':
-                            this.columns = value.split(',')
+                            sv.columns = value.split(',')
                                 .filter(column => column.trim())
                                 .map(column => {
                                     let columnExtra = ''
@@ -176,10 +177,10 @@ export class SearchView {
                 }
             }
         }
-        if (this.type === ESearchResultsRenderingTypes.LIST && this.columns.length > 0) {
+        if (sv.type === ESearchResultsRenderingTypes.LIST && sv.columns.length > 0) {
             throw new Error('type LIST and custom columns are not compatible options')
         }
-        return this
+        return sv
     }
 
     toString(): string {

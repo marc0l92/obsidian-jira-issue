@@ -100,7 +100,7 @@ function renderSearchFooter(rootEl: HTMLElement, searchView: SearchView, searchR
 export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> => {
     // console.log(`Search query: ${source}`)
     try {
-        const searchView = new SearchView().fromString(source)
+        const searchView = SearchView.fromString(source)
 
         const cachedSearchResults = ObjectsCache.get(searchView.getCacheKey())
         if (cachedSearchResults) {

@@ -10,9 +10,6 @@ const kFakeDateAfterExpiration = new Date('2000-01-02')
 jest.mock('../src/settings', () => {
     return { SettingsData: { cacheTime: '15m' } }
 })
-jest.mock('ms', () => {
-    return () => { return 10 }
-})
 
 describe('ObjectsCache', () => {
     
