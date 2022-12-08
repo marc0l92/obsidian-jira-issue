@@ -110,7 +110,11 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     }
 
     async loadSettings() {
+        // Read plugin data and fill new fields with default values
         Object.assign(SettingsData, DEFAULT_SETTINGS, await this._plugin.loadData())
+        for (const i in SettingsData.accounts) {
+            SettingsData.accounts[i] = Object.assign({}, DEFAULT_ACCOUNT, SettingsData.accounts[i])
+        }
         SettingsData.cache = DEFAULT_SETTINGS.cache
 
         if (SettingsData.accounts.first() === null || SettingsData.accounts.length === 0) {
@@ -141,7 +145,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     async saveSettings() {
         const settingsToStore: IJiraIssueSettings = Object.assign({}, SettingsData, {
             // Global cache settings cleanup
-            cache: DEFAULT_SETTINGS.cache,
+            cache: DEFAULT_SETTINGS.cache, jqlAutocomplete: null, customFieldsIdToName: null, customFieldsNameToId: null, statusColorCache: null
         })
         // Account cache settings cleanup
         settingsToStore.accounts.forEach(account => account.cache = DEFAULT_ACCOUNT.cache)

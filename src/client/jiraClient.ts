@@ -237,7 +237,7 @@ export const JiraClient = {
                     }
                 }
             } catch (e) {
-                console.error('Error while retrieving custom fields list of account:', account.alias)
+                console.error('Error while retrieving custom fields list of account:', account.alias, e)
             }
         }
     },
