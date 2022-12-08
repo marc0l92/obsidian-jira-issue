@@ -24,10 +24,6 @@ Examples:
 
 ## Issue URL to tag
 
-:::caution
-This feature is currently not available in Live Preview mode, but only in reading mode.
-:::
-
 This settings allows you to enable the conversion of Jira issue URL to tags. The plugin looks for URL that are composed like:
 
 ```
