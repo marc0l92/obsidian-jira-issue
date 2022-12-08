@@ -70,13 +70,7 @@ export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
         }
         // Custom fields
         query = query.replace(/^\$/, '')
-        let customFieldsOptions = []
-        if (Number(query)) {
-            customFieldsOptions = Object.keys(SettingsData.cache.customFieldsIdToName)
-        } else {
-            customFieldsOptions = Object.keys(SettingsData.cache.customFieldsNameToId)
-        }
-        for (const column of customFieldsOptions) {
+        for (const column of SettingsData.cache.columns) {
             if (suggestions.length >= this.limit) break
             if (column.toUpperCase().startsWith(query)) {
                 suggestions.push({

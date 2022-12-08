@@ -48,7 +48,7 @@ export default class JiraIssuePlugin extends Plugin {
         this.registerMarkdownPostProcessor(InlineIssueRenderer)
         // Live preview inline issue rendering
         this._inlineIssueViewPlugin = new ViewPluginManager()
-        this.registerEditorExtension(this._inlineIssueViewPlugin.getViewPlugin())
+        this._inlineIssueViewPlugin.getViewPlugins().forEach(vp => this.registerEditorExtension(vp))
 
         // Settings refresh
         this._settingTab.onChange(() => {

@@ -152,6 +152,18 @@ export interface IJiraIssueAccountSettings {
     bareToken?: string
     priority: number
     color: string
+    cache: {
+        statusColor: Record<string, string>
+        customFieldsIdToName: Record<string, string>
+        customFieldsNameToId: Record<string, string>
+        customFieldsType: Record<string, IJiraFieldSchema>
+        jqlAutocomplete: {
+            fields: IJiraAutocompleteDataField[]
+            functions: {
+                [key: string]: [string]
+            }
+        }
+    }
 }
 
 export interface IJiraDevStatus {

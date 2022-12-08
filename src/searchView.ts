@@ -140,20 +140,10 @@ export class SearchView {
                                     }
                                     // Custom field
                                     if (column.toUpperCase().startsWith('$')) {
-                                        const customFieldInput = column.slice(1)
+                                        columnExtra = column.slice(1)
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
-                                        if (Number(customFieldInput)) {
-                                            // Custom field provided as number
-                                            if (!(customFieldInput in SettingsData.cache.customFieldsIdToName)) {
-                                                throw new Error(`Custom field with id ${customFieldInput} not found`)
-                                            }
-                                            columnExtra = customFieldInput
-                                        } else {
-                                            // Custom field provided as name
-                                            columnExtra = SettingsData.cache.customFieldsNameToId[customFieldInput]
-                                            if (!columnExtra) {
-                                                throw new Error(`Custom field with name "${customFieldInput}" not found`)
-                                            }
+                                        if(!(columnExtra in SettingsData.cache.columns)){
+                                            throw new Error(`Custom field ${columnExtra} not found`)
                                         }
                                     }
                                     // Check validity

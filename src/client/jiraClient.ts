@@ -167,18 +167,19 @@ async function fetchIssueImages(issue: IJiraIssue) {
 
 export const JiraClient = {
 
-    async getIssue(issueKey: string): Promise<IJiraIssue> {
+    async getIssue(issueKey: string, account: IJiraIssueAccountSettings = null): Promise<IJiraIssue> {
         const issue = await sendRequest(
             {
                 method: 'GET',
                 path: `/issue/${issueKey}`,
+                account: account,
             }
         ) as IJiraIssue
         await fetchIssueImages(issue)
         return issue
     },
 
-    async getSearchResults(query: string, max: number): Promise<IJiraSearchResults> {
+    async getSearchResults(query: string, max: number, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: '0',
@@ -189,6 +190,7 @@ export const JiraClient = {
                 method: 'GET',
                 path: `/search`,
                 queryParameters: queryParameters,
+                account: account,
             }
         ) as IJiraSearchResults
         for (const issue of searchResults.issues) {
@@ -198,8 +200,8 @@ export const JiraClient = {
         return searchResults
     },
 
-    async updateStatusColorCache(status: string): Promise<void> {
-        if (status in SettingsData.cache.statusColor) {
+    async updateStatusColorCache(status: string, account: IJiraIssueAccountSettings): Promise<void> {
+        if (status in account.cache.statusColor) {
             return
         }
         const response = await sendRequest(
@@ -208,29 +210,30 @@ export const JiraClient = {
                 path: `/status/${status}`,
             }
         ) as IJiraStatus
-        SettingsData.cache.statusColor[status] = response.statusCategory.colorName
+        account.cache.statusColor[status] = response.statusCategory.colorName
     },
 
     async updateCustomFieldsCache(): Promise<void> {
+        SettingsData.cache.columns = []
         for (const account of SettingsData.accounts) {
-            let response
             try {
-                response = await sendRequest(
+                const response = await sendRequest(
                     {
                         method: 'GET',
                         path: `/field`,
                         account: account,
                     }
                 ) as IJiraField[]
-                SettingsData.cache.customFieldsIdToName = {}
-                SettingsData.cache.customFieldsNameToId = {}
-                SettingsData.cache.customFieldsType = {}
+                account.cache.customFieldsIdToName = {}
+                account.cache.customFieldsNameToId = {}
+                account.cache.customFieldsType = {}
                 for (let i in response) {
                     const field = response[i]
                     if (field.custom && field.schema && field.schema.customId) {
-                        SettingsData.cache.customFieldsIdToName[field.schema.customId] = field.name
-                        SettingsData.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
-                        SettingsData.cache.customFieldsType[field.schema.customId] = field.schema
+                        account.cache.customFieldsIdToName[field.schema.customId] = field.name
+                        account.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
+                        account.cache.customFieldsType[field.schema.customId] = field.schema
+                        SettingsData.cache.columns.push(field.schema.customId.toString(), field.name)
                     }
                 }
             } catch (e) {

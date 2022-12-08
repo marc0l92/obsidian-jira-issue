@@ -27,16 +27,7 @@ export interface IJiraIssueSettings {
     cacheTime: string
     searchResultsLimit: number
     cache: {
-        statusColor: Record<string, string>
-        customFieldsIdToName: Record<string, string>
-        customFieldsNameToId: Record<string, string>
-        customFieldsType: Record<string, IJiraFieldSchema>
-        jqlAutocomplete: {
-            fields: IJiraAutocompleteDataField[]
-            functions: {
-                [key: string]: [string]
-            }
-        }
+        columns: string[]
     }
     darkMode: boolean
     inlineIssueUrlToTag: boolean
@@ -59,14 +50,7 @@ const DEFAULT_SETTINGS: IJiraIssueSettings = {
     cacheTime: '15m',
     searchResultsLimit: 10,
     cache: {
-        statusColor: {},
-        customFieldsIdToName: {},
-        customFieldsNameToId: {},
-        customFieldsType: {},
-        jqlAutocomplete: {
-            fields: [],
-            functions: {},
-        },
+        columns: [],
     },
     darkMode: false,
     inlineIssueUrlToTag: true,
@@ -93,6 +77,16 @@ const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
     password: HIDDEN_PASSWORD_PLACEHOLDER,
     priority: 1,
     color: '#000000',
+    cache: {
+        statusColor: {},
+        customFieldsIdToName: {},
+        customFieldsNameToId: {},
+        customFieldsType: {},
+        jqlAutocomplete: {
+            fields: [],
+            functions: {},
+        },
+    },
 }
 
 function getRandomColor() {
@@ -117,21 +111,22 @@ export class JiraIssueSettingTab extends PluginSettingTab {
 
     async loadSettings() {
         Object.assign(SettingsData, DEFAULT_SETTINGS, await this._plugin.loadData())
-        SettingsData.cache.statusColor = DEFAULT_SETTINGS.cache.statusColor
+        SettingsData.cache = DEFAULT_SETTINGS.cache
 
         if (SettingsData.accounts.first() === null || SettingsData.accounts.length === 0) {
             if (SettingsData.host) {
                 // Legacy credentials migration
                 SettingsData.accounts = [
                     {
+                        priority: 1,
                         host: SettingsData.host,
                         authenticationType: SettingsData.authenticationType,
                         username: SettingsData.username,
                         password: SettingsData.password,
                         bareToken: SettingsData.bareToken,
-                        alias: 'Default',
-                        color: '#000000',
-                        priority: 1,
+                        alias: DEFAULT_ACCOUNT.alias,
+                        color: DEFAULT_ACCOUNT.color,
+                        cache: DEFAULT_ACCOUNT.cache,
                     }
                 ]
             } else {
@@ -144,10 +139,15 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     }
 
     async saveSettings() {
-        await this._plugin.saveData(Object.assign({}, SettingsData, {
-            // Cache settings cleanup
-            cache: {}, jqlAutocomplete: {}, customFieldsIdToName: {}, customFieldsNameToId: {},
-        }))
+        const settingsToStore: IJiraIssueSettings = Object.assign({}, SettingsData, {
+            // Global cache settings cleanup
+            cache: DEFAULT_SETTINGS.cache,
+        })
+        // Account cache settings cleanup
+        settingsToStore.accounts.forEach(account => account.cache = DEFAULT_ACCOUNT.cache)
+
+        await this._plugin.saveData(settingsToStore)
+
         if (this._onChangeListener) {
             this._onChangeListener()
         }
