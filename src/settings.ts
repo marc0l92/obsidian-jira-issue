@@ -583,7 +583,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Cache time')
-            .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of request to the server.')
+            .setDesc('Time before the cached issue status expires. A low value will refresh the data very often but do a lot of requests to the server.')
             .addText(text => text
                 .setPlaceholder('Example: 15m, 24h, 5s')
                 .setValue(SettingsData.cacheTime)
