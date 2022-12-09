@@ -20,14 +20,14 @@ async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, 
 
 async function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${RC.getTheme()}` })
-    renderSearchResultsTableHeader(table, searchView)
+    renderSearchResultsTableHeader(table, searchView, searchResults.account)
     await renderSearchResultsTableBody(table, searchView, searchResults)
 
     const footer = renderSearchFooter(rootEl, searchView, searchResults)
     rootEl.replaceChildren(RC.renderContainer([table, footer]))
 }
 
-function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchView): void {
+function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchView, account: IJiraIssueAccountSettings): void {
     const header = createEl('tr', {
         parent:
             createEl('thead', { attr: { style: getAccountBandStyle(searchView.account) }, parent: table })
@@ -41,7 +41,11 @@ function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchVi
         }
         // Custom field
         if (column.type === ESearchColumnsTypes.CUSTOM_FIELD) {
-            name = SettingsData.cache.customFieldsIdToName[column.extra]
+            if (Number(column.extra)) {
+                name = account.cache.customFieldsIdToName[column.extra]
+            } else {
+                name = column.extra
+            }
         }
         if (column.compact) {
             createEl('th', { text: name[0].toUpperCase(), attr: { 'aria-label-position': 'top', 'aria-label': column.type }, parent: header })

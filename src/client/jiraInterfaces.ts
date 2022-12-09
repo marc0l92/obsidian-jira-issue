@@ -207,13 +207,13 @@ export interface IJiraDevStatus {
     }
 }
 
-export function createProxy<T extends object>(obj: T): T {
+export function createProxy<T extends Object>(obj: T): T {
     const proxy = new Proxy<T>(obj, {
-        get: (target: T, p: string, receiver: any) => {
-            if (p in target) {
-                const value = Reflect.get(target, p, receiver)
+        get: (target: T, property: string, receiver: any) => {
+            if (property in target) {
+                const value = Reflect.get(target, property, receiver)
                 if (value !== undefined && value !== null) {
-                    if (value instanceof Object && p !== 'prototype') {
+                    if (value instanceof Object && property !== 'prototype') {
                         return createProxy(value)
                     } else {
                         return value
