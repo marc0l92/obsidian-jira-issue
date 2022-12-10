@@ -1,4 +1,4 @@
-import { StateField } from "@codemirror/state"
+import { RangeSet, StateField } from "@codemirror/state"
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
 import { editorLivePreviewField } from "obsidian"
 import { JiraClient } from "src/client/jiraClient"
@@ -8,6 +8,10 @@ import { COMPACT_SYMBOL, SettingsData } from "src/settings"
 import { RenderingCommon as RC } from "./renderingCommon"
 import escapeStringRegexp from 'escape-string-regexp'
 import { getAccountByHost } from "src/utils"
+
+interface IMatchDecoratorRef {
+    ref: MatchDecorator
+}
 
 function escapeRegexp(str: string): string {
     return escapeStringRegexp(str).replace(/\//g, '\\/')
@@ -53,11 +57,11 @@ class InlineIssueWidget extends WidgetType {
 }
 
 // Global variable with the last instance of the MatchDecorator rebuilt every time the settings are changed
-let jiraTagMatchDecorator: MatchDecorator
-let jiraUrlMatchDecorator: MatchDecorator
+let jiraTagMatchDecorator: IMatchDecoratorRef = { ref: null }
+let jiraUrlMatchDecorator: IMatchDecoratorRef = { ref: null }
 
 function buildMatchDecorators() {
-    jiraTagMatchDecorator = new MatchDecorator({
+    jiraTagMatchDecorator.ref = new MatchDecorator({
         regexp: new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
         decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
             const compact = !!match[1]
@@ -76,41 +80,45 @@ function buildMatchDecorators() {
         }
     })
 
-    const urls: string[] = []
-    SettingsData.accounts.forEach(account => urls.push(escapeRegexp(account.host)))
-    jiraUrlMatchDecorator = new MatchDecorator({
-        regexp: new RegExp(`(${COMPACT_SYMBOL}?)(${urls.join('|')})/browse/([A-Z0-9]+-[0-9]+)`, 'g'),
-        decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
-            const compact = !!match[1]
-            const host = match[2]
-            const key = match[3]
-            const cursor = view.state.selection.main.head
-            if (!view.state.field(editorLivePreviewField as unknown as StateField<boolean>) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
-                return Decoration.mark({
-                    tagName: 'div',
-                    class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
-                })
-            } else {
-                return Decoration.replace({
-                    widget: new InlineIssueWidget(key, compact, host),
-                })
+    if (SettingsData.inlineIssueUrlToTag) {
+        const urls: string[] = []
+        SettingsData.accounts.forEach(account => urls.push(escapeRegexp(account.host)))
+        jiraUrlMatchDecorator.ref = new MatchDecorator({
+            regexp: new RegExp(`(${COMPACT_SYMBOL}?)(${urls.join('|')})/browse/([A-Z0-9]+-[0-9]+)`, 'g'),
+            decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
+                const compact = !!match[1]
+                const host = match[2]
+                const key = match[3]
+                const cursor = view.state.selection.main.head
+                if (!view.state.field(editorLivePreviewField as unknown as StateField<boolean>) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
+                    return Decoration.mark({
+                        tagName: 'div',
+                        class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
+                    })
+                } else {
+                    return Decoration.replace({
+                        widget: new InlineIssueWidget(key, compact, host),
+                    })
+                }
             }
-        }
-    })
+        })
+    } else {
+        jiraUrlMatchDecorator.ref = null
+    }
 }
 
-function buildViewPluginClass(matchDecorator: MatchDecorator) {
+function buildViewPluginClass(matchDecorator: IMatchDecoratorRef) {
     class ViewPluginClass implements PluginValue {
         decorators: DecorationSet
 
         constructor(view: EditorView) {
-            this.decorators = matchDecorator.createDeco(view)
+            this.decorators = matchDecorator.ref ? matchDecorator.ref.createDeco(view) : RangeSet.empty
         }
 
         update(update: ViewUpdate): void {
             const editorModeChanged = update.startState.field(editorLivePreviewField as unknown as StateField<boolean>) !== update.state.field(editorLivePreviewField as unknown as StateField<boolean>)
             if (update.docChanged || update.startState.selection.main !== update.state.selection.main || editorModeChanged) {
-                this.decorators = matchDecorator.createDeco(update.view)
+                this.decorators = matchDecorator.ref ? matchDecorator.ref.createDeco(update.view) : RangeSet.empty
             }
         }
 

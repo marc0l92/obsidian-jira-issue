@@ -58,3 +58,11 @@ Example:
 Non compact mode: JIRA:AAA-123
 Compact mode: JIRA:-AAA-123
 ```
+
+The compact mode for URL can be enabled putting a `-` before the URL.
+
+Example:
+```
+Non compact mode: https://my-project.jira.com/browse/ABCD-1234
+Compact mode: -https://my-project.jira.com/browse/ABCD-1234
+```
