@@ -17,6 +17,12 @@ function escapeRegexp(str: string): string {
     return escapeStringRegexp(str).replace(/\//g, '\\/')
 }
 
+const isEditorInLivePreviewMode = (view: EditorView) => view.state.field(editorLivePreviewField as unknown as StateField<boolean>)
+const isCursorInsideTag = (view: EditorView, pos: number, length: number) => {
+    const cursor = view.state.selection.main.head
+    return (cursor > pos - 1 && cursor < pos + length + 1)
+}
+
 class InlineIssueWidget extends WidgetType {
     private _issueKey: string
     private _compact: boolean
@@ -66,8 +72,7 @@ function buildMatchDecorators() {
         decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
             const compact = !!match[1]
             const key = match[2]
-            const cursor = view.state.selection.main.head
-            if (!view.state.field(editorLivePreviewField as unknown as StateField<boolean>) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
+            if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, match[0].length)) {
                 return Decoration.mark({
                     tagName: 'div',
                     class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
@@ -89,8 +94,7 @@ function buildMatchDecorators() {
                 const compact = !!match[1]
                 const host = match[2]
                 const key = match[3]
-                const cursor = view.state.selection.main.head
-                if (!view.state.field(editorLivePreviewField as unknown as StateField<boolean>) || (cursor > pos - 1 && cursor < pos + match[0].length + 1)) {
+                if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, match[0].length)) {
                     return Decoration.mark({
                         tagName: 'div',
                         class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',

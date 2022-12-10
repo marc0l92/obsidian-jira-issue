@@ -24,12 +24,13 @@ function convertInlineIssuesToTags(el: HTMLElement): void {
 function convertInlineIssuesUrlToTags(el: HTMLElement): void {
     if (SettingsData.inlineIssueUrlToTag) {
         for (const account of SettingsData.accounts) {
-            const issueUrlElements: NodeListOf<HTMLAnchorElement> = el.querySelectorAll(`a.external-link[href^="${account.host}/browse/"]`)
-            issueUrlElements.forEach((value: HTMLAnchorElement) => {
-                const issueKey = value.href.replace(`${account.host}/browse/`, '')
-                const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': false } })
+            const issueUrlElements = el.querySelectorAll(`a.external-link[href^="${account.host}/browse/"]`)
+            issueUrlElements.forEach((issueUrlElement: HTMLAnchorElement) => {
+                const compact = issueUrlElement.previousSibling && issueUrlElement.previousSibling.textContent.endsWith('-')
+                const issueKey = issueUrlElement.href.replace(`${account.host}/browse/`, '')
+                const container = createSpan({ cls: 'ji-inline-issue jira-issue-container', attr: { 'data-issue-key': issueKey, 'data-compact': compact } })
                 container.appendChild(RC.renderLoadingItem(issueKey, true))
-                value.replaceWith(container)
+                issueUrlElement.replaceWith(container)
             })
         }
     }
