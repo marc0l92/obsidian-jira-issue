@@ -1,6 +1,6 @@
 import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
 import { JiraClient } from './client/jiraClient'
-import { IJiraAutocompleteDataField, IJiraFieldSchema, IJiraIssueAccountSettings } from './client/jiraInterfaces'
+import { IJiraIssueAccountSettings } from './client/jiraInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
@@ -456,13 +456,16 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     await this.saveSettings()
                 }))
 
-        new Setting(containerEl)
+        const inlineIssuePrefixDesc = (prefix: string) => 'Prefix to use when rendering inline issues. Keep this field empty to disable this feature. '
+            + (prefix ? `Example: ${prefix}AAA-123` : 'Feature disabled.')
+        const inlineIssuePrefixSetting = new Setting(containerEl)
             .setName('Inline issue prefix')
-            .setDesc(`Prefix to use when rendering inline issues. Keep this field empty to disable this feature. Example: ${SettingsData.inlineIssuePrefix}AAA-123`)
+            .setDesc(inlineIssuePrefixDesc(SettingsData.inlineIssuePrefix))
             .addText(text => text
                 .setValue(SettingsData.inlineIssuePrefix)
                 .onChange(async value => {
                     SettingsData.inlineIssuePrefix = value
+                    inlineIssuePrefixSetting.setDesc(inlineIssuePrefixDesc(SettingsData.inlineIssuePrefix))
                     await this.saveSettings()
                 }))
         new Setting(containerEl)

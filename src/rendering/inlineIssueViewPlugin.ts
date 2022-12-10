@@ -72,24 +72,28 @@ let jiraTagMatchDecorator: IMatchDecoratorRef = { ref: null }
 let jiraUrlMatchDecorator: IMatchDecoratorRef = { ref: null }
 
 function buildMatchDecorators() {
-    jiraTagMatchDecorator.ref = new MatchDecorator({
-        regexp: new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
-        decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
-            const compact = !!match[1]
-            const key = match[2]
-            const tagLength = match[0].length
-            if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, tagLength) || isSelectionContainsTag(view, pos, tagLength)) {
-                return Decoration.mark({
-                    tagName: 'div',
-                    class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
-                })
-            } else {
-                return Decoration.replace({
-                    widget: new InlineIssueWidget(key, compact),
-                })
+    if (SettingsData.inlineIssuePrefix !== '') {
+        jiraTagMatchDecorator.ref = new MatchDecorator({
+            regexp: new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
+            decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
+                const compact = !!match[1]
+                const key = match[2]
+                const tagLength = match[0].length
+                if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, tagLength) || isSelectionContainsTag(view, pos, tagLength)) {
+                    return Decoration.mark({
+                        tagName: 'div',
+                        class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
+                    })
+                } else {
+                    return Decoration.replace({
+                        widget: new InlineIssueWidget(key, compact),
+                    })
+                }
             }
-        }
-    })
+        })
+    } else {
+        jiraTagMatchDecorator.ref = null
+    }
 
     if (SettingsData.inlineIssueUrlToTag) {
         const urls: string[] = []
