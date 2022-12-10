@@ -45,3 +45,5 @@ JIRA:ABCD-711
 ```
 
 The default value is `JIRA:`.
+
+If this field is kept empty, this feature will be disabled.
