@@ -18,9 +18,14 @@ function escapeRegexp(str: string): string {
 }
 
 const isEditorInLivePreviewMode = (view: EditorView) => view.state.field(editorLivePreviewField as unknown as StateField<boolean>)
-const isCursorInsideTag = (view: EditorView, pos: number, length: number) => {
+const isCursorInsideTag = (view: EditorView, start: number, length: number) => {
     const cursor = view.state.selection.main.head
-    return (cursor > pos - 1 && cursor < pos + length + 1)
+    return (cursor > start - 1 && cursor < start + length + 1)
+}
+const isSelectionContainsTag = (view: EditorView, start: number, length: number) => {
+    const selectionBegin = view.state.selection.main.from
+    const selectionEnd = view.state.selection.main.to
+    return (selectionEnd > start - 1 && selectionBegin < start + length + 1)
 }
 
 class InlineIssueWidget extends WidgetType {
@@ -72,7 +77,8 @@ function buildMatchDecorators() {
         decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
             const compact = !!match[1]
             const key = match[2]
-            if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, match[0].length)) {
+            const tagLength = match[0].length
+            if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, tagLength) || isSelectionContainsTag(view, pos, tagLength)) {
                 return Decoration.mark({
                     tagName: 'div',
                     class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
@@ -94,7 +100,8 @@ function buildMatchDecorators() {
                 const compact = !!match[1]
                 const host = match[2]
                 const key = match[3]
-                if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, match[0].length)) {
+                const tagLength = match[0].length
+                if (!isEditorInLivePreviewMode(view) || isCursorInsideTag(view, pos, tagLength) || isSelectionContainsTag(view, pos, tagLength)) {
                     return Decoration.mark({
                         tagName: 'div',
                         class: 'HyperMD-codeblock HyperMD-codeblock-bg jira-issue-inline-mark',
