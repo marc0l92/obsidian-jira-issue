@@ -116,7 +116,7 @@ export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, c
         } else {
             // console.log(`Search results not available in the cache`)
             RC.renderLoadingItem('Loading...')
-            JiraClient.getSearchResults(searchView.query, parseInt(searchView.limit) || SettingsData.searchResultsLimit)
+            JiraClient.getSearchResults(searchView.query, parseInt(searchView.limit) || SettingsData.searchResultsLimit, searchView.account)
                 .then(newSearchResults => {
                     const searchResults = ObjectsCache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults
                     renderSearchResults(rootEl, searchView, searchResults)
@@ -129,4 +129,3 @@ export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, c
         RC.renderSearchError(rootEl, err, null)
     }
 }
-

@@ -1,5 +1,6 @@
 import { IJiraIssueAccountSettings } from "./client/jiraInterfaces"
 import { COMMENT_REGEX, COMPACT_SYMBOL, SettingsData } from "./settings"
+import { getAccountByAlias } from "./utils"
 
 export enum ESearchResultsRenderingTypes {
     TABLE = 'TABLE',
@@ -142,7 +143,7 @@ export class SearchView {
                                     if (column.toUpperCase().startsWith('$')) {
                                         columnExtra = column.slice(1)
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
-                                        if(!(columnExtra in SettingsData.cache.columns)){
+                                        if (!(columnExtra in SettingsData.cache.columns)) {
                                             throw new Error(`Custom field ${columnExtra} not found`)
                                         }
                                     }
@@ -160,6 +161,9 @@ export class SearchView {
                                         extra: columnExtra,
                                     }
                                 })
+                            break
+                        case 'account':
+                            sv.account = getAccountByAlias(value)
                             break
                         default:
                             throw new Error(`Invalid key: ${key}`)
@@ -191,6 +195,6 @@ export class SearchView {
     }
 
     getCacheKey(): string {
-        return this.query + this.limit
+        return this.query + this.limit + (this.account ? this.account.alias : '')
     }
 }

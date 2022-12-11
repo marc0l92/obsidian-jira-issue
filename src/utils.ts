@@ -3,7 +3,7 @@ import { SettingsData } from "./settings";
 
 export function getAccountByAlias(alias: string): IJiraIssueAccountSettings {
     if (alias) {
-        const account = SettingsData.accounts.find(account => account.alias === alias)
+        const account = SettingsData.accounts.find(account => account.alias.toUpperCase() === alias.toUpperCase())
         if (!account) {
             throw new Error(`No accounts found with alias: ${alias}`)
         }

@@ -28,6 +28,7 @@ It is possible to describe in each jira-search fence how the search results are 
 | `query` | Query to use with Jira to retrieve the results |  |  |
 | `limit` | Maximum number of items to display | Use value from settings | Integer number |
 | `columns` | List of columns to render ([Available columns](#standard-columns)) | Use value from settings | Comma separated list |
+| `account` | Explicitly select an account providing the alias | Try all account by priority | Account alias |
 
 Example:
 
@@ -37,6 +38,7 @@ type: TABLE
 query: status = 'In Progress' order by priority DESC
 limit: 15
 columns: KEY, SUMMARY, -ASSIGNEE, -REPORTER, STATUS
+account: Default
 ```
 ````
 
