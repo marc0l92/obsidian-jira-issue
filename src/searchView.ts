@@ -141,9 +141,9 @@ export class SearchView {
                                     }
                                     // Custom field
                                     if (column.startsWith('$')) {
-                                        columnExtra = column.slice(1).toUpperCase()
+                                        columnExtra = column.slice(1)
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
-                                        if (SettingsData.cache.columns.indexOf(columnExtra) === -1) {
+                                        if (SettingsData.cache.columns.indexOf(columnExtra.toUpperCase()) === -1) {
                                             throw new Error(`Custom field ${columnExtra} not found`)
                                         }
                                     }
