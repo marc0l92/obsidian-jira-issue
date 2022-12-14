@@ -365,7 +365,6 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     .onChange(async value => {
                         newAccount.color = value.replace(/[^#0-9A-Fa-f]/g, '')
                         if (newAccount.color[0] != '#') newAccount.color = '#' + newAccount.color
-                        console.log(newAccount.color)
                         colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
                     })
                 colorTextComponent = text

@@ -144,7 +144,6 @@ export class SearchView {
                                         columnExtra = column.slice(1).toUpperCase()
                                         column = ESearchColumnsTypes.CUSTOM_FIELD
                                         if (SettingsData.cache.columns.indexOf(columnExtra) === -1) {
-                                            console.log(SettingsData.cache.columns, columnExtra)
                                             throw new Error(`Custom field ${columnExtra} not found`)
                                         }
                                     }
