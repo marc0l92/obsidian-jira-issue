@@ -118,6 +118,7 @@ export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, c
             RC.renderLoadingItem('Loading...')
             JiraClient.getSearchResults(searchView.query, parseInt(searchView.limit) || SettingsData.searchResultsLimit, searchView.account)
                 .then(newSearchResults => {
+                    searchView.account = newSearchResults.account
                     const searchResults = ObjectsCache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults
                     renderSearchResults(rootEl, searchView, searchResults)
                 }).catch(err => {
