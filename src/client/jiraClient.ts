@@ -233,7 +233,7 @@ export const JiraClient = {
                         account.cache.customFieldsIdToName[field.schema.customId] = field.name
                         account.cache.customFieldsNameToId[field.name] = field.schema.customId.toString()
                         account.cache.customFieldsType[field.schema.customId] = field.schema
-                        SettingsData.cache.columns.push(field.schema.customId.toString(), field.name)
+                        SettingsData.cache.columns.push(field.schema.customId.toString(), field.name.toUpperCase())
                     }
                 }
             } catch (e) {
