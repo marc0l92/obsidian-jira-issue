@@ -189,7 +189,9 @@ export class SearchView {
             result += `limit: ${this.limit}\n`
         }
         if (this.columns.length > 0) {
-            result += `columns: ${this.columns.map(c => (c.compact ? COMPACT_SYMBOL : '') + c.type).join(', ')}\n`
+            result += `columns: ${this.columns.map(c =>
+                (c.compact ? COMPACT_SYMBOL : '') + (c.type !== ESearchColumnsTypes.CUSTOM_FIELD ? c.type : '$' + c.extra)
+            ).join(', ')}\n`
         }
         return result
     }
