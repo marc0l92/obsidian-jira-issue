@@ -14,8 +14,7 @@ const kInvalidValue = 'invalidValue'
 const kInvalidCustomColumn = 'CustomInvalid'
 
 jest.mock('../src/settings', () => {
-    const { TestSettingsDataBasic } = jest.requireActual('./testCommon')
-    return { SettingsData: TestSettingsDataBasic }
+    return jest.requireActual('./testCommon').SettingsMock
 })
 
 describe('SearchView', () => {
@@ -220,7 +219,6 @@ query: ${kQuery}
   query:      ${kQuery} 
   columns:
 `)
-            console.log('sv.query = ', sv.query)
             expect(sv.toRawString()).toEqual(`type: ${kType}
 query: ${kQuery}
 `)

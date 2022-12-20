@@ -4,8 +4,7 @@ import { TestAccountBasic, TestAccountOpen } from './testCommon'
 const kAccountNotFound = 'NotExistingAlias'
 
 jest.mock('../src/settings', () => {
-    const { TestSettingsDataBasic } = jest.requireActual('./testCommon')
-    return { SettingsData: TestSettingsDataBasic }
+    return jest.requireActual('./testCommon').SettingsMock
 })
 
 describe('Utils', () => {

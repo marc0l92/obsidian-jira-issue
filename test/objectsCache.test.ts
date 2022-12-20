@@ -8,8 +8,7 @@ const kFakeDateNow = new Date('2000-01-01')
 const kFakeDateAfterExpiration = new Date('2000-01-02')
 
 jest.mock('../src/settings', () => {
-    const { TestSettingsDataBasic } = jest.requireActual('./testCommon')
-    return { SettingsData: TestSettingsDataBasic }
+    return jest.requireActual('./testCommon').SettingsMock
 })
 
 describe('ObjectsCache', () => {

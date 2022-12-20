@@ -32,7 +32,7 @@ export const TestAccountBasic = {
     cache: kEmptyAccountCache
 }
 
-export const TestSettingsDataBasic: IJiraIssueSettings = {
+const TestSettingsData: IJiraIssueSettings = {
     accounts: [
         TestAccountOpen,
         TestAccountBasic,
@@ -51,3 +51,7 @@ export const TestSettingsDataBasic: IJiraIssueSettings = {
     ],
     logRequestsResponses: false,
 }
+
+export const SettingsMock = { SettingsData: TestSettingsData }
+
+export const ObsidianMock = {}
