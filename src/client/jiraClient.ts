@@ -1,6 +1,7 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { IJiraDevStatus, IJiraField, IJiraIssue, IJiraIssueAccountSettings, IJiraSearchResults, IJiraStatus, IJiraUser } from './jiraInterfaces'
-import { EAuthenticationTypes, SettingsData } from "../settings"
+import { EAuthenticationTypes, IJiraIssueAccountSettings } from 'src/interfaces/settingsInterfaces'
+import { IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
+import { SettingsData } from "../settings"
 
 interface RequestOptions {
     method: string

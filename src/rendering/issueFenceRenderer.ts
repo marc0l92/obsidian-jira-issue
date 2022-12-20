@@ -1,9 +1,9 @@
 import { MarkdownPostProcessorContext } from "obsidian"
-import { IJiraIssue } from "../client/jiraInterfaces"
+import { IJiraIssue } from "../interfaces/issueInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { RenderingCommon as RC } from "./renderingCommon"
-import { COMMENT_REGEX } from "src/settings"
+import { COMMENT_REGEX } from "src/interfaces/settingsInterfaces"
 
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
 const ISSUE_LINK_REGEX = /\/([A-Z0-9]+-[0-9]+)\s*$/i

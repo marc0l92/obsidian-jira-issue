@@ -1,15 +1,9 @@
 import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
 import { JiraClient } from './client/jiraClient'
-import { IJiraIssueAccountSettings } from './client/jiraInterfaces'
+import { EAuthenticationTypes, IJiraIssueAccountSettings, IJiraIssueSettings } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
-export enum EAuthenticationTypes {
-    OPEN = 'OPEN',
-    BASIC = 'BASIC',
-    CLOUD = 'CLOUD',
-    BEARER_TOKEN = 'BEARER_TOKEN',
-}
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
     [EAuthenticationTypes.BASIC]: 'Basic Authentication',
@@ -17,32 +11,7 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
-export const COMPACT_SYMBOL = '-'
-export const COMMENT_REGEX = /^\s*#/
 const HIDDEN_PASSWORD_PLACEHOLDER = '********'
-
-export interface IJiraIssueSettings {
-    accounts: IJiraIssueAccountSettings[]
-    apiBasePath: string
-    cacheTime: string
-    searchResultsLimit: number
-    cache: {
-        columns: string[]
-    }
-    darkMode: boolean
-    inlineIssueUrlToTag: boolean
-    inlineIssuePrefix: string
-    searchColumns: ISearchColumn[]
-    logRequestsResponses: boolean
-    showColorBand: boolean
-
-    // Legacy credentials
-    host?: string
-    authenticationType?: EAuthenticationTypes
-    username?: string
-    password?: string
-    bareToken?: string
-}
 
 const DEFAULT_SETTINGS: IJiraIssueSettings = {
     accounts: [],

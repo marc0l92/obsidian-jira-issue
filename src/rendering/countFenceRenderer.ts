@@ -1,5 +1,5 @@
 import { MarkdownPostProcessorContext } from "obsidian"
-import { IJiraSearchResults } from "../client/jiraInterfaces"
+import { IJiraSearchResults } from "../interfaces/issueInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { RenderingCommon as RC } from "./renderingCommon"

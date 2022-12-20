@@ -2,12 +2,13 @@ import { RangeSet, StateField } from "@codemirror/state"
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
 import { editorLivePreviewField } from "obsidian"
 import { JiraClient } from "src/client/jiraClient"
-import { IJiraIssue } from "src/client/jiraInterfaces"
+import { IJiraIssue } from "src/interfaces/issueInterfaces"
 import { ObjectsCache } from "src/objectsCache"
-import { COMPACT_SYMBOL, SettingsData } from "src/settings"
+import { SettingsData } from "src/settings"
 import { RenderingCommon as RC } from "./renderingCommon"
 import escapeStringRegexp from 'escape-string-regexp'
 import { getAccountByHost } from "src/utils"
+import { COMPACT_SYMBOL } from "src/interfaces/settingsInterfaces"
 
 interface IMatchDecoratorRef {
     ref: MatchDecorator

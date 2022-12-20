@@ -8,11 +8,11 @@ const kFakeDateNow = new Date('2000-01-01')
 const kFakeDateAfterExpiration = new Date('2000-01-02')
 
 jest.mock('../src/settings', () => {
-    return { SettingsData: { cacheTime: '15m' } }
+    const { TestSettingsDataBasic } = jest.requireActual('./testCommon')
+    return { SettingsData: TestSettingsDataBasic }
 })
 
 describe('ObjectsCache', () => {
-    
     beforeEach(() => {
         jest.useFakeTimers().setSystemTime(kFakeDateNow)
         ObjectsCache.clear()

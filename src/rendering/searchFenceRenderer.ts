@@ -1,11 +1,12 @@
 import { MarkdownPostProcessorContext, setIcon } from "obsidian"
-import { createProxy, IJiraIssueAccountSettings, IJiraSearchResults } from "../client/jiraInterfaces"
+import { createProxy, IJiraSearchResults } from "../interfaces/issueInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
 import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "../searchView"
 import { SettingsData } from "../settings"
 import { RenderingCommon as RC } from "./renderingCommon"
+import { IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
 
 
 async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {

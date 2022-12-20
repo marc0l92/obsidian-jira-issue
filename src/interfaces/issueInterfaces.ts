@@ -1,4 +1,4 @@
-import { EAuthenticationTypes } from "src/settings"
+import { IJiraIssueAccountSettings } from "./settingsInterfaces"
 
 export interface IJiraIssue {
     id: string
@@ -141,29 +141,6 @@ export interface IJiraAutocompleteField {
         value: string
         displayName: string
     }]
-}
-
-export interface IJiraIssueAccountSettings {
-    alias: string
-    host: string
-    authenticationType: EAuthenticationTypes
-    username?: string
-    password?: string
-    bareToken?: string
-    priority: number
-    color: string
-    cache: {
-        statusColor: Record<string, string>
-        customFieldsIdToName: Record<string, string>
-        customFieldsNameToId: Record<string, string>
-        customFieldsType: Record<string, IJiraFieldSchema>
-        jqlAutocomplete: {
-            fields: IJiraAutocompleteDataField[]
-            functions: {
-                [key: string]: [string]
-            }
-        }
-    }
 }
 
 export interface IJiraDevStatus {

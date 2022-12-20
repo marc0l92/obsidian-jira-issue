@@ -1,5 +1,6 @@
 import { FrontMatterCache, TFile } from "obsidian"
-import { IJiraIssue, IJiraIssueAccountSettings } from "src/client/jiraInterfaces"
+import { IJiraIssue } from "src/interfaces/issueInterfaces"
+import { IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
 import { ObsidianApp } from "src/main"
 import { SearchView } from "src/searchView"
 import { SettingsData } from "src/settings"

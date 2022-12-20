@@ -1,4 +1,4 @@
-import { IJiraIssueAccountSettings } from "./client/jiraInterfaces";
+import { IJiraIssueAccountSettings } from "./interfaces/settingsInterfaces";
 import { SettingsData } from "./settings";
 
 export function getAccountByAlias(alias: string): IJiraIssueAccountSettings {
@@ -15,7 +15,7 @@ export function getAccountByAlias(alias: string): IJiraIssueAccountSettings {
 
 export function getAccountByHost(host: string): IJiraIssueAccountSettings {
     if (host) {
-        return SettingsData.accounts.find(account => account.host === host)
+        return SettingsData.accounts.find(account => account.host === host) || null
     } else {
         return null
     }
