@@ -7,7 +7,7 @@ const kVal2 = 'val2'
 const kFakeDateNow = new Date('2000-01-01')
 const kFakeDateAfterExpiration = new Date('2000-01-02')
 
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings.ts').default)
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('ObjectsCache', () => {
     beforeEach(() => {

@@ -3,6 +3,7 @@ import JiraClient from './client/jiraClient'
 import { EAuthenticationTypes, IJiraIssueAccountSettings, IJiraIssueSettings } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
 import { ESearchColumnsTypes, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
+import { deepCopy } from './utils'
 
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
@@ -39,7 +40,7 @@ export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     logRequestsResponses: false,
 }
 
-const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
+export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
     alias: 'Default',
     host: 'https://mycompany.atlassian.net',
     authenticationType: EAuthenticationTypes.OPEN,
@@ -84,7 +85,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         for (const i in SettingsData.accounts) {
             SettingsData.accounts[i] = Object.assign({}, DEFAULT_ACCOUNT, SettingsData.accounts[i])
         }
-        SettingsData.cache = DEFAULT_SETTINGS.cache
+        SettingsData.cache = deepCopy(DEFAULT_SETTINGS.cache)
 
         if (SettingsData.accounts.length === 0 || SettingsData.accounts[0] === null) {
             if (SettingsData.host) {
@@ -603,4 +604,4 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         return options
     }
 }
-export const SettingsData: IJiraIssueSettings = DEFAULT_SETTINGS
+export const SettingsData: IJiraIssueSettings = deepCopy(DEFAULT_SETTINGS)

@@ -13,7 +13,7 @@ const kInvalidKey = 'invalidKey'
 const kInvalidValue = 'invalidValue'
 const kInvalidCustomColumn = 'CustomInvalid'
 
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings.ts').default)
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('SearchView', () => {
 

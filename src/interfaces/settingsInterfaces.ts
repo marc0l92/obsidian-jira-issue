@@ -1,4 +1,4 @@
-import { ISearchColumn } from "src/searchView"
+import { ISearchColumn } from "../searchView"
 import { IJiraAutocompleteDataField, IJiraFieldSchema } from "./issueInterfaces"
 
 export enum EAuthenticationTypes {

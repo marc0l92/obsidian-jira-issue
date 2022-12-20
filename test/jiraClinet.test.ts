@@ -1,7 +1,7 @@
 import JiraClient from '../src/client/jiraClient'
 
 jest.mock('obsidian')
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings.ts').default)
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('JiraClient', () => {
     beforeEach(() => {
