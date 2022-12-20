@@ -1,8 +1,8 @@
 import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
-import { JiraClient } from './client/jiraClient'
+import JiraClient from './client/jiraClient'
 import { EAuthenticationTypes, IJiraIssueAccountSettings, IJiraIssueSettings } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
-import { ESearchColumnsTypes, ISearchColumn, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
+import { ESearchColumnsTypes, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
 
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
@@ -13,7 +13,7 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
 
 const HIDDEN_PASSWORD_PLACEHOLDER = '********'
 
-const DEFAULT_SETTINGS: IJiraIssueSettings = {
+export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     accounts: [],
     apiBasePath: '/rest/api/latest',
     cacheTime: '15m',
@@ -86,7 +86,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         }
         SettingsData.cache = DEFAULT_SETTINGS.cache
 
-        if (SettingsData.accounts.first() === null || SettingsData.accounts.length === 0) {
+        if (SettingsData.accounts.length === 0 || SettingsData.accounts[0] === null) {
             if (SettingsData.host) {
                 // Legacy credentials migration
                 SettingsData.accounts = [

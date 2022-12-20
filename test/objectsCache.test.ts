@@ -1,4 +1,4 @@
-import { ObjectsCache } from '../src/objectsCache'
+import ObjectsCache from '../src/objectsCache'
 
 const kKey1 = 'key1'
 const kKey2 = 'key2'

@@ -3,8 +3,8 @@ import { IJiraDevStatus, IJiraIssue } from "../interfaces/issueInterfaces"
 import { JIRA_STATUS_COLOR_MAP, RenderingCommon as RC } from "./renderingCommon"
 import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
 import * as jsonpath from 'jsonpath'
-import { ObjectsCache } from "src/objectsCache"
-import { JiraClient } from "src/client/jiraClient"
+import ObjectsCache from "src/objectsCache"
+import JiraClient from "src/client/jiraClient"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 

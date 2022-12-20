@@ -14,7 +14,7 @@ interface Cache {
 
 let cache: Cache = {}
 
-export const ObjectsCache = {
+export default {
 
     add<T>(key: string, object: T, isError = false): CacheItem {
         cache[key] = {

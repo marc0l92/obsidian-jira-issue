@@ -166,7 +166,7 @@ async function fetchIssueImages(issue: IJiraIssue) {
     }
 }
 
-export const JiraClient = {
+export default {
 
     async getIssue(issueKey: string, account: IJiraIssueAccountSettings = null): Promise<IJiraIssue> {
         const issue = await sendRequest(

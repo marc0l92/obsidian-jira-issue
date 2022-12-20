@@ -1,9 +1,9 @@
 import { RangeSet, StateField } from "@codemirror/state"
 import { Decoration, DecorationSet, EditorView, MatchDecorator, PluginSpec, PluginValue, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view"
 import { editorLivePreviewField } from "obsidian"
-import { JiraClient } from "src/client/jiraClient"
+import JiraClient from "src/client/jiraClient"
 import { IJiraIssue } from "src/interfaces/issueInterfaces"
-import { ObjectsCache } from "src/objectsCache"
+import ObjectsCache from "src/objectsCache"
 import { SettingsData } from "src/settings"
 import { RenderingCommon as RC } from "./renderingCommon"
 import escapeStringRegexp from 'escape-string-regexp'
