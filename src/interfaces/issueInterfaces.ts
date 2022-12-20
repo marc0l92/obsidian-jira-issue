@@ -184,17 +184,19 @@ export interface IJiraDevStatus {
     }
 }
 
-const EMPTY_USER = {
-    active: false,
-    avatarUrls: {
-        "16x16": '',
-        "24x24": '',
-        "32x32": '',
-        "48x48": '',
-    },
-    displayName: '',
-    self: '',
-} as IJiraUser
+const newEmptyUser = () => {
+    return {
+        active: false,
+        avatarUrls: {
+            "16x16": '',
+            "24x24": '',
+            "32x32": '',
+            "48x48": '',
+        },
+        displayName: '',
+        self: '',
+    } as IJiraUser
+}
 
 const EMPTY_ISSUE: IJiraIssue = {
     key: '',
@@ -205,10 +207,10 @@ const EMPTY_ISSUE: IJiraIssue = {
         aggregatetimeestimate: 0,
         aggregatetimeoriginalestimate: 0,
         aggregatetimespent: 0,
-        assignee: EMPTY_USER,
+        assignee: newEmptyUser(),
         components: [],
         created: '',
-        creator: EMPTY_USER,
+        creator: newEmptyUser(),
         description: '',
         duedate: '',
         environment: '',
@@ -220,7 +222,7 @@ const EMPTY_ISSUE: IJiraIssue = {
         priority: { iconUrl: '', name: '' },
         progress: { percent: 0 },
         project: { key: '', name: '' },
-        reporter: EMPTY_USER,
+        reporter: newEmptyUser(),
         resolution: { name: '', description: '' },
         resolutiondate: '',
         status: { description: '', name: '', statusCategory: { colorName: '' } },
@@ -232,6 +234,36 @@ const EMPTY_ISSUE: IJiraIssue = {
     },
 }
 
-export function toDefaultedIssue(originalIssue: IJiraIssue) {
-    return Object.assign(originalIssue, EMPTY_ISSUE, originalIssue)
+function isObject(item: any): boolean {
+    return (item && typeof item === 'object' && !Array.isArray(item))
+}
+
+function mergeDeep(target: any, ...sources: any[]): any {
+    if (!sources.length) return target
+    const source = sources.shift()
+
+    if (isObject(target) && isObject(source)) {
+        for (const key in source) {
+            if (isObject(source[key])) {
+                if (!target[key]) {
+                    Object.assign(target, {
+                        [key]: {}
+                    })
+                }
+                mergeDeep(target[key], source[key])
+            } else {
+                if (source[key]) {
+                    Object.assign(target, {
+                        [key]: source[key]
+                    })
+                }
+            }
+        }
+    }
+
+    return mergeDeep(target, ...sources)
+}
+
+export function toDefaultedIssue(originalIssue: IJiraIssue): IJiraIssue {
+    return mergeDeep(EMPTY_ISSUE, originalIssue)
 }

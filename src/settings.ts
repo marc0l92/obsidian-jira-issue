@@ -59,12 +59,12 @@ const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
 }
 
 function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
+    const letters = '0123456789ABCDEF'
+    let color = '#'
     for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 16)]
     }
-    return color;
+    return color
 }
 
 
@@ -78,7 +78,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         this._plugin = plugin
     }
 
-    async loadSettings() {
+    async loadSettings(): Promise<void> {
         // Read plugin data and fill new fields with default values
         Object.assign(SettingsData, DEFAULT_SETTINGS, await this._plugin.loadData())
         for (const i in SettingsData.accounts) {
