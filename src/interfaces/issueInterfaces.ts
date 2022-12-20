@@ -38,21 +38,21 @@ export interface IJiraIssue {
             name: string
         }
         labels: string[]
-        fixVersions: [{
+        fixVersions: {
             name: string
             description: string
             released: boolean
-        }]
-        components: [{
+        }[]
+        components: {
             name: string
-        }]
+        }[]
         aggregatetimeestimate: number
         aggregatetimeoriginalestimate: number
         aggregatetimespent: number
         timeestimate: number
         timeoriginalestimate: number
         timespent: number
-        issueLinks: [{
+        issueLinks: {
             type: {
                 name: string
             }
@@ -62,7 +62,7 @@ export interface IJiraIssue {
                     summary: string
                 }
             }
-        }]
+        }[]
         aggregateprogress: {
             percent: number
         }
@@ -184,21 +184,54 @@ export interface IJiraDevStatus {
     }
 }
 
-export function createProxy<T extends Object>(obj: T): T {
-    const proxy = new Proxy<T>(obj, {
-        get: (target: T, property: string, receiver: any) => {
-            if (property in target) {
-                const value = Reflect.get(target, property, receiver)
-                if (value !== undefined && value !== null) {
-                    if (value instanceof Object && property !== 'prototype') {
-                        return createProxy(value)
-                    } else {
-                        return value
-                    }
-                }
-            }
-            return ''
-        },
-    })
-    return proxy
+const EMPTY_USER = {
+    active: false,
+    avatarUrls: {
+        "16x16": '',
+        "24x24": '',
+        "32x32": '',
+        "48x48": '',
+    },
+    displayName: '',
+    self: '',
+} as IJiraUser
+
+const EMPTY_ISSUE: IJiraIssue = {
+    key: '',
+    id: '',
+    account: null,
+    fields: {
+        aggregateprogress: { percent: 0 },
+        aggregatetimeestimate: 0,
+        aggregatetimeoriginalestimate: 0,
+        aggregatetimespent: 0,
+        assignee: EMPTY_USER,
+        components: [],
+        created: '',
+        creator: EMPTY_USER,
+        description: '',
+        duedate: '',
+        environment: '',
+        fixVersions: [],
+        issueLinks: [],
+        issuetype: { iconUrl: '', name: '' },
+        labels: [],
+        lastViewed: '',
+        priority: { iconUrl: '', name: '' },
+        progress: { percent: 0 },
+        project: { key: '', name: '' },
+        reporter: EMPTY_USER,
+        resolution: { name: '', description: '' },
+        resolutiondate: '',
+        status: { description: '', name: '', statusCategory: { colorName: '' } },
+        summary: '',
+        timeestimate: 0,
+        timeoriginalestimate: 0,
+        timespent: 0,
+        updated: '',
+    },
+}
+
+export function toDefaultedIssue(originalIssue: IJiraIssue) {
+    return Object.assign(originalIssue, EMPTY_ISSUE, originalIssue)
 }

@@ -1,5 +1,5 @@
 import { IJiraAutocompleteDataField } from "src/interfaces/issueInterfaces"
-import { EAuthenticationTypes, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
+import { EAuthenticationTypes, IJiraIssueSettings } from "../../src/interfaces/settingsInterfaces"
 
 const kEmptyAccountCache = {
     customFieldsIdToName: {},
@@ -32,26 +32,24 @@ export const TestAccountBasic = {
     cache: kEmptyAccountCache
 }
 
-const TestSettingsData: IJiraIssueSettings = {
-    accounts: [
-        TestAccountOpen,
-        TestAccountBasic,
-    ],
-    apiBasePath: '/rest/api/latest',
-    cacheTime: '15m',
-    searchResultsLimit: 10,
-    cache: {
-        columns: ['CUSTOM1', '12345'],
-    },
-    darkMode: false,
-    inlineIssueUrlToTag: true,
-    inlineIssuePrefix: 'JIRA:',
-    showColorBand: true,
-    searchColumns: [
-    ],
-    logRequestsResponses: false,
+export default {
+    SettingsData: {
+        accounts: [
+            TestAccountOpen,
+            TestAccountBasic,
+        ],
+        apiBasePath: '/rest/api/latest',
+        cacheTime: '15m',
+        searchResultsLimit: 10,
+        cache: {
+            columns: ['CUSTOM1', '12345'],
+        },
+        darkMode: false,
+        inlineIssueUrlToTag: true,
+        inlineIssuePrefix: 'JIRA:',
+        showColorBand: true,
+        searchColumns: [
+        ],
+        logRequestsResponses: false,
+    } as IJiraIssueSettings
 }
-
-export const SettingsMock = { SettingsData: TestSettingsData }
-
-export const ObsidianMock = {}

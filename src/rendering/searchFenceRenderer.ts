@@ -1,5 +1,5 @@
 import { MarkdownPostProcessorContext, setIcon } from "obsidian"
-import { createProxy, IJiraSearchResults } from "../interfaces/issueInterfaces"
+import { toDefaultedIssue, IJiraSearchResults } from "../interfaces/issueInterfaces"
 import { JiraClient } from "../client/jiraClient"
 import { ObjectsCache } from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
@@ -59,7 +59,7 @@ function renderSearchResultsTableHeader(table: HTMLElement, searchView: SearchVi
 async function renderSearchResultsTableBody(table: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     const tbody = createEl('tbody', { parent: table })
     for (let issue of searchResults.issues) {
-        issue = createProxy(issue)
+        issue = toDefaultedIssue(issue)
         const row = createEl('tr', { parent: tbody })
         const columns = searchView.columns.length > 0 ? searchView.columns : SettingsData.searchColumns
         await renderTableColumn(columns, issue, row)

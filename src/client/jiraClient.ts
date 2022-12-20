@@ -1,5 +1,5 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { EAuthenticationTypes, IJiraIssueAccountSettings } from 'src/interfaces/settingsInterfaces'
+import { EAuthenticationTypes, IJiraIssueAccountSettings } from '../interfaces/settingsInterfaces'
 import { IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
 import { SettingsData } from "../settings"
 

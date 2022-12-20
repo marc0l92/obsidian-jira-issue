@@ -1,6 +1,6 @@
 import { COMPACT_SYMBOL } from '../src/interfaces/settingsInterfaces'
 import { ESearchResultsRenderingTypes, ISearchColumn, SearchView } from '../src/searchView'
-import { TestAccountOpen } from './testCommon'
+import { TestAccountOpen } from './__mocks__/settings'
 
 const kQuery = `status = 'In Progress' order by priority DESC`
 const kLimit = '10'
@@ -13,9 +13,7 @@ const kInvalidKey = 'invalidKey'
 const kInvalidValue = 'invalidValue'
 const kInvalidCustomColumn = 'CustomInvalid'
 
-jest.mock('../src/settings', () => {
-    return jest.requireActual('./testCommon').SettingsMock
-})
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings.ts').default)
 
 describe('SearchView', () => {
 
