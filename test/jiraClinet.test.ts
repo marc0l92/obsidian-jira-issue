@@ -1,3 +1,4 @@
+import { DEFAULT_ACCOUNT } from '../src/settings'
 import JiraClient from '../src/client/jiraClient'
 
 jest.mock('obsidian')
@@ -5,10 +6,17 @@ jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').de
 
 describe('JiraClient', () => {
     beforeEach(() => {
-        JiraClient.getIssue('')
     })
 
-    test.todo('Define tests')
+    test.todo('getIssue')
+    test.todo('getSearchResults')
+    test.todo('updateStatusColorCache')
+    test.todo('updateCustomFieldsCache')
+    test('testConnection', async () => {
+        expect(await JiraClient.testConnection(DEFAULT_ACCOUNT)).toEqual(true)
+    })
+    test.todo('getLoggedUser')
+    test.todo('getDevStatus')
 })
 
 export { }

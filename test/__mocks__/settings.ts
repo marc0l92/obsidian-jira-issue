@@ -14,7 +14,7 @@ const kEmptyAccountCache = {
 
 export const TestAccountOpen = {
     alias: 'alias1',
-    host: 'host1',
+    host: 'https://test-company.atlassian.net',
     authenticationType: EAuthenticationTypes.OPEN,
     priority: 1,
     color: '#123456',
