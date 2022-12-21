@@ -1,5 +1,5 @@
-import { COMPACT_SYMBOL } from '../src/interfaces/settingsInterfaces'
-import { ESearchResultsRenderingTypes, ISearchColumn, SearchView } from '../src/searchView'
+import { COMPACT_SYMBOL, ESearchColumnsTypes, ESearchResultsRenderingTypes } from '../src/interfaces/settingsInterfaces'
+import { SearchView } from '../src/searchView'
 import { TestAccountOpen } from './__mocks__/settings'
 
 const kQuery = `status = 'In Progress' order by priority DESC`
@@ -33,12 +33,12 @@ columns: ${kColumns}`)
             expect(sv.limit).toEqual(kLimit)
             expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
             expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: 'KEY' } as ISearchColumn,
-                { compact: false, extra: '', type: 'SUMMARY' } as ISearchColumn,
-                { compact: true, extra: '', type: 'ASSIGNEE' } as ISearchColumn,
-                { compact: true, extra: '', type: 'REPORTER' } as ISearchColumn,
-                { compact: false, extra: '', type: 'STATUS' } as ISearchColumn,
-                { compact: false, extra: '', type: 'NOTES' } as ISearchColumn,
+                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
             ])
             expect(sv.account).toBeNull()
         })
@@ -64,12 +64,12 @@ account: ${TestAccountOpen.alias}`)
             expect(sv.limit).toEqual(kLimit)
             expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
             expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: 'KEY' } as ISearchColumn,
-                { compact: false, extra: '', type: 'SUMMARY' } as ISearchColumn,
-                { compact: true, extra: '', type: 'ASSIGNEE' } as ISearchColumn,
-                { compact: true, extra: '', type: 'REPORTER' } as ISearchColumn,
-                { compact: false, extra: '', type: 'STATUS' } as ISearchColumn,
-                { compact: false, extra: '', type: 'NOTES' } as ISearchColumn,
+                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
             ])
             expect(sv.account).toEqual(TestAccountOpen)
         })
@@ -83,15 +83,15 @@ account: ${TestAccountOpen.alias}`)
             expect(sv.limit).toEqual(kLimit)
             expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
             expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: 'KEY' } as ISearchColumn,
-                { compact: false, extra: '', type: 'SUMMARY' } as ISearchColumn,
-                { compact: true, extra: '', type: 'ASSIGNEE' } as ISearchColumn,
-                { compact: true, extra: '', type: 'REPORTER' } as ISearchColumn,
-                { compact: false, extra: '', type: 'STATUS' } as ISearchColumn,
-                { compact: false, extra: '', type: 'NOTES' } as ISearchColumn,
-                { compact: false, extra: 'Custom1', type: 'CUSTOM_FIELD' } as ISearchColumn,
-                { compact: true, extra: '12345', type: 'CUSTOM_FIELD' } as ISearchColumn,
-                { compact: false, extra: 'field1.field2', type: 'NOTES' } as ISearchColumn,
+                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
+                { compact: false, extra: 'Custom1', type: ESearchColumnsTypes.CUSTOM_FIELD },
+                { compact: true, extra: '12345', type: ESearchColumnsTypes.CUSTOM_FIELD },
+                { compact: false, extra: 'field1.field2', type: ESearchColumnsTypes.NOTES },
             ])
             expect(sv.account).toBeNull()
         })

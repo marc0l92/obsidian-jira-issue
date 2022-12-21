@@ -3,10 +3,10 @@ import { toDefaultedIssue, IJiraSearchResults } from "../interfaces/issueInterfa
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
-import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "../searchView"
+import { SearchView } from "../searchView"
 import { SettingsData } from "../settings"
 import RC from "./renderingCommon"
-import { IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, IJiraIssueAccountSettings, SEARCH_COLUMNS_DESCRIPTION } from "src/interfaces/settingsInterfaces"
 
 
 async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {

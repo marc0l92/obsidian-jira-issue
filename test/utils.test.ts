@@ -1,4 +1,4 @@
-import { deepCopy, getAccountByAlias, getAccountByHost } from '../src/utils'
+import { getAccountByAlias, getAccountByHost } from '../src/utils'
 import { TestAccountBasic, TestAccountOpen } from './__mocks__/settings'
 
 const kAccountNotFound = 'NotExistingAlias'
@@ -26,14 +26,6 @@ describe('Utils', () => {
     })
     test('getAccountByHost invalid input', () => {
         expect(getAccountByHost(null)).toBeNull()
-    })
-
-    test('deepCopy', () => {
-        const originalObject = { a: { b: { c: 1 } } }
-        const copyObject = deepCopy(originalObject)
-        copyObject.a.b.c = 9
-        expect(copyObject.a.b.c).toEqual(9)
-        expect(originalObject.a.b.c).toEqual(1)
     })
 })
 

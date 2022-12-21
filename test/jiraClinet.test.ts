@@ -13,10 +13,15 @@ describe('JiraClient', () => {
     test.todo('updateStatusColorCache')
     test.todo('updateCustomFieldsCache')
     test('testConnection', async () => {
+        // requestUrl.mock
         expect(await JiraClient.testConnection(DEFAULT_ACCOUNT)).toEqual(true)
     })
     test.todo('getLoggedUser')
     test.todo('getDevStatus')
+
+    afterEach(()=>{
+        jest.clearAllMocks()
+    })
 })
 
 export { }

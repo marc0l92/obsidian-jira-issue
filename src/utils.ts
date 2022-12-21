@@ -1,5 +1,5 @@
-import { IJiraIssueAccountSettings } from "./interfaces/settingsInterfaces";
-import { SettingsData } from "./settings";
+import { IJiraIssueAccountSettings } from "./interfaces/settingsInterfaces"
+import { SettingsData } from "./settings"
 
 export function getAccountByAlias(alias: string): IJiraIssueAccountSettings {
     if (alias) {
@@ -19,8 +19,4 @@ export function getAccountByHost(host: string): IJiraIssueAccountSettings {
     } else {
         return null
     }
-}
-
-export function deepCopy(obj: any): any {
-    return JSON.parse(JSON.stringify(obj))
 }

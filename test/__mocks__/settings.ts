@@ -33,6 +33,7 @@ export const TestAccountBasic = {
 }
 
 export default {
+    ...jest.requireActual('../../src/settings'),
     SettingsData: {
         accounts: [
             TestAccountOpen,
@@ -51,5 +52,5 @@ export default {
         searchColumns: [
         ],
         logRequestsResponses: false,
-    } as IJiraIssueSettings
+    } as IJiraIssueSettings,
 }

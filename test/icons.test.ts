@@ -1,12 +1,15 @@
-import { addIcon } from "../__mocks__/obsidian"
+import * as obsidian from 'obsidian'
 import { setupIcons } from "../src/icons/icons"
-
-jest.mock('obsidian')
 
 describe('Icons', () => {
     test('Icons setup', () => {
+        const addIconMock = jest.spyOn(obsidian, 'addIcon')
         setupIcons()
-        expect(addIcon.mock.calls.length).toBe(6)
+        expect(addIconMock).toBeCalledTimes(6)
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
     })
 })
 

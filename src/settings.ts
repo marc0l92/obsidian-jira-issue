@@ -1,9 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
 import JiraClient from './client/jiraClient'
-import { EAuthenticationTypes, IJiraIssueAccountSettings, IJiraIssueSettings } from './interfaces/settingsInterfaces'
+import { EAuthenticationTypes, ESearchColumnsTypes, IJiraIssueAccountSettings, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
-import { ESearchColumnsTypes, SEARCH_COLUMNS_DESCRIPTION } from './searchView'
-import { deepCopy } from './utils'
 
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
@@ -68,6 +66,9 @@ function getRandomColor() {
     return color
 }
 
+function deepCopy(obj: any): any {
+    return JSON.parse(JSON.stringify(obj))
+}
 
 export class JiraIssueSettingTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin

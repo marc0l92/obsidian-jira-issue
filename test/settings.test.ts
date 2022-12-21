@@ -4,7 +4,7 @@ import { DEFAULT_ACCOUNT, DEFAULT_SETTINGS, JiraIssueSettingTab, SettingsData } 
 jest.mock('obsidian')
 jest.mock('../src/client/jiraClient', () => jest.requireActual('./__mocks__/jiraClient').default)
 
-export function deepCopy(obj: any): any {
+function deepCopy(obj: any): any {
     return JSON.parse(JSON.stringify(obj))
 }
 
@@ -36,21 +36,17 @@ const StoredSettings = {
 } as IJiraIssueSettings
 
 describe('Settings', () => {
-    let settingTab: JiraIssueSettingTab = null
-    let pluginMock: any = null
-    beforeEach(() => {
-        pluginMock = {
-            loadData: jest.fn(),
-            saveData: jest.fn(),
-        }
-        settingTab = new JiraIssueSettingTab(null, pluginMock)
-    })
+    const pluginMock = {
+        loadData: jest.fn(),
+        saveData: jest.fn(),
+    }
+    const settingTab = new JiraIssueSettingTab(null, pluginMock as any)
 
     test('loadSettings empty settings to default', async () => {
         pluginMock.loadData.mockReturnValueOnce({})
         await settingTab.loadSettings()
-        expect(pluginMock.loadData.mock.calls.length).toEqual(1)
-        expect(pluginMock.saveData.mock.calls.length).toEqual(1)
+        expect(pluginMock.loadData).toBeCalledTimes(1)
+        expect(pluginMock.saveData).toBeCalledTimes(1)
         expect(pluginMock.saveData.mock.calls[0][0]).toEqual({
             ...DEFAULT_SETTINGS,
             accounts: [DEFAULT_ACCOUNT],
@@ -67,8 +63,8 @@ describe('Settings', () => {
     test('loadSettings valid full settings', async () => {
         pluginMock.loadData.mockReturnValueOnce(deepCopy(StoredSettings))
         await settingTab.loadSettings()
-        expect(pluginMock.loadData.mock.calls.length).toEqual(1)
-        expect(pluginMock.saveData.mock.calls.length).toEqual(0)
+        expect(pluginMock.loadData).toBeCalledTimes(1)
+        expect(pluginMock.saveData).toBeCalledTimes(0)
         expect(SettingsData).toEqual({
             ...StoredSettings,
             accounts: [{
@@ -98,6 +94,10 @@ describe('Settings', () => {
     test.todo('createNewEmptyAccount')
     test.todo('accountsConflictsFix')
     test.todo('createPriorityOptions')
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
 })
 
 export { }

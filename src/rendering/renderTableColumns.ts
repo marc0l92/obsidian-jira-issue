@@ -1,10 +1,10 @@
 import { setIcon, TFile } from "obsidian"
 import { IJiraDevStatus, IJiraIssue } from "../interfaces/issueInterfaces"
-import { JIRA_STATUS_COLOR_MAP, default as RC } from "./renderingCommon"
-import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
+import RC, { JIRA_STATUS_COLOR_MAP} from "./renderingCommon"
 import * as jsonpath from 'jsonpath'
 import ObjectsCache from "src/objectsCache"
 import JiraClient from "src/client/jiraClient"
+import { ESearchColumnsTypes, ISearchColumn } from "src/interfaces/settingsInterfaces"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
