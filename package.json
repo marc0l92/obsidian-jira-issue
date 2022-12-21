@@ -1,12 +1,12 @@
 {
     "name": "obsidian-jira-issue",
-    "version": "1.39.3",
+    "version": "1.40.0",
     "description": "This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.",
     "main": "src/main.js",
     "scripts": {
         "dev": "node esbuild.config.mjs",
         "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-        "version": "node version-bump.mjs && git add manifest.json versions.json",
+        "version": "node version-bump.mjs && git add manifest.json versions.json package.json",
         "test": "jest --watchAll"
     },
     "keywords": [
