@@ -2,7 +2,7 @@
     display: flex;
     align-items: flex-start;
     position: relative;
-    line-height: 1rem;
+    line-height: 1em;
     flex-direction: column;
     margin-bottom: 10px;
     vertical-align: middle;
@@ -13,19 +13,23 @@
     cursor: pointer;
     text-decoration: none;
 }
+
 .jira-issue-container img.fit-content {
     height: 16px;
     width: 16px;
 }
+
 .jira-issue-container img.fit-content {
     max-width: fit-content;
     width: fit-content;
 }
+
 .jira-issue-container .no-wrap {
     flex-grow: 0;
     flex-shrink: 0;
     white-space: nowrap;
 }
+
 .jira-issue-container .issue-summary {
     flex-grow: 1;
 }
@@ -57,6 +61,7 @@
     border-top-color: #000;
     animation: spinner 0.6s linear infinite;
 }
+
 @keyframes spinner {
     to {
         transform: rotate(360deg);
@@ -71,6 +76,7 @@
     width: 100%;
     justify-content: space-between;
 }
+
 .jira-issue-container .search-footer button {
     border: 0;
     padding: 0;
@@ -84,11 +90,12 @@
     vertical-align: middle;
     margin-left: 3px;
 }
+
 .jira-issue-container .search-footer button:hover {
     opacity: 0.8;
 }
 
-.jira-issue-container .search-footer button > svg {
+.jira-issue-container .search-footer button>svg {
     height: 1.5em;
     width: 1.5em;
 }
@@ -124,16 +131,17 @@
     font-size: 0.75em;
     justify-content: flex-start;
     line-height: 1.5;
-    padding: 0.2rem 0.75rem;
+    padding: 0.2em 0.75em;
 }
 
 .jira-issue-container .ji-tag.ji-sm-tag {
-    padding: 0.2rem 0.4rem;
+    padding: 0.2em 0.4em;
 }
 
 .jira-issue-container .ji-tags {
     margin-bottom: 0.5em;
 }
+
 .jira-issue-container .ji-tags:last-child {
     margin-bottom: 0;
 }
@@ -156,10 +164,12 @@
     height: 1px;
     width: 50%;
 }
+
 .ji-tag.is-delete::after {
     height: 50%;
     width: 1px;
 }
+
 .ji-tag.is-delete::after,
 .ji-tag.is-delete::before {
     background-color: currentColor;
@@ -177,6 +187,7 @@
     background-color: #eff1fa;
     color: #3850b7;
 }
+
 .jira-issue-container .ji-tag.is-link.is-dark {
     background-color: #485fc7;
     color: #fff;
@@ -222,12 +233,14 @@
     border-collapse: collapse;
     border-spacing: 0;
 }
+
 .jira-issue-container .table {
     background-color: #fff;
     color: #363636;
     font-size: small;
     margin-bottom: 0;
 }
+
 .jira-issue-container .table.is-fullwidth {
     width: 100%;
 }
@@ -242,30 +255,37 @@
 .jira-issue-container .table.is-bordered tr:last-child th {
     border-bottom-width: 1px;
 }
+
 .jira-issue-container .table.is-narrow td,
 .jira-issue-container .table.is-narrow th {
     padding: 0.25em 0.5em;
 }
+
 .jira-issue-container .table.is-bordered td,
 .jira-issue-container .table.is-bordered th {
     border-width: 1px;
 }
+
 .jira-issue-container .table th:not([align]) {
     text-align: inherit;
 }
+
 .jira-issue-container .table thead td,
 .jira-issue-container .table thead th {
     border-width: 0 0 2px;
     color: #363636;
 }
+
 .jira-issue-container table td:not([align]),
 .jira-issue-container table th:not([align]) {
     text-align: inherit;
 }
+
 .jira-issue-container .table th {
     color: #363636;
     white-space: nowrap;
 }
+
 .jira-issue-container .table td,
 .jira-issue-container .table th {
     border: 1px solid #dbdbdb;
@@ -273,17 +293,21 @@
     padding: 0.5em 0.75em;
     vertical-align: top;
 }
+
 .jira-issue-container td:not([align]),
 th:not([align]) {
     text-align: inherit;
 }
+
 .jira-issue-container table th {
     color: #363636;
 }
+
 .jira-issue-container table td,
 table th {
     vertical-align: top;
 }
+
 .jira-issue-container td,
 th {
     padding: 0;
@@ -296,6 +320,7 @@ th {
 .jira-issue-container .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover:nth-child(even) {
     background-color: #f5f5f5;
 }
+
 .jira-issue-container .table.is-hoverable.is-striped tbody tr:not(.is-selected):hover {
     background-color: #fafafa;
 }
@@ -303,6 +328,7 @@ th {
 .jira-issue-container .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
     background-color: #fafafa;
 }
+
 .jira-issue-container .table.is-hoverable tbody tr:not(.is-selected):hover {
     background-color: #fafafa;
 }
@@ -357,7 +383,7 @@ th {
 }
 
 .jira-issue-container.ji-inline-issue .ji-tag {
-    padding: 0.1rem 0.3rem;
+    padding: 0.1em 0.3em;
 }
 
 /* Settings */
@@ -365,6 +391,7 @@ th {
     flex-grow: 1;
     max-width: none;
 }
+
 .setting-item-control input[type="text"].custom-field-text {
     margin-left: 10px;
     height: 2.5em;
@@ -387,15 +414,19 @@ th {
     font-size: small;
     margin-right: 5px;
 }
+
 .jira-issue-suggestion:last-child {
     margin-right: 0;
 }
+
 .jira-issue-suggestion.is-compact {
     color: green;
 }
+
 .jira-issue-suggestion.is-custom-field {
     color: orange;
 }
+
 .jira-issue-suggestion.is-function {
     color: red;
 }
@@ -412,36 +443,48 @@ th {
     padding: 0;
 }
 
-.HyperMD-task-line[data-task="x"] .ji-inline-issue.jira-issue-container{
+.HyperMD-task-line[data-task="x"] .ji-inline-issue.jira-issue-container {
     text-decoration: line-through;
 }
 
-.jira-issue-container table svg{
+.jira-issue-container table svg {
     fill: #363636
 }
 
-.jira-issue-container table.is-dark svg{
+.jira-issue-container table.is-dark svg {
     fill: #dadada
 }
 
 .jira-issue-container span.pull-request-tag {
     padding: 1px 3px;
+    line-height: 1.5;
+    padding: 0.2em 0.75em;
+    font-size: 0.75em;
 }
+
 .jira-issue-container span.pull-request-tag:last-child {
-    border-radius: 0px 2px 2px 0px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+
 }
+
 .jira-issue-container span.pull-request-tag:first-child {
-    border-radius: 2px 0px 0px 2px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
 }
-.jira-issue-container span.pull-request-open{
+
+.jira-issue-container span.pull-request-open {
     background-color: #325186;
 }
-.jira-issue-container span.pull-request-merged{
+
+.jira-issue-container span.pull-request-merged {
     background-color: #25570F;
 }
-.jira-issue-container span.pull-request-delete{
+
+.jira-issue-container span.pull-request-delete {
     background-color: #984447;
 }
+
 .jira-issue-container .pull-request-tag>svg {
     height: 1em;
     width: 1em;
@@ -451,8 +494,13 @@ th {
     animation-name: rotate-keyframes;
     animation-duration: 2s;
 }
-  
+
 @keyframes rotate-keyframes {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
