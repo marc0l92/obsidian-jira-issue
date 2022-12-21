@@ -5,7 +5,7 @@ import JiraClient from "src/client/jiraClient"
 import { IJiraIssue } from "src/interfaces/issueInterfaces"
 import ObjectsCache from "src/objectsCache"
 import { SettingsData } from "src/settings"
-import { RenderingCommon as RC } from "./renderingCommon"
+import RC from "./renderingCommon"
 import escapeStringRegexp from 'escape-string-regexp'
 import { getAccountByHost } from "src/utils"
 import { COMPACT_SYMBOL } from "src/interfaces/settingsInterfaces"

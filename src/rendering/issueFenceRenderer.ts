@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext } from "obsidian"
 import { IJiraIssue } from "../interfaces/issueInterfaces"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
-import { RenderingCommon as RC } from "./renderingCommon"
+import RC from "./renderingCommon"
 import { COMMENT_REGEX } from "src/interfaces/settingsInterfaces"
 
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i

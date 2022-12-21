@@ -473,15 +473,27 @@ th {
     border-bottom-left-radius: 2px;
 }
 
-.jira-issue-container span.pull-request-open {
+.jira-issue-container span.pull-request-open.is-light {
+    background-color: #97AFD8;
+}
+
+.jira-issue-container span.pull-request-merged.is-light {
+    background-color: #96E773;
+}
+
+.jira-issue-container span.pull-request-delete.is-light {
+    background-color: #D39C9E;
+}
+
+.jira-issue-container span.pull-request-open.is-dark {
     background-color: #325186;
 }
 
-.jira-issue-container span.pull-request-merged {
+.jira-issue-container span.pull-request-merged.is-dark {
     background-color: #25570F;
 }
 
-.jira-issue-container span.pull-request-delete {
+.jira-issue-container span.pull-request-delete.is-dark {
     background-color: #984447;
 }
 

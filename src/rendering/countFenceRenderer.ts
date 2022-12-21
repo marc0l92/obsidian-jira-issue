@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext } from "obsidian"
 import { IJiraSearchResults } from "../interfaces/issueInterfaces"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
-import { RenderingCommon as RC } from "./renderingCommon"
+import RC from "./renderingCommon"
 import { SearchView } from "src/searchView"
 
 function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, query: string): void {

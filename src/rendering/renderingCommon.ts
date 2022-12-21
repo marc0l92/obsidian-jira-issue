@@ -13,7 +13,7 @@ export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'medium-gray': 'is-dark',
 }
 
-export const RenderingCommon = {
+export default {
     issueUrl(account: IJiraIssueAccountSettings, issueKey: string): string {
         try {
             return (new URL(`${account.host}/browse/${issueKey}`)).toString()

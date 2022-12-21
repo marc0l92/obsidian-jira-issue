@@ -4,7 +4,7 @@ import { IJiraIssue } from "src/interfaces/issueInterfaces"
 import { COMPACT_SYMBOL } from "src/interfaces/settingsInterfaces"
 import ObjectsCache from "src/objectsCache"
 import { SettingsData } from "../settings"
-import { RenderingCommon as RC } from "./renderingCommon"
+import RC from "./renderingCommon"
 
 // TODO: support explicit account selection in inline issues
 

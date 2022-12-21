@@ -1,6 +1,6 @@
 import { setIcon, TFile } from "obsidian"
 import { IJiraDevStatus, IJiraIssue } from "../interfaces/issueInterfaces"
-import { JIRA_STATUS_COLOR_MAP, RenderingCommon as RC } from "./renderingCommon"
+import { JIRA_STATUS_COLOR_MAP, default as RC } from "./renderingCommon"
 import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
 import * as jsonpath from 'jsonpath'
 import ObjectsCache from "src/objectsCache"
@@ -273,17 +273,17 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 const prDetails = devStatus.summary.pullrequest.overall.details
                 if (prDetails.openCount + prDetails.mergedCount + prDetails.declinedCount > 0) {
                     if (prDetails.openCount > 0) {
-                        const prOpen = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-open', title: 'Open pull-request' })
+                        const prOpen = createSpan({ parent: cell, cls: `pull-request-tag pull-request-open ${RC.getTheme()}`, title: 'Open pull-request' })
                         setIcon(prOpen, 'git-pull-request')
                         prOpen.appendText(`${prDetails.openCount}`)
                     }
                     if (prDetails.mergedCount > 0) {
-                        const prMerged = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-merged', title: 'Merged pull-request' })
+                        const prMerged = createSpan({ parent: cell, cls: `pull-request-tag pull-request-merged ${RC.getTheme()}`, title: 'Merged pull-request' })
                         setIcon(prMerged, 'git-merge')
                         prMerged.appendText(`${prDetails.mergedCount}`)
                     }
                     if (prDetails.declinedCount > 0) {
-                        const prDeclined = createSpan({ parent: cell, cls: 'pull-request-tag pull-request-delete', title: 'Declined pull-request' })
+                        const prDeclined = createSpan({ parent: cell, cls: `pull-request-tag pull-request-delete ${RC.getTheme()}`, title: 'Declined pull-request' })
                         setIcon(prDeclined, 'git-delete')
                         prDeclined.appendText(`${prDetails.declinedCount}`)
                     }

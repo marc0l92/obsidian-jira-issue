@@ -5,7 +5,7 @@ import ObjectsCache from "../objectsCache"
 import { renderTableColumn } from "./renderTableColumns"
 import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SearchView, SEARCH_COLUMNS_DESCRIPTION } from "../searchView"
 import { SettingsData } from "../settings"
-import { RenderingCommon as RC } from "./renderingCommon"
+import RC from "./renderingCommon"
 import { IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
 
 
