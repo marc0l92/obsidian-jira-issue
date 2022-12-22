@@ -180,7 +180,7 @@ export default {
         return issue
     },
 
-    async getSearchResults(query: string, limit: number, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
+    async getSearchResults(query: string, limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: '0',

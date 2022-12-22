@@ -289,5 +289,8 @@ function mergeDeep(target: any, ...sources: any[]): any {
 }
 
 export function toDefaultedIssue(originalIssue: IJiraIssue): IJiraIssue {
-    return mergeDeep(EMPTY_ISSUE, originalIssue)
+    if (originalIssue) {
+        return mergeDeep(EMPTY_ISSUE, originalIssue)
+    }
+    return originalIssue
 }
