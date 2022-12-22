@@ -288,7 +288,7 @@ export default {
         return true
     },
 
-    async getLoggedUser(account: IJiraIssueAccountSettings): Promise<IJiraUser> {
+    async getLoggedUser(account: IJiraIssueAccountSettings = null): Promise<IJiraUser> {
         return await sendRequest(
             {
                 method: 'GET',
@@ -298,7 +298,7 @@ export default {
         ) as IJiraUser
     },
 
-    async getDevStatus(issueId: string, account: IJiraIssueAccountSettings): Promise<IJiraDevStatus> {
+    async getDevStatus(issueId: string, account: IJiraIssueAccountSettings = null): Promise<IJiraDevStatus> {
         const queryParameters = new URLSearchParams({
             issueId: issueId,
         })

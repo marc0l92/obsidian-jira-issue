@@ -11,16 +11,18 @@ import { SearchWizardModal } from './rendering/searchWizardModal'
 import { ViewPluginManager } from './rendering/inlineIssueViewPlugin'
 import { QuerySuggest } from './rendering/querySuggest'
 import { setupIcons } from './icons/icons'
+import API from './api/api'
 
 // TODO: text on mobile and implement horizontal scrolling
 
 export let ObsidianApp: App = null
 
 export default class JiraIssuePlugin extends Plugin {
-    _settingTab: JiraIssueSettingTab
-    _columnsSuggest: ColumnsSuggest
-    _querySuggest: QuerySuggest
-    _inlineIssueViewPlugin: ViewPluginManager
+    private _settingTab: JiraIssueSettingTab
+    private _columnsSuggest: ColumnsSuggest
+    private _querySuggest: QuerySuggest
+    private _inlineIssueViewPlugin: ViewPluginManager
+    public api = API
 
     async onload() {
         ObsidianApp = this.app
