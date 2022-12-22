@@ -25,27 +25,27 @@ export default {
         return cache[key]
     },
 
-    get(key: string) {
+    get(key: string): CacheItem {
         if (key in cache && cache[key].updateTime + ms(SettingsData.cacheTime) > Date.now()) {
             return cache[key]
         }
         return null
     },
 
-    getTime(key: string) {
+    getTime(key: string): string {
         if (key in cache) {
             return moment(cache[key].updateTime).format('llll')
         }
         return null
     },
 
-    delete(key: string) {
+    delete(key: string): void {
         if (key in cache) {
             delete cache[key]
         }
     },
 
-    clear() {
+    clear(): void {
         cache = {}
     },
 }

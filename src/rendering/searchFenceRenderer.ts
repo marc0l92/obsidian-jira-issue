@@ -6,7 +6,7 @@ import { renderTableColumn } from "./renderTableColumns"
 import { SearchView } from "../searchView"
 import { SettingsData } from "../settings"
 import RC from "./renderingCommon"
-import { ESearchColumnsTypes, ESearchResultsRenderingTypes, IJiraIssueAccountSettings, SEARCH_COLUMNS_DESCRIPTION } from "src/interfaces/settingsInterfaces"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, IJiraIssueAccountSettings, SEARCH_COLUMNS_DESCRIPTION } from "../interfaces/settingsInterfaces"
 
 
 async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {

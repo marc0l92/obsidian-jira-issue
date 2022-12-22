@@ -3,7 +3,7 @@ import { IJiraSearchResults } from "../interfaces/issueInterfaces"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import RC from "./renderingCommon"
-import { SearchView } from "src/searchView"
+import { SearchView } from "../searchView"
 
 function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, query: string): void {
     const tagsRow = createDiv('ji-tags has-addons')

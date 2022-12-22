@@ -3,7 +3,7 @@ import { IJiraIssue } from "../interfaces/issueInterfaces"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import RC from "./renderingCommon"
-import { COMMENT_REGEX } from "src/interfaces/settingsInterfaces"
+import { COMMENT_REGEX } from "../interfaces/settingsInterfaces"
 
 const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
 const ISSUE_LINK_REGEX = /\/([A-Z0-9]+-[0-9]+)\s*$/i

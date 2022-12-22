@@ -1,6 +1,6 @@
 import { App, Modal, Setting } from "obsidian"
-import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SEARCH_COLUMNS_DESCRIPTION, SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION } from "src/interfaces/settingsInterfaces"
-import { SearchView } from "src/searchView"
+import { ESearchColumnsTypes, ESearchResultsRenderingTypes, SEARCH_COLUMNS_DESCRIPTION, SEARCH_RESULTS_RENDERING_TYPE_DESCRIPTION } from "../interfaces/settingsInterfaces"
+import { SearchView } from "../searchView"
 import { SettingsData } from "../settings"
 
 

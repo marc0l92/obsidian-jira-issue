@@ -1,6 +1,6 @@
 import { getAccountByAlias, getAccountByHost } from "../utils"
 import JiraClient from "../client/jiraClient"
-import { ESprintState, IJiraSprint } from "src/interfaces/issueInterfaces"
+import { ESprintState, IJiraSprint } from "../interfaces/issueInterfaces"
 import ObjectsCache from "../objectsCache"
 
 type InferArgs<T> = T extends (...t: [...infer Arg]) => any ? Arg : never;

@@ -1,4 +1,4 @@
-import { IJiraAutocompleteDataField } from "src/interfaces/issueInterfaces"
+import { IJiraAutocompleteDataField } from "../../src/interfaces/issueInterfaces"
 import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../../src/interfaces/settingsInterfaces"
 
 const kEmptyAccountCache = {
