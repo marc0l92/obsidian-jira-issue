@@ -1,4 +1,4 @@
-import { EAuthenticationTypes, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
+import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
 import { DEFAULT_ACCOUNT, DEFAULT_SETTINGS, JiraIssueSettingTab, SettingsData } from "../src/settings"
 
 jest.mock('obsidian')
@@ -23,7 +23,7 @@ const StoredSettings = {
         columns: ['column1', 'column2']
     },
     cacheTime: 'cacheTimeVal',
-    darkMode: true,
+    colorSchema: EColorSchema.LIGHT,
     inlineIssuePrefix: 'inlineIssuePrefixVal',
     inlineIssueUrlToTag: true,
     logRequestsResponses: true,

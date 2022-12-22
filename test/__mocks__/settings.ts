@@ -1,5 +1,5 @@
 import { IJiraAutocompleteDataField } from "src/interfaces/issueInterfaces"
-import { EAuthenticationTypes, IJiraIssueSettings } from "../../src/interfaces/settingsInterfaces"
+import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../../src/interfaces/settingsInterfaces"
 
 const kEmptyAccountCache = {
     customFieldsIdToName: {},
@@ -45,7 +45,7 @@ export default {
         cache: {
             columns: ['CUSTOM1', '12345'],
         },
-        darkMode: false,
+        colorSchema: EColorSchema.LIGHT,
         inlineIssueUrlToTag: true,
         inlineIssuePrefix: 'JIRA:',
         showColorBand: true,

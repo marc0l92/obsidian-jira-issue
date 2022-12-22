@@ -1,6 +1,6 @@
 import { FrontMatterCache, TFile } from "obsidian"
 import { IJiraIssue } from "src/interfaces/issueInterfaces"
-import { IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
+import { EColorSchema, IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
 import { ObsidianApp } from "src/main"
 import { SearchView } from "src/searchView"
 import { SettingsData } from "src/settings"
@@ -27,7 +27,28 @@ export default {
     },
 
     getTheme(): string {
-        return SettingsData.darkMode ? 'is-dark' : 'is-light'
+        switch (SettingsData.colorSchema) {
+            case EColorSchema.FOLLOW_OBSIDIAN:
+                // @ts-ignore
+                const obsidianTheme = ObsidianApp.vault.getConfig("theme")
+                if (obsidianTheme === 'obsidian') {
+                    return 'is-dark'
+                } else if (obsidianTheme === 'moonstone') {
+                    return 'is-light'
+                } else if (obsidianTheme === 'system') {
+                    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                        return 'is-dark'
+                    } else {
+                        return 'is-light'
+                    }
+                }
+                break
+            case EColorSchema.LIGHT:
+                return 'is-light'
+            case EColorSchema.DARK:
+                return 'is-dark'
+        }
+        return 'is-light'
     },
 
     getNotes(): TFile[] {

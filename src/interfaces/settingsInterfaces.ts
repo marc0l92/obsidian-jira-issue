@@ -6,6 +6,16 @@ export enum EAuthenticationTypes {
     CLOUD = 'CLOUD',
     BEARER_TOKEN = 'BEARER_TOKEN',
 }
+export enum EColorSchema {
+    FOLLOW_OBSIDIAN = 'FOLLOW_OBSIDIAN',
+    LIGHT = 'LIGHT',
+    DARK = 'DARK',
+}
+export const COLOR_SCHEMA_DESCRIPTION = {
+    [EColorSchema.FOLLOW_OBSIDIAN]: 'Follow Obsidian',
+    [EColorSchema.LIGHT]: 'Light',
+    [EColorSchema.DARK]: 'Dark',
+}
 
 export const COMPACT_SYMBOL = '-'
 export const COMMENT_REGEX = /^\s*#/
@@ -18,7 +28,7 @@ export interface IJiraIssueSettings {
     cache: {
         columns: string[]
     }
-    darkMode: boolean
+    colorSchema: EColorSchema
     inlineIssueUrlToTag: boolean
     inlineIssuePrefix: string
     searchColumns: ISearchColumn[]

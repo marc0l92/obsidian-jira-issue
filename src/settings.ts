@@ -1,6 +1,6 @@
 import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
 import JiraClient from './client/jiraClient'
-import { EAuthenticationTypes, ESearchColumnsTypes, IJiraIssueAccountSettings, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from './interfaces/settingsInterfaces'
+import { COLOR_SCHEMA_DESCRIPTION, EAuthenticationTypes, EColorSchema, ESearchColumnsTypes, IJiraIssueAccountSettings, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
 
 const AUTHENTICATION_TYPE_DESCRIPTION = {
@@ -20,7 +20,7 @@ export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     cache: {
         columns: [],
     },
-    darkMode: false,
+    colorSchema: EColorSchema.FOLLOW_OBSIDIAN,
     inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',
     showColorBand: true,
@@ -407,12 +407,13 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     await this.saveSettings()
                 }))
         new Setting(containerEl)
-            .setName('Dark mode')
+            .setName('Color schema')
             // .setDesc('')
-            .addToggle(toggle => toggle
-                .setValue(SettingsData.darkMode)
+            .addDropdown(dropdown => dropdown
+                .addOptions(COLOR_SCHEMA_DESCRIPTION)
+                .setValue(SettingsData.colorSchema)
                 .onChange(async value => {
-                    SettingsData.darkMode = value
+                    SettingsData.colorSchema = value as EColorSchema
                     await this.saveSettings()
                 }))
 
