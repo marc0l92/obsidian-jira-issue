@@ -184,6 +184,30 @@ export interface IJiraDevStatus {
     }
 }
 
+export interface IJiraBoard {
+    id: number
+    name: string
+    type: string
+}
+
+export interface IJiraSprint {
+    id: number
+    state: ESprintState
+    name: string
+    startDate: string
+    endDate: string
+    completeDate: string
+    activatedDate: string
+    originBoardId: number
+    goal: string
+}
+
+export enum ESprintState {
+    CLOSED = 'closed',
+    ACTIVE = 'active',
+    FUTURE = 'future',
+}
+
 const newEmptyUser = () => {
     return {
         active: false,

@@ -19,7 +19,7 @@ describe('JiraClient', () => {
     test.todo('getLoggedUser')
     test.todo('getDevStatus')
 
-    afterEach(()=>{
+    afterEach(() => {
         jest.clearAllMocks()
     })
 })

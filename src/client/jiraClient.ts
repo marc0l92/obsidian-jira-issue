@@ -1,6 +1,6 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
 import { EAuthenticationTypes, IJiraIssueAccountSettings } from '../interfaces/settingsInterfaces'
-import { IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
+import { ESprintState, IJiraAutocompleteField, IJiraBoard, IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraSprint, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
 import { SettingsData } from "../settings"
 
 interface RequestOptions {
@@ -180,11 +180,11 @@ export default {
         return issue
     },
 
-    async getSearchResults(query: string, max: number, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
+    async getSearchResults(query: string, limit: number, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: '0',
-            maxResults: max > 0 ? max.toString() : '',
+            maxResults: limit > 0 ? limit.toString() : '',
         })
         const searchResults = await sendRequest(
             {
@@ -263,19 +263,19 @@ export default {
     // settingData.cache.jqlAutocomplete.fields = response.visibleFieldNames
     // },
 
-    // async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
-    //     const queryParameters = new URLSearchParams({
-    //         fieldName: fieldName,
-    //         fieldValue: fieldValue,
-    //     })
-    //     return await sendRequest(
-    //         {
-    //             method: 'GET',
-    //             path: `/jql/autocompletedata/suggestions`,
-    //             queryParameters: queryParameters,
-    //         }
-    //     ) as IJiraAutocompleteField
-    // },
+    async getJQLAutoCompleteField(fieldName: string, fieldValue: string): Promise<IJiraAutocompleteField> {
+        const queryParameters = new URLSearchParams({
+            fieldName: fieldName,
+            fieldValue: fieldValue,
+        })
+        return await sendRequest(
+            {
+                method: 'GET',
+                path: `/jql/autocompletedata/suggestions`,
+                queryParameters: queryParameters,
+            }
+        ) as IJiraAutocompleteField
+    },
 
     async testConnection(account: IJiraIssueAccountSettings): Promise<boolean> {
         await sendRequest(
@@ -305,11 +305,51 @@ export default {
         return await sendRequest(
             {
                 method: 'GET',
-                path: `/rest/dev-status/latest/issue/summary?issueId=`,
+                path: `/rest/dev-status/latest/issue/summary`,
                 queryParameters: queryParameters,
                 noBasePath: true,
                 account: account,
             }
         ) as IJiraDevStatus
+    },
+
+    async getBoards(projectKeyOrId: string, limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraBoard[]> {
+        const queryParameters = new URLSearchParams({
+            projectKeyOrId: projectKeyOrId,
+            maxResults: limit.toString(),
+        })
+        const boards = await sendRequest(
+            {
+                method: 'GET',
+                path: `/rest/agile/1.0/board`,
+                queryParameters: queryParameters,
+                noBasePath: true,
+                account: account,
+            }
+        )
+        if (boards.values && boards.values.length) {
+            return boards.values
+        }
+        return []
+    },
+
+    async getSprints(boardId: number, state: ESprintState[] = [], limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraSprint[]> {
+        const queryParameters = new URLSearchParams({
+            maxResults: limit.toString(),
+            state: state.join(','),
+        })
+        const sprints = await sendRequest(
+            {
+                method: 'GET',
+                path: `/rest/agile/1.0/board/${boardId}/sprint`,
+                queryParameters: queryParameters,
+                noBasePath: true,
+                account: account,
+            }
+        )
+        if (sprints.values && sprints.values.length) {
+            return sprints.values
+        }
+        return []
     },
 }
