@@ -1,6 +1,6 @@
 import { App, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from "obsidian"
-import { COMPACT_SYMBOL, ESearchColumnsTypes } from "src/interfaces/settingsInterfaces"
-import { SettingsData } from "src/settings"
+import { COMPACT_SYMBOL, ESearchColumnsTypes } from "../interfaces/settingsInterfaces"
+import { SettingsData } from "../settings"
 
 interface SuggestionEntry {
     name: string

@@ -1,9 +1,9 @@
 import { FrontMatterCache, TFile } from "obsidian"
-import { IJiraIssue } from "src/interfaces/issueInterfaces"
-import { EColorSchema, IJiraIssueAccountSettings } from "src/interfaces/settingsInterfaces"
-import { ObsidianApp } from "src/main"
-import { SearchView } from "src/searchView"
-import { SettingsData } from "src/settings"
+import { IJiraIssue } from "../interfaces/issueInterfaces"
+import { EColorSchema, IJiraIssueAccountSettings } from "../interfaces/settingsInterfaces"
+import { ObsidianApp } from "../main"
+import { SearchView } from "../searchView"
+import { SettingsData } from "../settings"
 
 export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'blue-gray': 'is-info',
