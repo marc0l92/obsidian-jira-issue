@@ -26,6 +26,7 @@ export default class JiraIssuePlugin extends Plugin {
 
     async onload() {
         ObsidianApp = this.app
+        this.registerAPI()
         this._settingTab = new JiraIssueSettingTab(this.app, this)
         await this._settingTab.loadSettings()
         this.addSettingTab(this._settingTab)
@@ -98,6 +99,11 @@ export default class JiraIssuePlugin extends Plugin {
         this._settingTab = null
         this._columnsSuggest = null
         this._inlineIssueViewPlugin = null
+    }
+
+    private registerAPI() {
+        // @ts-ignore
+        window.$JI = API
     }
 }
 

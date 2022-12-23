@@ -70,9 +70,24 @@ export interface IJiraIssue {
             percent: number
         }
         lastViewed: string
+        worklog: {
+            worklogs: IJiraWorklog[]
+        }
         [k: string]: any
     }
     account: IJiraIssueAccountSettings
+}
+
+export interface IJiraWorklog {
+    id: string
+    author: IJiraUser
+    comment: string
+    create: string
+    started: string
+    timeSpent: string
+    timeSpentSeconds: number
+    updateAuthor: IJiraUser
+    updated: string
 }
 
 export interface IJiraUser {
@@ -255,6 +270,9 @@ const EMPTY_ISSUE: IJiraIssue = {
         timeoriginalestimate: 0,
         timespent: 0,
         updated: '',
+        worklog: {
+            worklogs: []
+        }
     },
 }
 

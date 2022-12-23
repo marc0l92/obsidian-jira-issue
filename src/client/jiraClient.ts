@@ -168,23 +168,28 @@ async function fetchIssueImages(issue: IJiraIssue) {
 
 export default {
 
-    async getIssue(issueKey: string, account: IJiraIssueAccountSettings = null): Promise<IJiraIssue> {
+    async getIssue(issueKey: string, fields: string[] = [], account: IJiraIssueAccountSettings = null): Promise<IJiraIssue> {
+        const queryParameters = new URLSearchParams({
+            fields: fields.join(','),
+        })
         const issue = await sendRequest(
             {
                 method: 'GET',
                 path: `/issue/${issueKey}`,
                 account: account,
+                queryParameters: queryParameters,
             }
         ) as IJiraIssue
         await fetchIssueImages(issue)
         return issue
     },
 
-    async getSearchResults(query: string, limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
+    async getSearchResults(query: string, limit: number = 50, fields: string[] = [], account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: '0',
             maxResults: limit > 0 ? limit.toString() : '',
+            fields: fields.join(','),
         })
         const searchResults = await sendRequest(
             {
