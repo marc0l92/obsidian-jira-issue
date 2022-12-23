@@ -168,15 +168,19 @@ async function fetchIssueImages(issue: IJiraIssue) {
 
 export default {
 
-    async getIssue(issueKey: string, fields: string[] = [], account: IJiraIssueAccountSettings = null): Promise<IJiraIssue> {
+    async getIssue(issueKey: string, options: { fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraIssue> {
+        const opt = {
+            fields: options.fields || [],
+            account: options.account || null
+        }
         const queryParameters = new URLSearchParams({
-            fields: fields.join(','),
+            fields: opt.fields.join(','),
         })
         const issue = await sendRequest(
             {
                 method: 'GET',
                 path: `/issue/${issueKey}`,
-                account: account,
+                account: opt.account,
                 queryParameters: queryParameters,
             }
         ) as IJiraIssue
@@ -184,19 +188,24 @@ export default {
         return issue
     },
 
-    async getSearchResults(query: string, limit: number = 50, fields: string[] = [], account: IJiraIssueAccountSettings = null): Promise<IJiraSearchResults> {
+    async getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSearchResults> {
+        const opt = {
+            limit: options.limit || 50,
+            fields: options.fields || [],
+            account: options.account || null
+        }
         const queryParameters = new URLSearchParams({
             jql: query,
             startAt: '0',
-            maxResults: limit > 0 ? limit.toString() : '',
-            fields: fields.join(','),
+            maxResults: opt.limit > 0 ? opt.limit.toString() : '',
+            fields: opt.fields.join(','),
         })
         const searchResults = await sendRequest(
             {
                 method: 'GET',
                 path: `/search`,
                 queryParameters: queryParameters,
-                account: account,
+                account: opt.account,
             }
         ) as IJiraSearchResults
         for (const issue of searchResults.issues) {
@@ -303,7 +312,10 @@ export default {
         ) as IJiraUser
     },
 
-    async getDevStatus(issueId: string, account: IJiraIssueAccountSettings = null): Promise<IJiraDevStatus> {
+    async getDevStatus(issueId: string, options: { account?: IJiraIssueAccountSettings } = {}): Promise<IJiraDevStatus> {
+        const opt = {
+            account: options.account || null
+        }
         const queryParameters = new URLSearchParams({
             issueId: issueId,
         })
@@ -313,15 +325,19 @@ export default {
                 path: `/rest/dev-status/latest/issue/summary`,
                 queryParameters: queryParameters,
                 noBasePath: true,
-                account: account,
+                account: opt.account,
             }
         ) as IJiraDevStatus
     },
 
-    async getBoards(projectKeyOrId: string, limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraBoard[]> {
+    async getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {}): Promise<IJiraBoard[]> {
+        const opt = {
+            limit: options.limit || 50,
+            account: options.account || null
+        }
         const queryParameters = new URLSearchParams({
             projectKeyOrId: projectKeyOrId,
-            maxResults: limit.toString(),
+            maxResults: opt.limit.toString(),
         })
         const boards = await sendRequest(
             {
@@ -329,7 +345,7 @@ export default {
                 path: `/rest/agile/1.0/board`,
                 queryParameters: queryParameters,
                 noBasePath: true,
-                account: account,
+                account: opt.account,
             }
         )
         if (boards.values && boards.values.length) {
@@ -338,10 +354,15 @@ export default {
         return []
     },
 
-    async getSprints(boardId: number, state: ESprintState[] = [], limit: number = 50, account: IJiraIssueAccountSettings = null): Promise<IJiraSprint[]> {
+    async getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSprint[]> {
+        const opt = {
+            limit: options.limit || 50,
+            state: options.state || [],
+            account: options.account || null
+        }
         const queryParameters = new URLSearchParams({
-            maxResults: limit.toString(),
-            state: state.join(','),
+            maxResults: opt.limit.toString(),
+            state: opt.state.join(','),
         })
         const sprints = await sendRequest(
             {
@@ -349,7 +370,7 @@ export default {
                 path: `/rest/agile/1.0/board/${boardId}/sprint`,
                 queryParameters: queryParameters,
                 noBasePath: true,
-                account: account,
+                account: opt.account,
             }
         )
         if (sprints.values && sprints.values.length) {

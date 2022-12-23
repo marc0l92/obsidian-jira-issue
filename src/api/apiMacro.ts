@@ -11,9 +11,9 @@ function dateTimeToDate(dateTime: string): string {
 }
 
 export async function getActiveSprint(projectKeyOrId: string): Promise<IJiraSprint> {
-    const boards = await API.base.getBoards(projectKeyOrId, 1)
+    const boards = await API.base.getBoards(projectKeyOrId, { limit: 1 })
     if (boards.length > 0) {
-        const sprints = await API.base.getSprints(boards[0].id, [ESprintState.ACTIVE], 1)
+        const sprints = await API.base.getSprints(boards[0].id, { state: [ESprintState.ACTIVE], limit: 1 })
         if (sprints.length > 0) {
             return sprints[0]
         }
@@ -31,7 +31,7 @@ export async function getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSp
 }
 
 export async function getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<IJiraWorklog[]> {
-    const searchResults = await JiraClient.getSearchResults(`project = "${projectKeyOrId}" AND worklogDate > ${startDate} AND worklogDate < ${endDate}`, 50, ['worklog'])
+    const searchResults = await JiraClient.getSearchResults(`project = "${projectKeyOrId}" AND worklogDate > ${startDate} AND worklogDate < ${endDate}`, { limit: 50, fields: ['worklog'] })
     let worklogs: IJiraWorklog[] = []
     for (const issue of searchResults.issues) {
         if (issue.fields.worklog && issue.fields.worklog.worklogs) {

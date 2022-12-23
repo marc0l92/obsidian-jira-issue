@@ -53,7 +53,7 @@ class InlineIssueWidget extends WidgetType {
             }
         } else {
             this._htmlContainer.replaceChildren(RC.renderLoadingItem(this._issueKey))
-            JiraClient.getIssue(this._issueKey, [], getAccountByHost(this._host)).then(newIssue => {
+            JiraClient.getIssue(this._issueKey, { account: getAccountByHost(this._host) }).then(newIssue => {
                 const issue = ObjectsCache.add(this._issueKey, newIssue).data as IJiraIssue
                 this._htmlContainer.replaceChildren(RC.renderIssue(issue, this._compact))
             }).catch(err => {
