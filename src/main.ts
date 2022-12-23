@@ -103,7 +103,7 @@ export default class JiraIssuePlugin extends Plugin {
 
     private registerAPI() {
         // @ts-ignore
-        window.$JI = API
+        window.$ji = API
     }
 }
 
