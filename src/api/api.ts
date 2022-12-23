@@ -26,9 +26,9 @@ const API = {
         getIssue: cacheWrapper(JiraClient.getIssue),
         getSearchResults: cacheWrapper(JiraClient.getSearchResults),
         getDevStatus: cacheWrapper(JiraClient.getDevStatus),
-        getLoggedUser: cacheWrapper(JiraClient.getLoggedUser),
         getBoards: cacheWrapper(JiraClient.getBoards),
         getSprints: cacheWrapper(JiraClient.getSprints),
+        getLoggedUser: cacheWrapper(JiraClient.getLoggedUser),
     },
     defaulted: {
         getIssue: cacheWrapper(getIssueDefaulted),
@@ -40,13 +40,13 @@ const API = {
         getWorkLogBySprint: getWorkLogBySprint,
         getWorkLogByDates: getWorkLogByDates,
     },
-    cache: {
-        clear: ObjectsCache.clear
-    },
-    accounts: {
+    account: {
         getAccountByAlias: getAccountByAlias,
         getAccountByHost: getAccountByHost,
-    }
+    },
+    util: {
+        clearCache: ObjectsCache.clear
+    },
 }
 
 export default API
