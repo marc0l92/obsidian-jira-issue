@@ -71,9 +71,9 @@ describe('API', () => {
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(1, expect.stringMatching(new RegExp(kProject)), [kBoard])
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(2, expect.stringMatching(new RegExp(kBoardId.toString())), [kSprint])
             expect(JiraClient.getBoards).toBeCalledTimes(1)
-            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, 1)
+            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, { limit: 1 })
             expect(JiraClient.getSprints).toBeCalledTimes(1)
-            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, ['active'], 1)
+            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, { state: ['active'], limit: 1 })
         })
         test('cached board, requested sprint', async () => {
             (ObjectsCache.get as jest.MockedFunction<any>)
@@ -90,7 +90,7 @@ describe('API', () => {
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(1, expect.stringMatching(new RegExp(kBoardId.toString())), [kSprint])
             expect(JiraClient.getBoards).not.toBeCalled()
             expect(JiraClient.getSprints).toBeCalledTimes(1)
-            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, ['active'], 1)
+            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, { limit: 1, state: ["active"] })
         })
         test('cached board, cached sprint', async () => {
             (ObjectsCache.get as jest.MockedFunction<any>)
@@ -117,7 +117,7 @@ describe('API', () => {
             expect(ObjectsCache.add).toBeCalledTimes(1)
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(1, expect.stringMatching(new RegExp(kProject)), [])
             expect(JiraClient.getBoards).toBeCalledTimes(1)
-            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, 1)
+            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, { limit: 1 })
             expect(JiraClient.getSprints).not.toBeCalled()
         })
         test('board found, sprint not found', async () => {
@@ -134,9 +134,9 @@ describe('API', () => {
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(1, expect.stringMatching(new RegExp(kProject)), [kBoard])
             expect(ObjectsCache.add).toHaveBeenNthCalledWith(2, expect.stringMatching(new RegExp(kBoardId.toString())), [])
             expect(JiraClient.getBoards).toBeCalledTimes(1)
-            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, 1)
+            expect(JiraClient.getBoards).toHaveBeenNthCalledWith(1, kProject, { limit: 1 })
             expect(JiraClient.getSprints).toBeCalledTimes(1)
-            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, ['active'], 1)
+            expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, { state: ['active'], limit: 1 })
         })
     })
 
