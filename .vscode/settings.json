@@ -13,6 +13,7 @@
         "issuetype",
         "pullrequest",
         "resolutiondate",
+        "Templater",
         "timeestimate",
         "timeoriginalestimate",
         "timespent",
