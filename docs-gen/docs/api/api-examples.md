@@ -29,3 +29,15 @@ Description
 <%* } %>
 ````
 
+## Dataview
+
+## Obsidian chart
+
+````md
+```dataviewjs
+const projectKey = 'AAA'
+const sprint = await $ji.macro.getActiveSprint(projectKey)
+const chartData = await $ji.chart.getWorklogPerDay(projectKey, sprint.startDate, sprint.endDate)
+renderChart(chartData, this.container)
+```
+````

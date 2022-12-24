@@ -93,6 +93,8 @@ export interface IJiraWorklog {
 export interface IJiraUser {
     active: boolean
     displayName: string
+    key: string
+    emailAddress: string
     self: string
     avatarUrls: {
         '16x16': string

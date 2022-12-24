@@ -1,13 +1,10 @@
 import JiraClient from "../client/jiraClient"
 import { ESprintState, IJiraSprint, IJiraWorklog } from "../interfaces/issueInterfaces"
 import API from "./api"
+import moment from "moment"
 
 function dateTimeToDate(dateTime: string): string {
-    const matches = dateTime.match(/^(\d{4}-\d{2}-\d{2})T.*/)
-    if (matches) {
-        return matches[1]
-    }
-    return null
+    return moment(dateTime).format('YYYY-MM-DD')
 }
 
 export async function getActiveSprint(projectKeyOrId: string): Promise<IJiraSprint> {
@@ -27,11 +24,14 @@ export async function getActiveSprintName(projectKeyOrId: string): Promise<strin
 }
 
 export async function getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSprint): Promise<IJiraWorklog[]> {
-    return await getWorkLogByDates(projectKeyOrId, dateTimeToDate(sprint.startDate), dateTimeToDate(sprint.endDate))
+    return await getWorkLogByDates(projectKeyOrId, sprint.startDate, sprint.endDate)
 }
 
 export async function getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<IJiraWorklog[]> {
-    const searchResults = await JiraClient.getSearchResults(`project = "${projectKeyOrId}" AND worklogDate > ${startDate} AND worklogDate < ${endDate}`, { limit: 50, fields: ['worklog'] })
+    const searchResults = await JiraClient.getSearchResults(
+        `project = "${projectKeyOrId}" AND worklogDate > ${dateTimeToDate(startDate)} AND worklogDate < ${dateTimeToDate(endDate)}`,
+        { limit: 50, fields: ['worklog'] }
+    )
     let worklogs: IJiraWorklog[] = []
     for (const issue of searchResults.issues) {
         if (issue.fields.worklog && issue.fields.worklog.worklogs) {

@@ -2,6 +2,7 @@ import { App, Notice, PluginSettingTab, Setting, TextComponent } from 'obsidian'
 import JiraClient from './client/jiraClient'
 import { COLOR_SCHEMA_DESCRIPTION, EAuthenticationTypes, EColorSchema, ESearchColumnsTypes, IJiraIssueAccountSettings, IJiraIssueSettings, SEARCH_COLUMNS_DESCRIPTION } from './interfaces/settingsInterfaces'
 import JiraIssuePlugin from './main'
+import { getRandomHexColor } from './utils'
 
 const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.OPEN]: 'Open',
@@ -55,15 +56,6 @@ export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
             functions: {},
         },
     },
-}
-
-function getRandomColor() {
-    const letters = '0123456789ABCDEF'
-    let color = '#'
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)]
-    }
-    return color
 }
 
 function deepCopy(obj: any): any {
@@ -344,7 +336,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setIcon('dice')
                 .setTooltip('New random color')
                 .onClick(async () => {
-                    newAccount.color = getRandomColor()
+                    newAccount.color = getRandomHexColor()
                     if (colorTextComponent != null) colorTextComponent.setValue(newAccount.color)
                     colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
                 })).controlEl.children[0]
