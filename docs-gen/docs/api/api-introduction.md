@@ -48,7 +48,7 @@ The responses are cached in order to reduce the network load.
 - [`$ji.defaulted.getIssue(issueKey: string, options: { fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-defaulted#getIssue)
 - [`$ji.defaulted.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-defaulted#getSearchResults)
 
-### API Category - [Macro](/docs/api/api-marco)
+### API Category - [Macro](/docs/api/api-macro)
 
 This category contains functions that perform few Jira API call to get some advanced information. This category is designed to help the user access some data with few steps.
 
@@ -56,10 +56,10 @@ Please open an Issue on GitHub to request more of this functions.
 
 The responses are cached in order to reduce the network load.
 
-- [`$ji.macro.getActiveSprint(projectKeyOrId: string)`](/docs/api/api-marco#getActiveSprint)
-- [`$ji.macro.getActiveSprintName(projectKeyOrId: string)`](/docs/api/api-marco#getActiveSprintName)
-- [`$ji.macro.getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSprint)`](/docs/api/api-marco#getWorkLogBySprint)
-- [`$ji.macro.getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-marco#getWorkLogByDates)
+- [`$ji.macro.getActiveSprint(projectKeyOrId: string)`](/docs/api/api-macro#getActiveSprint)
+- [`$ji.macro.getActiveSprintName(projectKeyOrId: string)`](/docs/api/api-macro#getActiveSprintName)
+- [`$ji.macro.getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSprint)`](/docs/api/api-macro#getWorkLogBySprint)
+- [`$ji.macro.getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogByDates)
 
 ### API Category - [Account](/docs/api/api-account)
 
