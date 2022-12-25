@@ -19,6 +19,7 @@ export const COLOR_SCHEMA_DESCRIPTION = {
 
 export const COMPACT_SYMBOL = '-'
 export const COMMENT_REGEX = /^\s*#/
+export const SECOND_IN_A_DAY = 25200
 
 export interface IJiraIssueSettings {
     accounts: IJiraIssueAccountSettings[]

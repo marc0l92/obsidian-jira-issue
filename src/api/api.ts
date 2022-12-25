@@ -3,7 +3,7 @@ import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import { getActiveSprint, getActiveSprintName, getWorkLogByDates, getWorkLogBySprint } from "./apiMacro"
 import { getDefaultedSearchResults, getIssueDefaulted } from "./apiDefaulted"
-import { getWorklogPerDay } from "./apiChart"
+import { getWorklogPerDay, getWorklogPerUser } from "./apiChart"
 
 type InferArgs<T> = T extends (...t: [...infer Arg]) => any ? Arg : never;
 type InferReturn<T> = T extends (...t: [...infer Arg]) => infer Res ? Res : never;
@@ -43,6 +43,7 @@ const API = {
     },
     chart: {
         getWorklogPerDay: getWorklogPerDay,
+        getWorklogPerUser: getWorklogPerUser,
     },
     account: {
         getAccountByAlias: getAccountByAlias,
