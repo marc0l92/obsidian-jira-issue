@@ -56,7 +56,11 @@ export async function getWorklogPerDay(projectKeyOrId: string, startDate: string
     }
 }
 
-export async function getWorklogPerUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()', format: EChartFormat = EChartFormat.PERCENTAGE) {
+export async function getWorklogPerUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()', options: { format?: EChartFormat, capacity?: ISeries } = {}) {
+    const opt = {
+        format: options.format || EChartFormat.PERCENTAGE,
+        capacity: options.capacity || {},
+    }
     const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
     const series: ISeries = {}
     const intervalStart = moment(startDate)
@@ -71,7 +75,9 @@ export async function getWorklogPerUser(projectKeyOrId: string, startDate: strin
             series[author] += worklog.timeSpentSeconds
         }
     }
-    switch (format) {
+    switch (opt.format) {
+        case EChartFormat.SECONDS:
+            break
         case EChartFormat.DAYS:
             for (const a in series) {
                 series[a] = series[a] / SECOND_IN_A_DAY
@@ -79,10 +85,13 @@ export async function getWorklogPerUser(projectKeyOrId: string, startDate: strin
             break
         case EChartFormat.PERCENTAGE:
             const days = moment(intervalEnd.unix() - intervalStart.unix()).days()
-            for (const a in series) {
-                series[a] = series[a] / days / SECOND_IN_A_DAY * 100
+            for (const author in series) {
+                const capacity = opt.capacity[author] || days
+                series[author] = series[author] / capacity / SECOND_IN_A_DAY * 100
             }
             break
+        default:
+            throw new Error('Invalid chart format')
     }
     // resetRandomGenerator()
     const color = getRandomRGBColor()
@@ -91,7 +100,7 @@ export async function getWorklogPerUser(projectKeyOrId: string, startDate: strin
         data: {
             labels: Object.keys(series),
             datasets: [{
-                label: `Time logged [${EChartFormat.PERCENTAGE}]`,
+                label: `Time logged [${opt.format}]`,
                 data: Object.values(series),
                 backgroundColor: [`rgba(${color.r}, ${color.g}, ${color.b}, 0.2)`],
                 borderColor: [`rgba(${color.r}, ${color.g}, ${color.b}, 1)`],
