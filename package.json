@@ -1,6 +1,6 @@
 {
     "name": "obsidian-jira-issue",
-    "version": "1.44.0",
+    "version": "1.45.0",
     "description": "This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian](https://obsidian.md/) notes.",
     "main": "src/main.js",
     "scripts": {
