@@ -33,8 +33,8 @@ const API = {
         getLoggedUser: cacheWrapper(JiraClient.getLoggedUser),
     },
     defaulted: {
-        getIssue: cacheWrapper(getIssueDefaulted),
-        getSearchResults: cacheWrapper(getDefaultedSearchResults),
+        getIssue: getIssueDefaulted,
+        getSearchResults: getDefaultedSearchResults,
     },
     macro: {
         getActiveSprint: getActiveSprint,
