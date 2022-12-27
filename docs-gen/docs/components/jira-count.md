@@ -16,6 +16,22 @@ project = REF AND status changed to (Done, "Won't Fix", Archived, "Can't Reprodu
 ```
 ````
 
-:::info
-This feature is quite basic, if you have any ideas on how to improve it feel free to [open an issue](https://github.com/marc0l92/obsidian-jira-issue/issues/new) about it.
-:::
+## Advanced usage
+
+It is possible to specify additional attribute to this component
+
+| Keyword | Description | Default | Values |
+| :- | :- | :- | :- |
+| `query` | Query to use with Jira to retrieve the results |  | `string` |
+| `label` | Message to write near the counter | 'Count' | `string` |
+| `account` | Explicitly select an account providing the alias | Try all account by priority | Account alias |
+
+Example:
+
+````
+```jira-search
+query: status = 'In Progress' order by priority DESC
+limit: Issues to complete
+account: Default
+```
+````
