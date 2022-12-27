@@ -249,7 +249,7 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                         }
                     }
                 } else {
-                    createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link', parent: noteCell })
+                    createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link icon-link', parent: noteCell })
                 }
                 break
             case ESearchColumnsTypes.LAST_VIEWED:

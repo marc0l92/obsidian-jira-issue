@@ -516,3 +516,7 @@ th {
         transform: rotate(360deg);
     }
 }
+
+.jira-issue-container .icon-link:hover {
+    text-decoration: none;
+}
