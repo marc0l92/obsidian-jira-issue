@@ -25,139 +25,141 @@ const kInvalidCustomColumn = 'CustomInvalid';
 describe('SearchView', () => {
 
     describe('Constructor', () => {
-        // Positive tests
-        test('legacy query only', () => {
-            const sv = SearchView.fromString(kQuery)
-            expect(sv.query).toEqual(kQuery)
-        })
-        test('Full basic query', () => {
-            const sv = SearchView.fromString(`type: ${kType}
+        describe('Positive tests', () => {
+            test('legacy query only', () => {
+                const sv = SearchView.fromString(kQuery)
+                expect(sv.query).toEqual(kQuery)
+            })
+            test('Full basic query', () => {
+                const sv = SearchView.fromString(`type: ${kType}
 ${kComment}
 query: ${kQuery}
 limit: ${kLimit}
 columns: ${kColumns}
 label: ${kLabel}`)
-            expect(sv.query).toEqual(kQuery)
-            expect(sv.limit).toEqual(kLimit)
-            expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
-            expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
-                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
-                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
-                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
-                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
-                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
-            ])
-            expect(sv.label).toEqual(kLabel)
-            expect(sv.account).toBeNull()
-        })
-        test('List type', () => {
-            const sv = SearchView.fromString(`type: ${ESearchResultsRenderingTypes.LIST}
+                expect(sv.query).toEqual(kQuery)
+                expect(sv.limit).toEqual(kLimit)
+                expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
+                expect(sv.columns).toEqual([
+                    { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
+                ])
+                expect(sv.label).toEqual(kLabel)
+                expect(sv.account).toBeNull()
+            })
+            test('List type', () => {
+                const sv = SearchView.fromString(`type: ${ESearchResultsRenderingTypes.LIST}
             ${kComment}
             query: ${kQuery}
             limit: ${kLimit}`)
-            expect(sv.query).toEqual(kQuery)
-            expect(sv.limit).toEqual(kLimit)
-            expect(sv.type).toEqual(ESearchResultsRenderingTypes.LIST)
-            expect(sv.columns).toEqual([])
-            expect(sv.account).toBeNull()
-        })
-        test('Explicit account', () => {
-            const sv = SearchView.fromString(`type: ${kType}
+                expect(sv.query).toEqual(kQuery)
+                expect(sv.limit).toEqual(kLimit)
+                expect(sv.type).toEqual(ESearchResultsRenderingTypes.LIST)
+                expect(sv.columns).toEqual([])
+                expect(sv.account).toBeNull()
+            })
+            test('Explicit account', () => {
+                const sv = SearchView.fromString(`type: ${kType}
 ${kComment}
 query: ${kQuery}
 limit: ${kLimit}
 columns: ${kColumns}
 account: ${TestAccountOpen.alias}`)
-            expect(sv.query).toEqual(kQuery)
-            expect(sv.limit).toEqual(kLimit)
-            expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
-            expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
-                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
-                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
-                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
-                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
-                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
-            ])
-            expect(sv.account).toEqual(TestAccountOpen)
-        })
-        test('Columns custom fields', () => {
-            const sv = SearchView.fromString(`type: ${kType}
+                expect(sv.query).toEqual(kQuery)
+                expect(sv.limit).toEqual(kLimit)
+                expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
+                expect(sv.columns).toEqual([
+                    { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
+                ])
+                expect(sv.account).toEqual(TestAccountOpen)
+            })
+            test('Columns custom fields', () => {
+                const sv = SearchView.fromString(`type: ${kType}
     ${kComment}
     query: ${kQuery}
     limit: ${kLimit}
     columns: ${kColumns}, $Custom1, ${COMPACT_SYMBOL}$12345, NOTES.field1.field2,`)
-            expect(sv.query).toEqual(kQuery)
-            expect(sv.limit).toEqual(kLimit)
-            expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
-            expect(sv.columns).toEqual([
-                { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
-                { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
-                { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
-                { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
-                { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
-                { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
-                { compact: false, extra: 'Custom1', type: ESearchColumnsTypes.CUSTOM_FIELD },
-                { compact: true, extra: '12345', type: ESearchColumnsTypes.CUSTOM_FIELD },
-                { compact: false, extra: 'field1.field2', type: ESearchColumnsTypes.NOTES },
-            ])
-            expect(sv.account).toBeNull()
+                expect(sv.query).toEqual(kQuery)
+                expect(sv.limit).toEqual(kLimit)
+                expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
+                expect(sv.columns).toEqual([
+                    { compact: false, extra: '', type: ESearchColumnsTypes.KEY },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.SUMMARY },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.ASSIGNEE },
+                    { compact: true, extra: '', type: ESearchColumnsTypes.REPORTER },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
+                    { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
+                    { compact: false, extra: 'Custom1', type: ESearchColumnsTypes.CUSTOM_FIELD },
+                    { compact: true, extra: '12345', type: ESearchColumnsTypes.CUSTOM_FIELD },
+                    { compact: false, extra: 'field1.field2', type: ESearchColumnsTypes.NOTES },
+                ])
+                expect(sv.account).toBeNull()
+            })
         })
 
-        // Negative tests
-        test('Invalid keyword key', () => {
-            expect(() => SearchView.fromString(`type: ${kType}
+        describe('Negative tests', () => {
+            test('Invalid keyword key', () => {
+                expect(() => SearchView.fromString(`type: ${kType}
         ${kComment}
         query: ${kQuery}
         limit: ${kLimit}
         ${kInvalidKey}: ${kInvalidValue}
         columns: ${kColumns}`)).toThrow(new Error(`Invalid key: ${kInvalidKey}`))
-        })
-        test('Invalid type', () => {
-            expect(() => SearchView.fromString(`type: ${kTypeInvalid}
+            })
+            test('Invalid type', () => {
+                expect(() => SearchView.fromString(`type: ${kTypeInvalid}
         ${kComment}
         query: ${kQuery}
         limit: ${kLimit}
         columns: ${kColumns}`)).toThrow(new Error(`Invalid type: ${kTypeInvalid}`))
-        })
-        test('Invalid limit', () => {
-            expect(() => SearchView.fromString(`type: ${kType}
+            })
+            test('Invalid limit', () => {
+                expect(() => SearchView.fromString(`type: ${kType}
         ${kComment}
         query: ${kQuery}
         limit: ${kLimitInvalid}
         columns: ${kColumns}`)).toThrow(new Error(`Invalid limit: ${kLimitInvalid}`))
-        })
-        test('List type with custom columns', () => {
-            expect(() => SearchView.fromString(`type: ${ESearchResultsRenderingTypes.LIST}
+            })
+            test('List type with custom columns', () => {
+                expect(() => SearchView.fromString(`type: ${ESearchResultsRenderingTypes.LIST}
             ${kComment}
             query: ${kQuery}
             limit: ${kLimit}
             columns: ${kColumns}`)).toThrow(new Error(`Type LIST and custom columns are not compatible options`))
-        })
-        test('Standard columns not found', () => {
-            expect(() => SearchView.fromString(`type: ${kType}
+            })
+            test('Standard columns not found', () => {
+                expect(() => SearchView.fromString(`type: ${kType}
     ${kComment}
     query: ${kQuery}
     limit: ${kLimit}
     columns: ${kColumns}, ${kInvalidCustomColumn},`))
-                .toThrow(new Error(`Invalid column: ${kInvalidCustomColumn.toUpperCase()}`))
-        })
-        test('Custom columns not found', () => {
-            expect(() => SearchView.fromString(`type: ${kType}
+                    .toThrow(new Error(`Invalid column: ${kInvalidCustomColumn.toUpperCase()}`))
+            })
+            test('Custom columns not found', () => {
+                expect(() => SearchView.fromString(`type: ${kType}
     ${kComment}
     query: ${kQuery}
     limit: ${kLimit}
     columns: ${kColumns}, $${kInvalidCustomColumn},`))
-                .toThrow(new Error(`Custom field ${kInvalidCustomColumn} not found`))
-        })
-        test('Legacy compact column not supported', () => {
-            expect(() => SearchView.fromString(`type: ${kType}
+                    .toThrow(new Error(`Custom field ${kInvalidCustomColumn} not found`))
+            })
+            test('Legacy compact column not supported', () => {
+                expect(() => SearchView.fromString(`type: ${kType}
     ${kComment}
     query: ${kQuery}
     limit: ${kLimit}
     columns: ${kColumns}, #${kInvalidCustomColumn},`))
-                .toThrow(new Error(`Please replace the symbol "#" with "${COMPACT_SYMBOL}" to use the compact format`))
+                    .toThrow(new Error(`Please replace the symbol "#" with "${COMPACT_SYMBOL}" to use the compact format`))
+            })
         })
     })
 

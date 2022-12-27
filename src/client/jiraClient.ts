@@ -93,9 +93,9 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
         }
     }
 
-    if (response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
+    if (response && response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
         throw new Error(response.json.errorMessages.join('\n'))
-    } else if (response.status) {
+    } else if (response && response.status) {
         throw new Error(`HTTP status ${response.status}`)
     } else {
         throw new Error(response as any)
