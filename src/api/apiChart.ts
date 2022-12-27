@@ -1,7 +1,7 @@
 import moment from "moment"
-import { IMultiSeries, ISeries } from "src/interfaces/issueInterfaces"
-import { SECOND_IN_A_DAY } from "src/interfaces/settingsInterfaces"
-import { getRandomRGBColor, resetRandomGenerator } from "src/utils"
+import { IMultiSeries, ISeries } from "../interfaces/issueInterfaces"
+import { SECOND_IN_A_DAY } from "../interfaces/settingsInterfaces"
+import { getRandomRGBColor, resetRandomGenerator } from "../utils"
 import API from "./api"
 
 enum EChartFormat {

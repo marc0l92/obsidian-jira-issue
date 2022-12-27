@@ -117,6 +117,6 @@ export class SearchView {
     }
 
     getCacheKey(): string {
-        return this.query + this.limit + (this.account ? this.account.alias : '')
+        return this.query + (this.limit || '') + (this.account ? this.account.alias : '')
     }
 }

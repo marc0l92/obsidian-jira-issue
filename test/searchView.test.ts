@@ -1,9 +1,12 @@
+jest.mock('colorsys')
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+
 import { COMPACT_SYMBOL, ESearchColumnsTypes, ESearchResultsRenderingTypes } from '../src/interfaces/settingsInterfaces'
 import { SearchView } from '../src/searchView'
 import { TestAccountOpen } from './__mocks__/settings'
 
 const kQuery = `status = 'In Progress' order by priority DESC`
-const kLimit = '10'
+const kLimit = 10
 const kLimitInvalid = 'xx'
 const kComment = '# This is a comment'
 const kType = 'TABLE'
@@ -13,7 +16,6 @@ const kInvalidKey = 'invalidKey'
 const kInvalidValue = 'invalidValue'
 const kInvalidCustomColumn = 'CustomInvalid'
 
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('SearchView', () => {
 
@@ -210,7 +212,7 @@ query: ${kQuery}
 \`\`\``)
         })
         test('getCacheKey', () => {
-            expect(sv.getCacheKey()).toEqual(`${kQuery}`)
+            expect(sv.getCacheKey()).toEqual(kQuery)
         })
         test('toRawString zero columns', () => {
             sv = SearchView.fromString(`type: ${kType}
