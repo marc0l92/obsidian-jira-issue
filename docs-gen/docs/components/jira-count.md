@@ -29,9 +29,9 @@ It is possible to specify additional attribute to this component
 Example:
 
 ````
-```jira-search
+```jira-count
 query: status = 'In Progress' order by priority DESC
-limit: Issues to complete
+label: Issues to complete
 account: Default
 ```
 ````
