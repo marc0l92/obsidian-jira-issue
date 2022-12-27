@@ -18,7 +18,7 @@ Retrieve all details related to an issue based on the key. Use the parameter `op
 | options.fields | False | `string[]` | Most of the fields | List of fields to retrieve |
 | options.account | False | `IJiraIssueAccountSettings` | Automatically detect | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraIssue>`
+Return value type: [`Promise<IJiraIssue>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L3-L79)
 
 ## getSearchResults
 - `$ji.base.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`
@@ -32,7 +32,7 @@ Execute a JQL query to get all the matching issues.
 | options.fields | False | `string[]` | Most of the fields | List of fields to retrieve |
 | options.account | False | `IJiraIssueAccountSettings` | Automatically detect | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraSearchResults>`
+Return value type: [`Promise<IJiraSearchResults>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L107-L113)
 
 ## getDevStatus
 - `$ji.base.getDevStatus(issueId: string, options: { account?: IJiraIssueAccountSettings } = {})`
@@ -47,7 +47,7 @@ To check your the list of Authorized Application go to [`Profile > Tools > View 
 | issueId | True | `string` | - | Issue ID. The id can be found using the [getIssue](/docs/api/api-base#getIssue) API. |
 | options.account | False | `IJiraIssueAccountSettings` | Automatically detect | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraDevStatus>`
+Return value type: [`Promise<IJiraDevStatus>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L163-L202)
 
 ## getBoards
 - `$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {})`
@@ -60,7 +60,7 @@ Retrieve list of boards associated to a project.
 | options.limit | False | `number > 0` | Configured in Settings | Maximum number of boards to extract |
 | options.account | False | `IJiraIssueAccountSettings` | Automatically detect | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraBoard[]>`
+Return value type: [`Promise<IJiraBoard[]>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L204-L208)
 
 ## getSprints
 - `$ji.base.getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`
@@ -73,7 +73,7 @@ Retrieve list of sprints associated to a board.
 | options.limit | False | `number > 0` | Configured in Settings | Maximum number of sprints to extract |
 | options.account | False | `IJiraIssueAccountSettings` | Automatically detect | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraSprint[]>`
+Return value type: [`Promise<IJiraSprint[]>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L210-L220)
 
 ## getLoggedUser
 - `$ji.base.getLoggedUser(account: IJiraIssueAccountSettings = null)`
@@ -84,4 +84,4 @@ Retrieve information related to the user associated to the credentials configure
 |-|-|-|-|-|
 | account | True | `IJiraIssueAccountSettings` | - | Jira account to use. Use the [util api](/docs/api/api-util) to retrieve an account object. |
 
-Return value type: `Promise<IJiraUser>`
+Return value type: [`Promise<IJiraUser>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L93-L105)

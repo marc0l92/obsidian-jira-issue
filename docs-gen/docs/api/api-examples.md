@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 ---
 # API Examples
 
@@ -32,6 +32,8 @@ Description
 ## Dataview
 
 ## Obsidian chart
+
+getWorklogPerDay
 
 ````md
 ```dataviewjs
