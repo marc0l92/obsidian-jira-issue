@@ -3,8 +3,8 @@ import { IJiraIssueAccountSettings } from "../interfaces/settingsInterfaces"
 import ObjectsCache from "../objectsCache"
 import JiraClient from "../client/jiraClient"
 
-type InferArgs<T> = T extends (...t: [...infer Arg]) => any ? Arg : never;
-type InferReturn<T> = T extends (...t: [...infer Arg]) => infer Res ? Res : never;
+type InferArgs<T> = T extends (...t: [...infer Arg]) => any ? Arg : never
+type InferReturn<T> = T extends (...t: [...infer Arg]) => infer Res ? Res : never
 
 function cacheWrapper<TFunc extends (...args: any[]) => any>(func: TFunc)
     : (...args: InferArgs<TFunc>) => InferReturn<TFunc> {

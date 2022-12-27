@@ -88,7 +88,7 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
             if (response.status === 200) {
                 return { ...response.json, account: account }
             } else if (Math.floor(response.status / 100) !== 4) {
-                break;
+                break
             }
         }
     }

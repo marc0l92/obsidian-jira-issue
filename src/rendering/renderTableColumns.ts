@@ -18,9 +18,9 @@ function dateToStr(fullDate: string): string {
 
 function deltaToStr(delta: number): string {
     if (delta) {
-        const h = Math.floor(delta / 3600);
-        const m = Math.floor(delta % 3600 / 60);
-        const s = Math.floor(delta % 3600 % 60);
+        const h = Math.floor(delta / 3600)
+        const m = Math.floor(delta % 3600 / 60)
+        const s = Math.floor(delta % 3600 % 60)
         let timeStr = ''
         if (h > 0) {
             timeStr += h + 'h'
