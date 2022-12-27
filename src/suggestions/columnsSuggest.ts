@@ -19,10 +19,12 @@ export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
         const cursorLine = editor.getLine(cursor.line)
         // check line contains prefix "columns:"
         if (!cursorLine.match(/^\s*columns\s*:/)) {
+            // console.log('!check line contains prefix "columns:"')
             return null
         }
         // check cursor is after "columns:"
         if (!cursorLine.substring(0, cursor.ch).match(/^\s*columns\s*:/)) {
+            // console.log('!check cursor is after "columns:"')
             return null
         }
         // check cursor inside jira-search fence
@@ -35,6 +37,7 @@ export class ColumnsSuggest extends EditorSuggest<SuggestionEntry> {
             }
         }
         if (!jiraSearchFenceStartFound) {
+            // console.log('!check cursor inside jira-search fence')
             return null
         }
 
