@@ -4,10 +4,11 @@ import { getAccountByAlias } from "./utils"
 
 export class SearchView {
     type: ESearchResultsRenderingTypes = ESearchResultsRenderingTypes.TABLE
-    query = ''
-    limit = ''
+    query: string = ''
+    limit: number = null
     columns: ISearchColumn[] = []
     account: IJiraIssueAccountSettings = null
+    label: string = null
 
     static fromString(str: string): SearchView {
         const sv = new SearchView()
@@ -34,7 +35,7 @@ export class SearchView {
                         break
                     case 'limit':
                         if (parseInt(value)) {
-                            sv.limit = parseInt(value).toString()
+                            sv.limit = parseInt(value)
                         } else {
                             throw new Error(`Invalid limit: ${value}`)
                         }
@@ -78,6 +79,9 @@ export class SearchView {
                         break
                     case 'account':
                         sv.account = getAccountByAlias(value)
+                        break
+                    case 'label':
+                        sv.label = value
                         break
                     default:
                         throw new Error(`Invalid key: ${key.trim()}`)

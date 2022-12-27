@@ -18,7 +18,6 @@ async function renderSearchResults(rootEl: HTMLElement, searchView: SearchView, 
     }
 }
 
-
 async function renderSearchResultsTable(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): Promise<void> {
     const table = createEl('table', { cls: `table is-bordered is-striped is-narrow is-hoverable is-fullwidth ${RC.getTheme()}` })
     renderSearchResultsTableHeader(table, searchView, searchResults.account)
@@ -117,7 +116,7 @@ export const SearchFenceRenderer = async (source: string, rootEl: HTMLElement, c
         } else {
             // console.log(`Search results not available in the cache`)
             RC.renderLoadingItem('Loading...')
-            JiraClient.getSearchResults(searchView.query, { limit: parseInt(searchView.limit) || SettingsData.searchResultsLimit, account: searchView.account })
+            JiraClient.getSearchResults(searchView.query, { limit: searchView.limit || SettingsData.searchResultsLimit, account: searchView.account })
                 .then(newSearchResults => {
                     searchView.account = newSearchResults.account
                     const searchResults = ObjectsCache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults

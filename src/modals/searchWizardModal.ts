@@ -38,9 +38,9 @@ export class SearchWizardModal extends Modal {
             .setName('Search results limit')
             .addText(text => text
                 .setPlaceholder(`Use default value: ${SettingsData.searchResultsLimit}`)
-                .setValue(this._searchView.limit)
+                .setValue(this._searchView.limit ? this._searchView.limit.toString() : '')
                 .onChange(async value => {
-                    this._searchView.limit = value ? (parseInt(value).toString() || '') : ''
+                    this._searchView.limit = value ? (parseInt(value) || null) : null
                 }))
 
         const desc = document.createDocumentFragment()

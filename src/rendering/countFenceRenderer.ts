@@ -5,31 +5,34 @@ import ObjectsCache from "../objectsCache"
 import RC from "./renderingCommon"
 import { SearchView } from "../searchView"
 
-function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, query: string): void {
+function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, searchView: SearchView): void {
     const tagsRow = createDiv('ji-tags has-addons')
     RC.renderAccountColorBand(searchResults.account, tagsRow)
-    createSpan({ cls: `ji-tag is-link ${RC.getTheme()}`, text: `Count`, title: query, parent: tagsRow })
-    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: searchResults.total.toString(), title: query, parent: tagsRow })
+    if (searchView.label !== '') {
+        createSpan({ cls: `ji-tag is-link ${RC.getTheme()}`, text: searchView.label || `Count`, title: searchView.query, parent: tagsRow })
+    }
+    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: searchResults.total.toString(), title: searchView.query, parent: tagsRow })
     el.replaceChildren(RC.renderContainer([tagsRow]))
 }
 
 export const CountFenceRenderer = async (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> => {
     // console.log(`Search query: ${source}`)
-    const cachedSearchResults = ObjectsCache.get(source)
+    const searchView = SearchView.fromString(source)
+    const cachedSearchResults = ObjectsCache.get(searchView.getCacheKey())
     if (cachedSearchResults) {
         if (cachedSearchResults.isError) {
-            RC.renderSearchError(el, source, cachedSearchResults.data as SearchView)
+            RC.renderSearchError(el, cachedSearchResults.data as string, searchView)
         } else {
-            renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults), source)
+            renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults), searchView)
         }
     } else {
         RC.renderLoadingItem('Loading...')
-        JiraClient.getSearchResults(source, { limit: 1 }).then(newSearchResults => {
-            const searchResults = ObjectsCache.add(source, newSearchResults).data as IJiraSearchResults
-            renderSearchCount(el, searchResults, source)
+        JiraClient.getSearchResults(searchView.query, { limit: 1 }).then(newSearchResults => {
+            const searchResults = ObjectsCache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults
+            renderSearchCount(el, searchResults, searchView)
         }).catch(err => {
-            ObjectsCache.add(source, err, true)
-            RC.renderSearchError(el, source, err)
+            ObjectsCache.add(searchView.getCacheKey(), err, true)
+            RC.renderSearchError(el, err, searchView)
         })
     }
 }
