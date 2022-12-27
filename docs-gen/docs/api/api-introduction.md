@@ -34,6 +34,7 @@ The responses are cached in order to reduce the network load.
 - [`$ji.base.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSearchResults)
 - [`$ji.base.getDevStatus(issueId: string, options: { account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getDevStatus)
 - [`$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getBoards)
+- [`$ji.base.getSprint(sprintId: number, options: { account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSprint)
 - [`$ji.base.getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSprints)
 - [`$ji.base.getLoggedUser(account: IJiraIssueAccountSettings = null)`](/docs/api/api-base#getLoggedUser)
 
@@ -59,7 +60,17 @@ The responses are cached in order to reduce the network load.
 - [`$ji.macro.getActiveSprint(projectKeyOrId: string)`](/docs/api/api-macro#getActiveSprint)
 - [`$ji.macro.getActiveSprintName(projectKeyOrId: string)`](/docs/api/api-macro#getActiveSprintName)
 - [`$ji.macro.getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSprint)`](/docs/api/api-macro#getWorkLogBySprint)
+- [`$ji.macro.getWorkLogBySprintId(projectKeyOrId: string, sprintId: number)`](/docs/api/api-macro#getWorkLogBySprintId)
 - [`$ji.macro.getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogByDates)
+- [`$ji.macro.getWorkLogByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogByUser)
+- [`$ji.macro.getVelocity(projectKeyOrId: string, sprintId: number, storyPointFieldName: string = 'aggregatetimeoriginalestimate')`](/docs/api/api-macro#getVelocity)
+
+### API Category - [Chart](/docs/api/api-chart)
+
+This category contains functions to generate charts using the community plugin [Obsidian-Charts](https://github.com/phibr0/obsidian-charts).
+
+- [`$ji.chart.getWorklogPerDay(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-chart#getWorklogPerDay)
+- [`$ji.chart.getWorklogPerUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()', options: { format?: EChartFormat, capacity?: ISeries } = {})`](/docs/api/api-chart#getWorklogPerUser)
 
 ### API Category - [Account](/docs/api/api-account)
 
