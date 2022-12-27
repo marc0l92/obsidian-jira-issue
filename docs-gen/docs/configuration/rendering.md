@@ -12,9 +12,9 @@ You can override this setting in the `jira-search` fence by using the `limit` at
 
 [Read more...](/docs/components/jira-search)
 
-## Dark mode
+## Color schema
 
-This setting allows you to enable the dark mode of the plugin.
+This setting allows you to enable the dark/light mode of the plugin components rendering.
 
 Examples:
 
