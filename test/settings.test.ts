@@ -1,8 +1,8 @@
-import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
-import { DEFAULT_ACCOUNT, DEFAULT_SETTINGS, JiraIssueSettingTab, SettingsData } from "../src/settings"
-
 jest.mock('obsidian')
 jest.mock('../src/client/jiraClient', () => jest.requireActual('./__mocks__/jiraClient').default)
+
+import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
+import { DEFAULT_ACCOUNT, DEFAULT_SETTINGS, JiraIssueSettingTab, SettingsData } from "../src/settings"
 
 function deepCopy(obj: any): any {
     return JSON.parse(JSON.stringify(obj))

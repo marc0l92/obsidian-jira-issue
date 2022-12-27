@@ -1,9 +1,9 @@
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+
 import { getAccountByAlias, getAccountByHost } from '../src/utils'
 import { TestAccountBasic, TestAccountOpen } from './__mocks__/settings'
 
 const kAccountNotFound = 'NotExistingAlias'
-
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('Utils', () => {
     test('getAccountByAlias ok', () => {

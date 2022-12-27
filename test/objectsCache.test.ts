@@ -1,3 +1,5 @@
+jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+
 import ObjectsCache from '../src/objectsCache'
 
 const kKey1 = 'key1'
@@ -6,8 +8,6 @@ const kVal1 = 'val1'
 const kVal2 = 'val2'
 const kFakeDateNow = new Date('2000-01-01')
 const kFakeDateAfterExpiration = new Date('2000-01-02')
-
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
 
 describe('ObjectsCache', () => {
     beforeEach(() => {
