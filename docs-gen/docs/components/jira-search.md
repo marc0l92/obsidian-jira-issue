@@ -110,3 +110,13 @@ You can also access the frontmatter section of the linked notes using the [jsonp
 query: status = 'In Progress' order by priority DESC
 columns: key, notes, notes.title, notes.status, notes.tags, notes.tags[0], notes..book[?(@.price<30 && @.category=="fiction")]
 ```
+
+## Footer
+
+At the bottom of each search table you have several information:
+- Total results of the query
+- Alias of the account used
+- Last execution date
+- Refresh results button
+
+![searchFooter](/img/searchFooter.png)
