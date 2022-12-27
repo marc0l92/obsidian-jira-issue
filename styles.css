@@ -98,6 +98,8 @@
 .jira-issue-container .search-footer button>svg {
     height: 1.5em;
     width: 1.5em;
+    fill: none;
+    stroke: currentColor;
 }
 
 /* ji-tags */
@@ -447,14 +449,6 @@ th {
     text-decoration: line-through;
 }
 
-.jira-issue-container table svg {
-    fill: #363636
-}
-
-.jira-issue-container table.is-dark svg {
-    fill: #dadada
-}
-
 .jira-issue-container span.pull-request-tag {
     padding: 1px 3px;
     line-height: 1.5;
@@ -500,6 +494,8 @@ th {
 .jira-issue-container .pull-request-tag>svg {
     height: 1em;
     width: 1em;
+    stroke: none;
+    fill: currentColor;
 }
 
 .jira-issue-container .rotate-animation {
@@ -519,4 +515,14 @@ th {
 
 .jira-issue-container .icon-link:hover {
     text-decoration: none;
+}
+
+svg.svg-icon.visible {
+    stroke: none;
+    fill: currentColor;
+}
+
+svg.svg-icon.hidden {
+    stroke: none;
+    fill: currentColor;
 }

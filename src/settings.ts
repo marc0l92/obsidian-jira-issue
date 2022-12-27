@@ -11,8 +11,6 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
     [EAuthenticationTypes.BEARER_TOKEN]: 'Bearer Token',
 }
 
-const HIDDEN_PASSWORD_PLACEHOLDER = '********'
-
 export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     accounts: [],
     apiBasePath: '/rest/api/latest',
@@ -43,7 +41,7 @@ export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
     alias: 'Default',
     host: 'https://mycompany.atlassian.net',
     authenticationType: EAuthenticationTypes.OPEN,
-    password: HIDDEN_PASSWORD_PLACEHOLDER,
+    password: '',
     priority: 1,
     color: '#000000',
     cache: {
@@ -66,6 +64,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
     private _onChangeListener: (() => void) | null = null
     private _searchColumnsDetails: HTMLDetailsElement = null
+    private _showPassword: boolean = false
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
@@ -256,6 +255,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setValue(newAccount.authenticationType)
                 .onChange(async value => {
                     newAccount.authenticationType = value as EAuthenticationTypes
+                    this._showPassword = false
                     // Force refresh
                     this.displayModifyAccountPage(prevAccount, newAccount)
                 }))
@@ -274,9 +274,17 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setDesc('Password to access your Jira Server account using HTTP basic authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
+                    .setValue(newAccount.password)
                     .onChange(async value => {
                         newAccount.password = value
+                    }).inputEl.setAttr('type', this._showPassword ? 'text' : 'password'))
+                .addExtraButton(button => button
+                    .setIcon(this._showPassword ? 'hidden' : 'visible')
+                    .setTooltip(this._showPassword ? 'Hide password' : 'Show password')
+                    .onClick(async () => {
+                        this._showPassword = !this._showPassword
+                        // Force refresh
+                        this.displayModifyAccountPage(prevAccount, newAccount)
                     }))
         } else if (newAccount.authenticationType === EAuthenticationTypes.CLOUD) {
             new Setting(containerEl)
@@ -292,9 +300,17 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setName('API Token')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
+                    .setValue(newAccount.password)
                     .onChange(async value => {
                         newAccount.password = value
+                    }).inputEl.setAttr('type', this._showPassword ? 'text' : 'password'))
+                .addExtraButton(button => button
+                    .setIcon(this._showPassword ? 'hidden' : 'visible')
+                    .setTooltip(this._showPassword ? 'Hide password' : 'Show password')
+                    .onClick(async () => {
+                        this._showPassword = !this._showPassword
+                        // Force refresh
+                        this.displayModifyAccountPage(prevAccount, newAccount)
                     }))
                 .descEl
             apiTokenDescription.appendText('API token of your Jira Cloud account (')
@@ -310,9 +326,17 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setDesc('Token to access your Jira account using OAuth3 Bearer token authentication.')
                 .addText(text => text
                     // .setPlaceholder('')
-                    .setValue(HIDDEN_PASSWORD_PLACEHOLDER)
+                    .setValue(newAccount.bareToken)
                     .onChange(async value => {
                         newAccount.bareToken = value
+                    }).inputEl.setAttr('type', this._showPassword ? 'text' : 'password'))
+                .addExtraButton(button => button
+                    .setIcon(this._showPassword ? 'hidden' : 'visible')
+                    .setTooltip(this._showPassword ? 'Hide password' : 'Show password')
+                    .onClick(async () => {
+                        this._showPassword = !this._showPassword
+                        // Force refresh
+                        this.displayModifyAccountPage(prevAccount, newAccount)
                     }))
         }
         new Setting(containerEl)
@@ -354,6 +378,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setButtonText("Back")
                 .setWarning()
                 .onClick(async value => {
+                    this._showPassword = false
                     this.display()
                 }))
             .addButton(button => button
@@ -382,6 +407,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setButtonText("Save")
                 .setCta()
                 .onClick(async value => {
+                    this._showPassword = false
                     // Swap priority with another existing account
                     SettingsData.accounts.find(a => a.priority === newAccount.priority).priority = prevAccount.priority
                     Object.assign(prevAccount, newAccount)
