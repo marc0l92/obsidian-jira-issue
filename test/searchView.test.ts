@@ -1,9 +1,11 @@
 jest.mock('colorsys')
 jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+jest.mock('../src/utils', () => { return { getAccountByAlias: jest.fn() } })
 
 import { COMPACT_SYMBOL, ESearchColumnsTypes, ESearchResultsRenderingTypes } from '../src/interfaces/settingsInterfaces'
 import { SearchView } from '../src/searchView'
 import { TestAccountOpen } from './__mocks__/settings'
+import * as Utils from '../src/utils'
 
 const kQuery = `status = 'In Progress' order by priority DESC`
 const kLimit = 10
@@ -14,8 +16,9 @@ const kTypeInvalid = 'NOT_SUPPORTED'
 const kColumns = ` KEY, summary, ${COMPACT_SYMBOL}ASSIgnee,    ${COMPACT_SYMBOL}REPORTER, STATUS, NOTES`
 const kInvalidKey = 'invalidKey'
 const kInvalidValue = 'invalidValue'
-const kInvalidCustomColumn = 'CustomInvalid'
+const kInvalidCustomColumn = 'CustomInvalid';
 
+(Utils.getAccountByAlias as jest.MockedFunction<any>).mockReturnValue(TestAccountOpen);
 
 describe('SearchView', () => {
 
@@ -225,6 +228,9 @@ query: ${kQuery}
         })
     })
 
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
 })
 
 export { }
