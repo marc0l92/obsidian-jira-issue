@@ -1,36 +1,19 @@
 import { getAccountByAlias, getAccountByHost } from "../utils"
-import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import { getActiveSprint, getActiveSprintName, getVelocity, getWorkLogByDates, getWorkLogBySprint, getWorkLogBySprintId, getWorkLogByUser } from "./apiMacro"
 import { getDefaultedSearchResults, getIssueDefaulted } from "./apiDefaulted"
 import { getWorklogPerDay, getWorklogPerUser } from "./apiChart"
-
-type InferArgs<T> = T extends (...t: [...infer Arg]) => any ? Arg : never;
-type InferReturn<T> = T extends (...t: [...infer Arg]) => infer Res ? Res : never;
-
-function cacheWrapper<TFunc extends (...args: any[]) => any>(func: TFunc)
-    : (...args: InferArgs<TFunc>) => InferReturn<TFunc> {
-    return (...args: InferArgs<TFunc>) => {
-        const cacheKey = `api-${func.name}-${JSON.stringify(args)}`
-        const cacheVal = ObjectsCache.get(cacheKey)
-        if (cacheVal) {
-            return cacheVal.data
-        }
-        const returnValue = func(...args)
-        ObjectsCache.add(cacheKey, returnValue)
-        return returnValue
-    }
-}
+import { getBoards, getDevStatus, getIssue, getLoggedUser, getSearchResults, getSprint, getSprints } from "./apiBase"
 
 const API = {
     base: {
-        getIssue: cacheWrapper(JiraClient.getIssue),
-        getSearchResults: cacheWrapper(JiraClient.getSearchResults),
-        getDevStatus: cacheWrapper(JiraClient.getDevStatus),
-        getBoards: cacheWrapper(JiraClient.getBoards),
-        getSprint: cacheWrapper(JiraClient.getSprint),
-        getSprints: cacheWrapper(JiraClient.getSprints),
-        getLoggedUser: cacheWrapper(JiraClient.getLoggedUser),
+        getIssue: getIssue,
+        getSearchResults: getSearchResults,
+        getDevStatus: getDevStatus,
+        getBoards: getBoards,
+        getSprint: getSprint,
+        getSprints: getSprints,
+        getLoggedUser: getLoggedUser,
     },
     defaulted: {
         getIssue: getIssueDefaulted,
