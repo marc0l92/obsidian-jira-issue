@@ -1,14 +1,8 @@
 import moment from "moment"
+import { IMultiSeries, ISeries } from "src/interfaces/issueInterfaces"
 import { SECOND_IN_A_DAY } from "src/interfaces/settingsInterfaces"
 import { getRandomRGBColor, resetRandomGenerator } from "src/utils"
 import API from "./api"
-
-interface IMultiSeries {
-    [user: string]: ISeries
-}
-interface ISeries {
-    [date: string]: number
-}
 
 enum EChartFormat {
     SECONDS = 'Seconds',
@@ -61,20 +55,7 @@ export async function getWorklogPerUser(projectKeyOrId: string, startDate: strin
         format: options.format || EChartFormat.PERCENTAGE,
         capacity: options.capacity || {},
     }
-    const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
-    const series: ISeries = {}
-    const intervalStart = moment(startDate)
-    const intervalEnd = moment(endDate)
-    for (const worklog of worklogs) {
-        const author = worklog.author.key
-        if (!(author in series)) {
-            series[author] = 0
-        }
-        const worklogStart = moment(worklog.started)
-        if (intervalStart <= worklogStart && worklogStart <= intervalEnd) {
-            series[author] += worklog.timeSpentSeconds
-        }
-    }
+    const series = await API.macro.getWorkLogByUser(projectKeyOrId, startDate, endDate)
     switch (opt.format) {
         case EChartFormat.SECONDS:
             break
@@ -84,7 +65,7 @@ export async function getWorklogPerUser(projectKeyOrId: string, startDate: strin
             }
             break
         case EChartFormat.PERCENTAGE:
-            const days = moment(intervalEnd.unix() - intervalStart.unix()).days()
+            const days = moment(moment(endDate).unix() - moment(startDate).unix()).days()
             for (const author in series) {
                 const capacity = opt.capacity[author] || days
                 series[author] = series[author] / capacity / SECOND_IN_A_DAY * 100

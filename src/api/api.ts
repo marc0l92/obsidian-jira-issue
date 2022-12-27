@@ -1,7 +1,7 @@
 import { getAccountByAlias, getAccountByHost } from "../utils"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
-import { getActiveSprint, getActiveSprintName, getWorkLogByDates, getWorkLogBySprint } from "./apiMacro"
+import { getActiveSprint, getActiveSprintName, getVelocity, getWorkLogByDates, getWorkLogBySprint, getWorkLogBySprintId, getWorkLogByUser } from "./apiMacro"
 import { getDefaultedSearchResults, getIssueDefaulted } from "./apiDefaulted"
 import { getWorklogPerDay, getWorklogPerUser } from "./apiChart"
 
@@ -28,6 +28,7 @@ const API = {
         getSearchResults: cacheWrapper(JiraClient.getSearchResults),
         getDevStatus: cacheWrapper(JiraClient.getDevStatus),
         getBoards: cacheWrapper(JiraClient.getBoards),
+        getSprint: cacheWrapper(JiraClient.getSprint),
         getSprints: cacheWrapper(JiraClient.getSprints),
         getLoggedUser: cacheWrapper(JiraClient.getLoggedUser),
     },
@@ -39,7 +40,10 @@ const API = {
         getActiveSprint: getActiveSprint,
         getActiveSprintName: getActiveSprintName,
         getWorkLogBySprint: getWorkLogBySprint,
+        getWorkLogBySprintId: getWorkLogBySprintId,
         getWorkLogByDates: getWorkLogByDates,
+        getWorkLogByUser: getWorkLogByUser,
+        getVelocity: getVelocity,
     },
     chart: {
         getWorklogPerDay: getWorklogPerDay,

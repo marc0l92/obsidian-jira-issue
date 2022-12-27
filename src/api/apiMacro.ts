@@ -1,5 +1,4 @@
-import JiraClient from "../client/jiraClient"
-import { ESprintState, IJiraSprint, IJiraWorklog } from "../interfaces/issueInterfaces"
+import { ESprintState, IJiraSprint, IJiraWorklog, ISeries } from "../interfaces/issueInterfaces"
 import API from "./api"
 import moment from "moment"
 
@@ -27,8 +26,13 @@ export async function getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSp
     return await getWorkLogByDates(projectKeyOrId, sprint.startDate, sprint.endDate)
 }
 
+export async function getWorkLogBySprintId(projectKeyOrId: string, sprintId: number): Promise<IJiraWorklog[]> {
+    const sprint = await API.base.getSprint(sprintId)
+    return await getWorkLogByDates(projectKeyOrId, sprint.startDate, sprint.endDate)
+}
+
 export async function getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<IJiraWorklog[]> {
-    const searchResults = await JiraClient.getSearchResults(
+    const searchResults = await API.base.getSearchResults(
         `project = "${projectKeyOrId}" AND worklogDate > ${dateTimeToDate(startDate)} AND worklogDate < ${dateTimeToDate(endDate)}`,
         { limit: 50, fields: ['worklog'] }
     )
@@ -39,4 +43,29 @@ export async function getWorkLogByDates(projectKeyOrId: string, startDate: strin
         }
     }
     return worklogs
+}
+
+export async function getWorkLogByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<ISeries> {
+    const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
+    const series: ISeries = {}
+    for (const worklog of worklogs) {
+        const author = worklog.author.key
+        if (!(author in series)) {
+            series[author] = 0
+        }
+        series[author] += worklog.timeSpentSeconds
+    }
+    return series
+}
+
+export async function getVelocity(projectKeyOrId: string, sprintId: number, storyPointFieldName: string = 'aggregatetimeoriginalestimate') {
+    const searchResults = await API.base.getSearchResults(
+        `project = "${projectKeyOrId}" AND sprint = ${sprintId} AND resolution = Done`,
+        { limit: 50, fields: [storyPointFieldName] }
+    )
+    let velocity = 0
+    for (const issue of searchResults.issues) {
+        velocity += issue.fields[storyPointFieldName]
+    }
+    return velocity
 }

@@ -225,6 +225,13 @@ export enum ESprintState {
     FUTURE = 'future',
 }
 
+export interface IMultiSeries {
+    [user: string]: ISeries
+}
+export interface ISeries {
+    [date: string]: number
+}
+
 const newEmptyUser = () => {
     return {
         active: false,
