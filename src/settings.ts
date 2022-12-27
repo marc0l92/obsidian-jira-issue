@@ -112,6 +112,13 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         })
         // Account cache settings cleanup
         settingsToStore.accounts.forEach(account => account.cache = DEFAULT_ACCOUNT.cache)
+        // Delete old properties
+        delete (settingsToStore as any)['darkMode']
+        delete (settingsToStore as any)['host']
+        delete (settingsToStore as any)['authenticationType']
+        delete (settingsToStore as any)['username']
+        delete (settingsToStore as any)['password']
+        delete (settingsToStore as any)['customFieldsNames']
 
         await this._plugin.saveData(settingsToStore)
 
@@ -527,7 +534,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setButtonText("Reset columns")
                 .setWarning()
                 .onClick(async value => {
-                    SettingsData.searchColumns = DEFAULT_SETTINGS.searchColumns
+                    SettingsData.searchColumns = [...DEFAULT_SETTINGS.searchColumns]
                     await this.saveSettings()
                     // Force refresh
                     this.display()
