@@ -1,10 +1,11 @@
-jest.mock('colorsys')
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+jest.mock('../src/settings', () => {
+    return { SettingsData: { cache: { columns: ['CUSTOM1', '12345'] } } }
+})
 jest.mock('../src/utils', () => { return { getAccountByAlias: jest.fn() } })
 
 import { COMPACT_SYMBOL, ESearchColumnsTypes, ESearchResultsRenderingTypes } from '../src/interfaces/settingsInterfaces'
 import { SearchView } from '../src/searchView'
-import { TestAccountOpen } from './__mocks__/settings'
+import { TestAccountOpen } from './testData'
 import * as Utils from '../src/utils'
 
 const kQuery = `status = 'In Progress' order by priority DESC`
@@ -16,9 +17,10 @@ const kTypeInvalid = 'NOT_SUPPORTED'
 const kColumns = ` KEY, summary, ${COMPACT_SYMBOL}ASSIgnee,    ${COMPACT_SYMBOL}REPORTER, STATUS, NOTES`
 const kInvalidKey = 'invalidKey'
 const kInvalidValue = 'invalidValue'
+const kLabel = 'A label'
 const kInvalidCustomColumn = 'CustomInvalid';
 
-(Utils.getAccountByAlias as jest.MockedFunction<any>).mockReturnValue(TestAccountOpen);
+(Utils.getAccountByAlias as jest.Mock).mockReturnValue(TestAccountOpen)
 
 describe('SearchView', () => {
 
@@ -28,12 +30,13 @@ describe('SearchView', () => {
             const sv = SearchView.fromString(kQuery)
             expect(sv.query).toEqual(kQuery)
         })
-        test('full basic query', () => {
+        test('Full basic query', () => {
             const sv = SearchView.fromString(`type: ${kType}
 ${kComment}
 query: ${kQuery}
 limit: ${kLimit}
-columns: ${kColumns}`)
+columns: ${kColumns}
+label: ${kLabel}`)
             expect(sv.query).toEqual(kQuery)
             expect(sv.limit).toEqual(kLimit)
             expect(sv.type).toEqual(ESearchResultsRenderingTypes.TABLE)
@@ -45,6 +48,7 @@ columns: ${kColumns}`)
                 { compact: false, extra: '', type: ESearchColumnsTypes.STATUS },
                 { compact: false, extra: '', type: ESearchColumnsTypes.NOTES },
             ])
+            expect(sv.label).toEqual(kLabel)
             expect(sv.account).toBeNull()
         })
         test('List type', () => {

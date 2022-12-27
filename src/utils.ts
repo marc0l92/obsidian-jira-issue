@@ -40,6 +40,7 @@ function cyrb128(str: string) {
     h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179)
     return [(h1 ^ h2 ^ h3 ^ h4) >>> 0, (h2 ^ h1) >>> 0, (h3 ^ h1) >>> 0, (h4 ^ h1) >>> 0]
 }
+
 function mulberry32(a: number) {
     return function () {
         let t = a += 0x6D2B79F5
@@ -48,6 +49,7 @@ function mulberry32(a: number) {
         return ((t ^ t >>> 14) >>> 0) / 4294967296
     }
 }
+
 let random: () => number = mulberry32(cyrb128(kSeed)[0])
 export function resetRandomGenerator() {
     random = mulberry32(cyrb128(kSeed)[0])

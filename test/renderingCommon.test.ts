@@ -1,7 +1,7 @@
 jest.mock('../src/main', () => {
     return { ObsidianApp: { vault: { getConfig: jest.fn() } } }
 })
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+jest.mock('../src/settings', () => { return { SettingsData: { colorSchema: null } } })
 
 import { SettingsData } from '../src/settings'
 import RC from '../src/rendering/renderingCommon'
@@ -11,6 +11,8 @@ import * as main from '../src/main'
 const kLightCSSClass = 'is-light'
 const kDarkCSSClass = 'is-dark'
 
+// @ts-ignore
+const getConfigMock: jest.Mock = main.ObsidianApp.vault.getConfig
 
 describe('RenderingCommon', () => {
     describe('getTheme', () => {
@@ -27,15 +29,11 @@ describe('RenderingCommon', () => {
             expect(RC.getTheme()).toEqual(kLightCSSClass)
         })
         test('Follow Obsidian - Light', () => {
-            // @ts-ignore
-            const getConfigMock = main.ObsidianApp.vault.getConfig
             getConfigMock.mockReturnValueOnce('moonstone')
             SettingsData.colorSchema = EColorSchema.FOLLOW_OBSIDIAN
             expect(RC.getTheme()).toEqual(kLightCSSClass)
         })
         test('Follow Obsidian - Dark', () => {
-            // @ts-ignore
-            const getConfigMock = main.ObsidianApp.vault.getConfig
             getConfigMock.mockReturnValueOnce('obsidian')
             SettingsData.colorSchema = EColorSchema.FOLLOW_OBSIDIAN
             expect(RC.getTheme()).toEqual(kDarkCSSClass)

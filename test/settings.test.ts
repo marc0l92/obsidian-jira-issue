@@ -1,5 +1,5 @@
 jest.mock('obsidian')
-jest.mock('../src/client/jiraClient', () => jest.requireActual('./__mocks__/jiraClient').default)
+jest.mock('../src/client/jiraClient')
 
 import { EAuthenticationTypes, EColorSchema, IJiraIssueSettings } from "../src/interfaces/settingsInterfaces"
 import { DEFAULT_ACCOUNT, DEFAULT_SETTINGS, JiraIssueSettingTab, SettingsData } from "../src/settings"

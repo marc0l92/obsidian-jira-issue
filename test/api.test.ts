@@ -33,7 +33,7 @@ describe('API', () => {
 
     describe('defaulted', () => {
         test('getIssue', async () => {
-            (JiraClient.getIssue as jest.MockedFunction<any>).mockReturnValue(kIssue);
+            (JiraClient.getIssue as jest.Mock).mockReturnValue(kIssue);
 
             const baseIssue = await API.base.getIssue(kIssueKey)
             const defaultedIssue = await API.defaulted.getIssue(kIssueKey)
@@ -43,7 +43,7 @@ describe('API', () => {
             expect(defaultedIssue.fields.assignee.displayName).toEqual('')
         })
         test('getSearchResults', async () => {
-            (JiraClient.getSearchResults as jest.MockedFunction<any>).mockReturnValue(kSearchResults);
+            (JiraClient.getSearchResults as jest.Mock).mockReturnValue(kSearchResults);
 
             const baseSearchResults = await API.base.getSearchResults(kSearchQuery)
             const defaultedSearchResults = await API.defaulted.getSearchResults(kSearchQuery)
@@ -56,11 +56,11 @@ describe('API', () => {
 
     describe('getActiveSprint', () => {
         test('requested board, requested sprint', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>)
+            (ObjectsCache.get as jest.Mock)
                 .mockReturnValueOnce(null)
                 .mockReturnValueOnce(null);
-            (JiraClient.getBoards as jest.MockedFunction<any>).mockReturnValueOnce([kBoard]);
-            (JiraClient.getSprints as jest.MockedFunction<any>).mockReturnValueOnce([kSprint]);
+            (JiraClient.getBoards as jest.Mock).mockReturnValueOnce([kBoard]);
+            (JiraClient.getSprints as jest.Mock).mockReturnValueOnce([kSprint]);
 
             expect(await API.macro.getActiveSprint(kProject)).toEqual(kSprint)
 
@@ -76,10 +76,10 @@ describe('API', () => {
             expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, { state: ['active'], limit: 1 })
         })
         test('cached board, requested sprint', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>)
+            (ObjectsCache.get as jest.Mock)
                 .mockReturnValueOnce({ data: [kBoard] })
                 .mockReturnValueOnce(null);
-            (JiraClient.getSprints as jest.MockedFunction<any>).mockReturnValueOnce([kSprint]);
+            (JiraClient.getSprints as jest.Mock).mockReturnValueOnce([kSprint]);
 
             expect(await API.macro.getActiveSprint(kProject)).toEqual(kSprint)
 
@@ -93,7 +93,7 @@ describe('API', () => {
             expect(JiraClient.getSprints).toHaveBeenNthCalledWith(1, kBoardId, { limit: 1, state: ["active"] })
         })
         test('cached board, cached sprint', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>)
+            (ObjectsCache.get as jest.Mock)
                 .mockReturnValueOnce({ data: [kBoard] })
                 .mockReturnValueOnce({ data: [kSprint] });
 
@@ -107,8 +107,8 @@ describe('API', () => {
             expect(JiraClient.getSprints).not.toBeCalled()
         })
         test('board not found', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>).mockReturnValueOnce(null);
-            (JiraClient.getBoards as jest.MockedFunction<any>).mockReturnValueOnce([]);
+            (ObjectsCache.get as jest.Mock).mockReturnValueOnce(null);
+            (JiraClient.getBoards as jest.Mock).mockReturnValueOnce([]);
 
             expect(await API.macro.getActiveSprint(kProject)).toEqual(null)
 
@@ -121,9 +121,9 @@ describe('API', () => {
             expect(JiraClient.getSprints).not.toBeCalled()
         })
         test('board found, sprint not found', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>).mockReturnValueOnce(null).mockReturnValueOnce(null);
-            (JiraClient.getBoards as jest.MockedFunction<any>).mockReturnValueOnce([kBoard]);
-            (JiraClient.getSprints as jest.MockedFunction<any>).mockReturnValueOnce([]);
+            (ObjectsCache.get as jest.Mock).mockReturnValueOnce(null).mockReturnValueOnce(null);
+            (JiraClient.getBoards as jest.Mock).mockReturnValueOnce([kBoard]);
+            (JiraClient.getSprints as jest.Mock).mockReturnValueOnce([]);
 
             expect(await API.macro.getActiveSprint(kProject)).toEqual(null)
 
@@ -142,15 +142,15 @@ describe('API', () => {
 
     describe('getActiveSprintName', () => {
         test('found', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>)
+            (ObjectsCache.get as jest.Mock)
                 .mockReturnValueOnce({ data: [kBoard] })
                 .mockReturnValueOnce({ data: [kSprint] });
 
             expect(await API.macro.getActiveSprintName(kProject)).toEqual(kSprintName)
         })
         test('not found', async () => {
-            (ObjectsCache.get as jest.MockedFunction<any>).mockReturnValueOnce(null);
-            (JiraClient.getBoards as jest.MockedFunction<any>).mockReturnValueOnce([]);
+            (ObjectsCache.get as jest.Mock).mockReturnValueOnce(null);
+            (JiraClient.getBoards as jest.Mock).mockReturnValueOnce([]);
 
             expect(await API.macro.getActiveSprintName(kProject)).toEqual('')
         })

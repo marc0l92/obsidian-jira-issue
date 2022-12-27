@@ -1,4 +1,4 @@
-jest.mock('../src/settings', () => jest.requireActual('./__mocks__/settings').default)
+jest.mock('../src/settings', () => { return { SettingsData: { cacheTime: '15m' } } })
 
 import ObjectsCache from '../src/objectsCache'
 

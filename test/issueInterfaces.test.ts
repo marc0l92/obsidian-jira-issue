@@ -42,6 +42,10 @@ describe('IssueInterfaces', () => {
         expect(issue.fields.customfield_10000).toEqual(kVal1)
         expect(issue.fields.customfield_10001.key).toEqual(kVal1)
     })
+
+    test('toDefaultedIssue invalid', () => {
+        expect(toDefaultedIssue(null)).toBeNull()
+    })
 })
 
 export { }
