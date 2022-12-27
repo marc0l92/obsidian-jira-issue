@@ -378,4 +378,18 @@ export default {
         }
         return []
     },
+
+    async getSprint(sprintId: number, options: { account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSprint> {
+        const opt = {
+            account: options.account || null
+        }
+        return await sendRequest(
+            {
+                method: 'GET',
+                path: `/rest/agile/1.0/sprint/${sprintId}`,
+                noBasePath: true,
+                account: opt.account,
+            }
+        )
+    },
 }
