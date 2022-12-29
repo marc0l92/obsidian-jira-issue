@@ -9,6 +9,7 @@ export class SearchView {
     columns: ISearchColumn[] = []
     account: IJiraIssueAccountSettings = null
     label: string = null
+    private _cacheKey: string = null
 
     static fromString(str: string): SearchView {
         const sv = new SearchView()
@@ -117,6 +118,9 @@ export class SearchView {
     }
 
     getCacheKey(): string {
-        return this.query + (this.limit || '') + (this.account ? this.account.alias : '')
+        if (!this._cacheKey) {
+            this._cacheKey = this.query + (this.limit || '') + (this.account ? this.account.alias : '')
+        }
+        return this._cacheKey
     }
 }
