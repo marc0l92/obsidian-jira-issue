@@ -3,7 +3,7 @@ import API from "./api"
 import moment from "moment"
 
 function dateTimeToDate(dateTime: string): string {
-    if (dateTime.match(/$\d/)) {
+    if (dateTime.match(/^\d/)) {
         return moment(dateTime).format('YYYY-MM-DD')
     }
     return null
