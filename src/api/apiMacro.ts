@@ -1,6 +1,7 @@
 import { ESprintState, IJiraSprint, IJiraWorklog, ISeries } from "../interfaces/issueInterfaces"
 import API from "./api"
 import moment from "moment"
+const ms = require('ms')
 
 function dateTimeToDate(dateTime: string): string {
     if (dateTime.match(/^\d/)) {
@@ -42,21 +43,22 @@ export async function getWorkLogByDates(projectKeyOrId: string, startDate: strin
     let worklogs: IJiraWorklog[] = []
     for (const issue of searchResults.issues) {
         if (issue.fields.worklog && issue.fields.worklog.worklogs) {
+            issue.fields.worklog.worklogs.forEach(worklog => worklog.issueKey = issue.key)
             worklogs = worklogs.concat(issue.fields.worklog.worklogs)
         }
     }
     return worklogs
 }
 
-export async function getWorkLogByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<ISeries> {
+export async function getWorkLogSeriesByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()'): Promise<ISeries> {
     const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
     const series: ISeries = {}
     for (const worklog of worklogs) {
-        const author = worklog.author.key
+        const author = worklog.author.name
         if (!(author in series)) {
             series[author] = 0
         }
-        series[author] += worklog.timeSpentSeconds
+        series[author] += worklog.timeSpent.split(' ').map(x => ms(x)).reduce((x, y) => x + y)
     }
     return series
 }

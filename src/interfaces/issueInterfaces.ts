@@ -88,11 +88,13 @@ export interface IJiraWorklog {
     timeSpentSeconds: number
     updateAuthor: IJiraUser
     updated: string
+    issueKey?: string
 }
 
 export interface IJiraUser {
     active: boolean
     displayName: string
+    name: string
     key: string
     emailAddress: string
     self: string

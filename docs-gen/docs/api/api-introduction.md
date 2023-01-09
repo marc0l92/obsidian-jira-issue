@@ -62,7 +62,7 @@ The responses are cached in order to reduce the network load.
 - [`$ji.macro.getWorkLogBySprint(projectKeyOrId: string, sprint: IJiraSprint)`](/docs/api/api-macro#getWorkLogBySprint)
 - [`$ji.macro.getWorkLogBySprintId(projectKeyOrId: string, sprintId: number)`](/docs/api/api-macro#getWorkLogBySprintId)
 - [`$ji.macro.getWorkLogByDates(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogByDates)
-- [`$ji.macro.getWorkLogByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogByUser)
+- [`$ji.macro.getWorkLogSeriesByUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()')`](/docs/api/api-macro#getWorkLogSeriesByUser)
 - [`$ji.macro.getVelocity(projectKeyOrId: string, sprintId: number, storyPointFieldName: string = 'aggregatetimeoriginalestimate')`](/docs/api/api-macro#getVelocity)
 
 ### API Category - [Chart](/docs/api/api-chart)

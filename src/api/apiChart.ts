@@ -1,14 +1,17 @@
 import moment from "moment"
 import { IMultiSeries, ISeries } from "../interfaces/issueInterfaces"
-import { SECOND_IN_A_DAY } from "../interfaces/settingsInterfaces"
 import { getRandomRGBColor, resetRandomGenerator } from "../utils"
 import API from "./api"
+const ms = require('ms')
 
 enum EChartFormat {
-    SECONDS = 'Seconds',
+    HOURS = 'Hours',
     DAYS = 'Days',
     PERCENTAGE = 'Percentage',
 }
+
+const MS_IN_A_DAY = ms('1d')
+const MS_IN_A_HOUR = ms('1h')
 
 export async function getWorklogPerDay(projectKeyOrId: string, startDate: string, endDate: string = 'now()') {
     const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
@@ -22,7 +25,7 @@ export async function getWorklogPerDay(projectKeyOrId: string, startDate: string
     }
     const usersSeries: IMultiSeries = {}
     for (const worklog of worklogs) {
-        const author = worklog.author.key
+        const author = worklog.author.name
         if (!usersSeries[author]) {
             usersSeries[author] = Object.assign({}, emptySeries)
         }
@@ -53,22 +56,32 @@ export async function getWorklogPerDay(projectKeyOrId: string, startDate: string
 export async function getWorklogPerUser(projectKeyOrId: string, startDate: string, endDate: string = 'now()', options: { format?: EChartFormat, capacity?: ISeries } = {}) {
     const opt = {
         format: options.format || EChartFormat.PERCENTAGE,
-        capacity: options.capacity || {},
+        capacity: options.capacity || null,
     }
-    const series = await API.macro.getWorkLogByUser(projectKeyOrId, startDate, endDate)
+    const series = await API.macro.getWorkLogSeriesByUser(projectKeyOrId, startDate, endDate)
     switch (opt.format) {
-        case EChartFormat.SECONDS:
+        case EChartFormat.HOURS:
+            for (const a in series) {
+                series[a] = series[a] / MS_IN_A_HOUR
+            }
             break
         case EChartFormat.DAYS:
             for (const a in series) {
-                series[a] = series[a] / SECOND_IN_A_DAY
+                series[a] = series[a] / MS_IN_A_DAY
             }
             break
         case EChartFormat.PERCENTAGE:
-            const days = moment(moment(endDate).unix() - moment(startDate).unix()).days()
+            const days = moment.duration(moment(endDate).diff(startDate)).asDays()
             for (const author in series) {
-                const capacity = opt.capacity[author] || days
-                series[author] = series[author] / capacity / SECOND_IN_A_DAY * 100
+                if (opt.capacity) {
+                    if (author in opt.capacity) {
+                        series[author] = series[author] / opt.capacity[author] / MS_IN_A_DAY * 100
+                    } else {
+                        delete series[author]
+                    }
+                } else {
+                    series[author] = series[author] / days / MS_IN_A_DAY * 100
+                }
             }
             break
         default:
