@@ -8,7 +8,7 @@ import { SettingsData } from "../settings"
 import RC from "./renderingCommon"
 import escapeStringRegexp from 'escape-string-regexp'
 import { getAccountByHost } from "../utils"
-import { COMPACT_SYMBOL } from "../interfaces/settingsInterfaces"
+import { COMPACT_SYMBOL, JIRA_KEY_REGEX } from "../interfaces/settingsInterfaces"
 
 interface IMatchDecoratorRef {
     ref: MatchDecorator
@@ -75,7 +75,7 @@ let jiraUrlMatchDecorator: IMatchDecoratorRef = { ref: null }
 function buildMatchDecorators() {
     if (SettingsData.inlineIssuePrefix !== '') {
         jiraTagMatchDecorator.ref = new MatchDecorator({
-            regexp: new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`, 'g'),
+            regexp: new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)(${JIRA_KEY_REGEX})`, 'g'),
             decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
                 const compact = !!match[1]
                 const key = match[2]
@@ -100,7 +100,7 @@ function buildMatchDecorators() {
         const urls: string[] = []
         SettingsData.accounts.forEach(account => urls.push(escapeRegexp(account.host)))
         jiraUrlMatchDecorator.ref = new MatchDecorator({
-            regexp: new RegExp(`(${COMPACT_SYMBOL}?)(${urls.join('|')})/browse/([A-Z0-9]+-[0-9]+)`, 'g'),
+            regexp: new RegExp(`(${COMPACT_SYMBOL}?)(${urls.join('|')})/browse/(${JIRA_KEY_REGEX})`, 'g'),
             decoration: (match: RegExpExecArray, view: EditorView, pos: number) => {
                 const compact = !!match[1]
                 const host = match[2]

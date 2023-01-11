@@ -1,7 +1,7 @@
 import { MarkdownPostProcessorContext } from "obsidian"
 import JiraClient from "../client/jiraClient"
 import { IJiraIssue } from "../interfaces/issueInterfaces"
-import { COMPACT_SYMBOL } from "../interfaces/settingsInterfaces"
+import { COMPACT_SYMBOL, JIRA_KEY_REGEX } from "../interfaces/settingsInterfaces"
 import ObjectsCache from "../objectsCache"
 import { SettingsData } from "../settings"
 import RC from "./renderingCommon"
@@ -11,7 +11,7 @@ import RC from "./renderingCommon"
 function convertInlineIssuesToTags(el: HTMLElement): void {
     if (SettingsData.inlineIssuePrefix) {
         let match
-        while (match = new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)([A-Z0-9]+-[0-9]+)`).exec(el.innerHTML)) {
+        while (match = new RegExp(`${SettingsData.inlineIssuePrefix}(${COMPACT_SYMBOL}?)(${JIRA_KEY_REGEX})`).exec(el.innerHTML)) {
             // console.log({ match })
             const compact = !!match[1]
             const issueKey = match[2]

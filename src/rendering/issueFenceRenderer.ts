@@ -3,10 +3,10 @@ import { IJiraIssue } from "../interfaces/issueInterfaces"
 import JiraClient from "../client/jiraClient"
 import ObjectsCache from "../objectsCache"
 import RC from "./renderingCommon"
-import { COMMENT_REGEX } from "../interfaces/settingsInterfaces"
+import { COMMENT_REGEX, JIRA_KEY_REGEX } from "../interfaces/settingsInterfaces"
 
-const ISSUE_REGEX = /^\s*([A-Z0-9]+-[0-9]+)\s*$/i
-const ISSUE_LINK_REGEX = /\/([A-Z0-9]+-[0-9]+)\s*$/i
+const ISSUE_REGEX = new RegExp(`^\s*(${JIRA_KEY_REGEX})\s*$`, 'i')
+const ISSUE_LINK_REGEX = new RegExp(`\/(${JIRA_KEY_REGEX})\s*$`, 'i')
 
 function getIssueKey(line: string): string | null {
     if (COMMENT_REGEX.test(line)) {
