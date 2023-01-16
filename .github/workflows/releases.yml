@@ -21,12 +21,11 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: latest
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --strict-peer-dependencies]
+          run_install: false
       - name: Build
         id: build
         run: |
+          pnpm install --frozen-lockfile
           pnpm run build --if-present
           mkdir ${{ env.PLUGIN_NAME }}
           cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
