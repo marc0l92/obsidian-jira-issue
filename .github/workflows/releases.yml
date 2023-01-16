@@ -20,6 +20,7 @@ jobs:
           node-version: "16.x"
       - uses: pnpm/action-setup@v2
         with:
+          version: latest
           run_install: |
             - recursive: true
               args: [--frozen-lockfile, --strict-peer-dependencies]
