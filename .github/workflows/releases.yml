@@ -18,10 +18,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.x"
+      - uses: pnpm/action-setup@v2
+        with:
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
       - name: Build
         id: build
         run: |
-          pnpm i
           pnpm run build --if-present
           mkdir ${{ env.PLUGIN_NAME }}
           cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
