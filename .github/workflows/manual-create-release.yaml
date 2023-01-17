@@ -1,4 +1,12 @@
-on: workflow_dispatch
+name: Manually create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Name of the tag to use for the next release
+        required: true
+        type: string
 
 jobs:
   create-release:
@@ -11,4 +19,29 @@ jobs:
 
       - name: Check that the last commit is not tagged
         run: |
-          echo test
+          if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]]; then
+            exit 1
+          fi
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Update version
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run version ${{ inputs.tag }}
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Update release version to ${{ inputs.tag }}"
+          git push
+          git tag ${{ inputs.tag }}
+          git push --tags

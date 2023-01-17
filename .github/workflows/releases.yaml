@@ -1,4 +1,4 @@
-name: Release Obsidian plugin
+name: Create new release on new tag
 
 on:
   push:
