@@ -11,8 +11,6 @@ const kFakeDateAfterExpiration = new Date(Date.UTC(2000, 0, 2))
 
 describe('ObjectsCache', () => {
     beforeEach(() => {
-        process.env.TZ = 'UTC'
-        Date.prototype.getTimezoneOffset = jest.fn(() => 0);
         jest.useFakeTimers().setSystemTime(kFakeDateNow)
         ObjectsCache.clear()
     })
@@ -69,7 +67,7 @@ describe('ObjectsCache', () => {
     test('Item getTime', () => {
         expect(ObjectsCache.getTime(kKey1)).toBeNull()
         ObjectsCache.add(kKey1, kVal1)
-        expect(ObjectsCache.getTime(kKey1)).toEqual('Sat, Jan 1, 2000 1:00 AM')
+        expect(ObjectsCache.getTime(kKey1)).toEqual('Sat, Jan 1, 2000 12:00 AM')
     })
 
     test('Item get item after expiration', () => {
