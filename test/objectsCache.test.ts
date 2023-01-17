@@ -6,8 +6,8 @@ const kKey1 = 'key1'
 const kKey2 = 'key2'
 const kVal1 = 'val1'
 const kVal2 = 'val2'
-const kFakeDateNow = new Date('2000-01-01')
-const kFakeDateAfterExpiration = new Date('2000-01-02')
+const kFakeDateNow = new Date(Date.UTC(2000, 0, 1))
+const kFakeDateAfterExpiration = new Date(Date.UTC(2000, 0, 2))
 
 describe('ObjectsCache', () => {
     beforeEach(() => {
