@@ -45,7 +45,7 @@ jobs:
             ./manifest.json
             ./styles.css
           tag_name: ${{ github.ref }}
-          name: ${{ github.ref }}
+          # name: ${{ github.ref }}
           draft: false
           prerelease: false
           generate_release_notes: true

@@ -10,6 +10,9 @@ changelog:
     - title: Bug Fixes 🐞
       labels:
         - bug
+    - title: Documentation updates 📖
+      labels:
+        - documentation
     - title: Other Changes
       labels:
         - "*"
