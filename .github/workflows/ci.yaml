@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   build:
@@ -31,9 +31,9 @@ jobs:
       - name: Build
         id: build
         run: |
-          pnpm run build --if-present
+          pnpm run build
 
       - name: Test
         id: test
         run: |
-          pnpm run test --if-present
+          pnpm run test
