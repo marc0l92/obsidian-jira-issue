@@ -46,6 +46,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          git status
           git add .
           git commit -m "Update release version to ${{ inputs.tag }}"
           git push
