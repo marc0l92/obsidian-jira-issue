@@ -20,7 +20,6 @@ jobs:
 
       - name: Check that the last commit is not tagged
         run: |
-          echo "$(git describe --tags) == $(git describe --tags --abbrev=0)"
           if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]]; then
             exit 1
           fi
@@ -39,6 +38,11 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm run version ${{ inputs.tag }}
+
+      - name: Configure git credentials
+        run: |
+          git config --global user.name 'Github Action'
+          git config --global user.email 'marc0l92@users.noreply.github.com'
 
       - name: Commit and push changes
         run: |
