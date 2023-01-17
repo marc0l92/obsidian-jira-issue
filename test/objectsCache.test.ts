@@ -11,6 +11,7 @@ const kFakeDateAfterExpiration = new Date(Date.UTC(2000, 0, 2))
 
 describe('ObjectsCache', () => {
     beforeEach(() => {
+        Date.prototype.getTimezoneOffset = jest.fn(() => 0)
         jest.useFakeTimers().setSystemTime(kFakeDateNow)
         ObjectsCache.clear()
     })
