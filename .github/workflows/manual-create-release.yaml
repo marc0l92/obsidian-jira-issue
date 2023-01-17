@@ -19,6 +19,7 @@ jobs:
 
       - name: Check that the last commit is not tagged
         run: |
+          echo "$(git describe --tags) == $(git describe --tags --abbrev=0)"
           if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]]; then
             exit 1
           fi
