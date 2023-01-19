@@ -1,4 +1,6 @@
 # Obsidian jira-issue
+![Test Status](https://github.com/marc0l92/obsidian-jira-issue/actions/workflows/ci.yaml/badge.svg)
+
 
 This plugin allows you to track the progress of [Atlassian Jira](https://www.atlassian.com/software/jira) issues from your [Obsidian.md](https://obsidian.md/) notes.
 
