@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - "*"
+  workflow_run:
+    workflows: ["Manually create release"]
+    types:
+      - completed
 
 env:
   PLUGIN_NAME: obsidian-jira-issue
