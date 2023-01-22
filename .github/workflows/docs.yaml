@@ -10,20 +10,26 @@ jobs:
     name: Deploy docs to GitHub Pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: yarn
+          node-version: "lts/*"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
 
       - name: Install dependencies
         run: |
           cd ./docs-gen
-          yarn install --frozen-lockfile
+          pnpm install --frozen-lockfile
+
       - name: Build website
         run: |
           cd ./docs-gen
-          yarn run build
+          pnpm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
