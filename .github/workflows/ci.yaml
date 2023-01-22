@@ -9,30 +9,64 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
-
       - uses: pnpm/action-setup@v2
         with:
           version: latest
           run_install: false
-
       - name: Install dependencies
         id: install
         run: |
           pnpm install --frozen-lockfile
-
       - name: Build
         id: build
         run: |
           pnpm run build
 
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+      - name: Install dependencies
+        id: install
+        run: |
+          pnpm install --frozen-lockfile
       - name: Test
         id: test
         run: |
           pnpm run test
+
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+      - name: Install dependencies
+        id: install
+        run: |
+          cd ./docs-gen
+          pnpm install --frozen-lockfile
+      - name: Build
+        id: build
+        run: |
+          cd ./docs-gen
+          pnpm run build
