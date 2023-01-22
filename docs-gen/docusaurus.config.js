@@ -78,12 +78,6 @@ const config = {
             label: 'API',
           },
           {
-            type: 'doc',
-            docId: 'changelog/changelog',
-            position: 'left',
-            label: 'Changelog',
-          },
-          {
             href: 'https://ko-fi.com/marc0l92',
             label: 'Buy me a coffee',
             position: 'right',

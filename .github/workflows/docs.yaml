@@ -11,26 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
-
       - uses: pnpm/action-setup@v2
         with:
           version: latest
           run_install: false
-
       - name: Install dependencies
         run: |
           cd ./docs-gen
           pnpm install --frozen-lockfile
-
       - name: Build website
         run: |
           cd ./docs-gen
           pnpm run build
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
