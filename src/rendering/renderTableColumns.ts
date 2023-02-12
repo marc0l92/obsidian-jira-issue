@@ -142,9 +142,9 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
             case ESearchColumnsTypes.STATUS:
                 const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
                 if (column.compact) {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, attr: { 'data-status': issue.fields.status.name }, parent: createEl('td', { parent: row }) })
                 } else {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, attr: { 'data-status': issue.fields.status.name }, parent: createEl('td', { parent: row }) })
                 }
                 break
             case ESearchColumnsTypes.DUE_DATE:
