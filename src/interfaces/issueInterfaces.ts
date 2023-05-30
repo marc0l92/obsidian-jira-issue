@@ -248,7 +248,7 @@ const newEmptyUser = () => {
     } as IJiraUser
 }
 
-const EMPTY_ISSUE: IJiraIssue = {
+const buildEmptyIssue = (): IJiraIssue => JSON.parse(JSON.stringify({
     key: '',
     id: '',
     account: null,
@@ -285,7 +285,7 @@ const EMPTY_ISSUE: IJiraIssue = {
             worklogs: []
         }
     },
-}
+} as IJiraIssue))
 
 function isObject(item: any): boolean {
     return (item && typeof item === 'object' && !Array.isArray(item))
@@ -319,7 +319,7 @@ function mergeDeep(target: any, ...sources: any[]): any {
 
 export function toDefaultedIssue(originalIssue: IJiraIssue): IJiraIssue {
     if (originalIssue) {
-        return mergeDeep(EMPTY_ISSUE, originalIssue)
+        return mergeDeep(buildEmptyIssue(), originalIssue)
     }
     return originalIssue
 }
