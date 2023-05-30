@@ -24,7 +24,7 @@ export async function getIssue(issueKey: string, options: { fields?: string[], a
     return cacheWrapper(JiraClient.getIssue)(issueKey, options)
 }
 
-export async function getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSearchResults> {
+export async function getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSearchResults> {
     return cacheWrapper(JiraClient.getSearchResults)(query, options)
 }
 
@@ -32,7 +32,7 @@ export async function getDevStatus(issueId: string, options: { account?: IJiraIs
     return cacheWrapper(JiraClient.getDevStatus)(issueId, options)
 }
 
-export async function getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {}): Promise<IJiraBoard[]> {
+export async function getBoards(projectKeyOrId: string, options: { limit?: number, offset?: number, account?: IJiraIssueAccountSettings } = {}): Promise<IJiraBoard[]> {
     return cacheWrapper(JiraClient.getBoards)(projectKeyOrId, options)
 }
 
@@ -40,7 +40,7 @@ export async function getSprint(sprintId: number, options: { account?: IJiraIssu
     return cacheWrapper(JiraClient.getSprint)(sprintId, options)
 }
 
-export async function getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSprint[]> {
+export async function getSprints(boardId: number, options: { limit?: number, offset?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSprint[]> {
     return cacheWrapper(JiraClient.getSprints)(boardId, options)
 }
 

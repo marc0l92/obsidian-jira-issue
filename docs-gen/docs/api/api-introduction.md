@@ -31,11 +31,11 @@ This category contains all the functions to directly access the Jira API.
 The responses are cached in order to reduce the network load.
 
 - [`$ji.base.getIssue(issueKey: string, options: { fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getIssue)
-- [`$ji.base.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSearchResults)
+- [`$ji.base.getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSearchResults)
 - [`$ji.base.getDevStatus(issueId: string, options: { account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getDevStatus)
-- [`$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getBoards)
+- [`$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, offset?: number, account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getBoards)
 - [`$ji.base.getSprint(sprintId: number, options: { account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSprint)
-- [`$ji.base.getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSprints)
+- [`$ji.base.getSprints(boardId: number, options: { limit?: number, offset?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-base#getSprints)
 - [`$ji.base.getLoggedUser(account: IJiraIssueAccountSettings = null)`](/docs/api/api-base#getLoggedUser)
 
 ### API Category - [Defaulted](/docs/api/api-defaulted)
@@ -47,7 +47,7 @@ The responses are cached in order to reduce the network load.
 
 
 - [`$ji.defaulted.getIssue(issueKey: string, options: { fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-defaulted#getIssue)
-- [`$ji.defaulted.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-defaulted#getSearchResults)
+- [`$ji.defaulted.getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`](/docs/api/api-defaulted#getSearchResults)
 
 ### API Category - [Macro](/docs/api/api-macro)
 
