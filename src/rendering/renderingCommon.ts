@@ -94,12 +94,14 @@ export default {
     renderIssue(issue: IJiraIssue, compact = false): HTMLElement {
         const tagsRow = createDiv('ji-tags has-addons')
         this.renderAccountColorBand(issue.account, tagsRow)
-        createEl('img', {
-            cls: 'fit-content',
-            attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-            title: issue.fields.issuetype.name,
-            parent: createSpan({ cls: `ji-tag ${this.getTheme()} ji-sm-tag`, parent: tagsRow })
-        })
+        if (issue.fields.issuetype.iconUrl) {
+            createEl('img', {
+                cls: 'fit-content',
+                attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+                title: issue.fields.issuetype.name,
+                parent: createSpan({ cls: `ji-tag ${this.getTheme()} ji-sm-tag`, parent: tagsRow })
+            })
+        }
         createEl('a', { cls: `ji-tag is-link ${this.getTheme()} no-wrap`, href: this.issueUrl(issue.account, issue.key), title: this.issueUrl(issue.account, issue.key), text: issue.key, parent: tagsRow })
         if (!compact) {
             createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })

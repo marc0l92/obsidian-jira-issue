@@ -1,5 +1,5 @@
 import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { EAuthenticationTypes, IJiraIssueAccountSettings } from '../interfaces/settingsInterfaces'
+import { AVATAR_RESOLUTION, EAuthenticationTypes, IJiraIssueAccountSettings } from '../interfaces/settingsInterfaces'
 import { ESprintState, IJiraAutocompleteField, IJiraBoard, IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraSprint, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
 import { SettingsData } from "../settings"
 
@@ -31,7 +31,7 @@ function getMimeType(imageBuffer: ArrayBuffer): string {
         case '3C3F786D':
             return 'image/svg+xml'
         default:
-            console.error('Image mimeType not found:', hex)
+            SettingsData.logImagesFetch && console.error('Image mimeType not found:', hex)
             return null
     }
 }
@@ -146,7 +146,7 @@ async function preFetchImage(account: IJiraIssueAccountSettings, url: string): P
             url = `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
         }
     }
-    return url
+    return null
 }
 
 async function fetchIssueImages(issue: IJiraIssue) {
@@ -155,10 +155,10 @@ async function fetchIssueImages(issue: IJiraIssue) {
             issue.fields.issuetype.iconUrl = await preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
         }
         if (issue.fields.reporter) {
-            issue.fields.reporter.avatarUrls['16x16'] = await preFetchImage(issue.account, issue.fields.reporter.avatarUrls['16x16'])
+            issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION])
         }
-        if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls['16x16']) {
-            issue.fields.assignee.avatarUrls['16x16'] = await preFetchImage(issue.account, issue.fields.assignee.avatarUrls['16x16'])
+        if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION]) {
+            issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION])
         }
         if (issue.fields.priority && issue.fields.priority.iconUrl) {
             issue.fields.priority.iconUrl = await preFetchImage(issue.account, issue.fields.priority.iconUrl)

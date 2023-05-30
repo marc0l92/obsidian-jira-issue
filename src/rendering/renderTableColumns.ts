@@ -4,7 +4,7 @@ import RC, { JIRA_STATUS_COLOR_MAP } from "./renderingCommon"
 import * as jsonpath from 'jsonpath'
 import ObjectsCache from "../objectsCache"
 import JiraClient from "../client/jiraClient"
-import { ESearchColumnsTypes, ISearchColumn } from "../interfaces/settingsInterfaces"
+import { AVATAR_RESOLUTION, ESearchColumnsTypes, ISearchColumn } from "../interfaces/settingsInterfaces"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -73,12 +73,18 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 break
             case ESearchColumnsTypes.TYPE:
                 const typeCell = createEl('td', { parent: row })
-                createEl('img', {
-                    attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-                    title: column.compact ? issue.fields.issuetype.name : '',
-                    cls: 'letter-height',
-                    parent: typeCell
-                })
+                if (issue.fields.issuetype.iconUrl) {
+                    createEl('img', {
+                        attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+                        title: column.compact ? issue.fields.issuetype.name : '',
+                        cls: 'letter-height',
+                        parent: typeCell
+                    })
+                } else {
+                    if (column.compact) {
+                        createSpan({ text: issue.fields.issuetype.name[0].toUpperCase(), title: issue.fields.issuetype.name, parent: typeCell })
+                    }
+                }
                 if (!column.compact) {
                     createSpan({ text: ' ' + issue.fields.issuetype.name, parent: typeCell })
                 }
@@ -99,9 +105,9 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 break
             case ESearchColumnsTypes.REPORTER:
                 const reporterName = issue.fields.reporter.displayName || ''
-                if (column.compact && reporterName) {
+                if (column.compact && reporterName && issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION]) {
                     createEl('img', {
-                        attr: { src: issue.fields.reporter.avatarUrls['16x16'], alt: reporterName },
+                        attr: { src: issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION], alt: reporterName },
                         title: reporterName,
                         cls: 'avatar-image',
                         parent: createEl('td', { parent: row })
@@ -112,9 +118,9 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 break
             case ESearchColumnsTypes.ASSIGNEE:
                 const assigneeName = issue.fields.assignee.displayName || ''
-                if (column.compact && assigneeName) {
+                if (column.compact && assigneeName && issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION]) {
                     createEl('img', {
-                        attr: { src: issue.fields.assignee.avatarUrls['16x16'], alt: assigneeName },
+                        attr: { src: issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION], alt: assigneeName },
                         title: assigneeName,
                         cls: 'avatar-image',
                         parent: createEl('td', { parent: row })
@@ -126,12 +132,18 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
             case ESearchColumnsTypes.PRIORITY:
                 const priorityCell = createEl('td', { parent: row })
                 if (issue.fields.priority) {
-                    createEl('img', {
-                        attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
-                        title: column.compact ? issue.fields.priority.name : '',
-                        cls: 'letter-height',
-                        parent: priorityCell
-                    })
+                    if (issue.fields.priority.iconUrl) {
+                        createEl('img', {
+                            attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
+                            title: column.compact ? issue.fields.priority.name : '',
+                            cls: 'letter-height',
+                            parent: priorityCell
+                        })
+                    } else {
+                        if (column.compact) {
+                            createSpan({ text: issue.fields.priority.name[0].toUpperCase(), title: issue.fields.priority.name, parent: priorityCell })
+                        }
+                    }
                     if (!column.compact) {
                         createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
                     }
