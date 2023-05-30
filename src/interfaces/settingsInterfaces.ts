@@ -18,6 +18,7 @@ export const COLOR_SCHEMA_DESCRIPTION = {
 }
 
 export const COMPACT_SYMBOL = '-'
+export const AVATAR_RESOLUTION = '16x16'
 export const COMMENT_REGEX = /^\s*#/
 export const JIRA_KEY_REGEX = '[A-Z][A-Z0-9_]*-[0-9]+'
 
