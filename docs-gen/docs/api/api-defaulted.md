@@ -15,6 +15,6 @@ The responses are cached in order to reduce the network load. You can clean the 
 Read [$ji.base.getIssue](/docs/api/api-base#getIssue)
 
 ## getSearchResults
-- `$ji.defaulted.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`
+- `$ji.defaulted.getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`
 
 Read [$ji.base.getSearchResults](/docs/api/api-base#getSearchResults)

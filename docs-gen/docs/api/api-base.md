@@ -21,7 +21,7 @@ Retrieve all details related to an issue based on the key. Use the parameter `op
 Return value type: [`Promise<IJiraIssue>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L3-L79)
 
 ## getSearchResults
-- `$ji.base.getSearchResults(query: string, options: { limit?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`
+- `$ji.base.getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {})`
 
 Execute a JQL query to get all the matching issues.
 
@@ -50,7 +50,7 @@ To check your the list of Authorized Application go to [`Profile > Tools > View 
 Return value type: [`Promise<IJiraDevStatus>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L163-L202)
 
 ## getBoards
-- `$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, account?: IJiraIssueAccountSettings } = {})`
+- `$ji.base.getBoards(projectKeyOrId: string, options: { limit?: number, offset?: number, account?: IJiraIssueAccountSettings } = {})`
 
 Retrieve list of boards associated to a project.
 
@@ -63,7 +63,7 @@ Retrieve list of boards associated to a project.
 Return value type: [`Promise<IJiraBoard[]>`](https://github.com/marc0l92/obsidian-jira-issue/blob/master/src/interfaces/issueInterfaces.ts#L204-L208)
 
 ## getSprints
-- `$ji.base.getSprints(boardId: number, options: { limit?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`
+- `$ji.base.getSprints(boardId: number, options: { limit?: number, offset?: number, state?: ESprintState[], account?: IJiraIssueAccountSettings } = {})`
 
 Retrieve list of sprints associated to a board.
 
