@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS: IJiraIssueSettings = {
         { type: ESearchColumnsTypes.STATUS, compact: false },
     ],
     logRequestsResponses: false,
+    logImagesFetch: false,
 }
 
 export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
@@ -593,12 +594,21 @@ export class JiraIssueSettingTab extends PluginSettingTab {
 
         containerEl.createEl('h3', { text: 'Troubleshooting' })
         new Setting(containerEl)
-            .setName('Log Request and Responses')
+            .setName('Log data request and responses')
             .setDesc('Log in the console (CTRL+Shift+I) all the API requests and responses performed by the plugin.')
             .addToggle(toggle => toggle
                 .setValue(SettingsData.logRequestsResponses)
                 .onChange(async value => {
                     SettingsData.logRequestsResponses = value
+                    await this.saveSettings()
+                }))
+        new Setting(containerEl)
+            .setName('Log images requests and responses')
+            .setDesc('Log in the console (CTRL+Shift+I) all the images fetch requests and responses performed by the plugin.')
+            .addToggle(toggle => toggle
+                .setValue(SettingsData.logImagesFetch)
+                .onChange(async value => {
+                    SettingsData.logImagesFetch = value
                     await this.saveSettings()
                 }))
     }

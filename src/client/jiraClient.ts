@@ -134,9 +134,9 @@ async function preFetchImage(account: IJiraIssueAccountSettings, url: string): P
     let response: RequestUrlResponse
     try {
         response = await requestUrl(options)
-        SettingsData.logRequestsResponses && console.info('JiraIssue:FetchImage:', { request: options, response })
+        SettingsData.logImagesFetch && console.info('JiraIssue:FetchImage:', { request: options, response })
     } catch (errorResponse) {
-        SettingsData.logRequestsResponses && console.warn('JiraIssue:FetchImage:', { request: options, response: errorResponse })
+        SettingsData.logImagesFetch && console.warn('JiraIssue:FetchImage:', { request: options, response: errorResponse })
         response = errorResponse
     }
 
