@@ -34,6 +34,7 @@ export interface IJiraIssueSettings {
     inlineIssuePrefix: string
     searchColumns: ISearchColumn[]
     logRequestsResponses: boolean
+    logImagesFetch: boolean
     showColorBand: boolean
 
     // Legacy credentials

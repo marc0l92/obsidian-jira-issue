@@ -26,6 +26,7 @@ const StoredSettings = {
     colorSchema: EColorSchema.LIGHT,
     inlineIssuePrefix: 'inlineIssuePrefixVal',
     inlineIssueUrlToTag: true,
+    logImagesFetch: false,
     logRequestsResponses: true,
     searchColumns: [
         // { type: ESearchColumnsTypes.KEY, compact: true },
