@@ -48,7 +48,7 @@ export class QuerySuggest extends EditorSuggest<SuggestionEntry> {
 
     getSuggestions(context: EditorSuggestContext): SuggestionEntry[] | Promise<SuggestionEntry[]> {
         const suggestions: SuggestionEntry[] = []
-        console.log({ context })
+        // console.log({ context })
         // let query = context.query.trim().toUpperCase()
         // const isCompact = query.startsWith(COMPACT_SYMBOL)
         // query = query.replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
