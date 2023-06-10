@@ -143,7 +143,7 @@ async function preFetchImage(account: IJiraIssueAccountSettings, url: string): P
     if (response.status === 200) {
         const mimeType = getMimeType(response.arrayBuffer)
         if (mimeType) {
-            url = `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
+            return `data:${mimeType};base64,` + bufferBase64Encode(response.arrayBuffer)
         }
     }
     return null

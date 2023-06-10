@@ -131,7 +131,7 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 break
             case ESearchColumnsTypes.PRIORITY:
                 const priorityCell = createEl('td', { parent: row })
-                if (issue.fields.priority) {
+                if (issue.fields.priority && issue.fields.priority.name) {
                     if (issue.fields.priority.iconUrl) {
                         createEl('img', {
                             attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
@@ -139,10 +139,8 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                             cls: 'letter-height',
                             parent: priorityCell
                         })
-                    } else {
-                        if (column.compact) {
-                            createSpan({ text: issue.fields.priority.name[0].toUpperCase(), title: issue.fields.priority.name, parent: priorityCell })
-                        }
+                    } else if (column.compact) {
+                        createSpan({ text: issue.fields.priority.name[0].toUpperCase(), title: issue.fields.priority.name, parent: priorityCell })
                     }
                     if (!column.compact) {
                         createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
