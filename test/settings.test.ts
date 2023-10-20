@@ -34,6 +34,7 @@ const StoredSettings = {
     ],
     searchResultsLimit: 99,
     showColorBand: true,
+    showJiraLink: true,
 } as IJiraIssueSettings
 
 describe('Settings', () => {

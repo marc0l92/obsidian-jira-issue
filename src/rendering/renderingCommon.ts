@@ -22,10 +22,10 @@ export default {
 
     searchUrl(account: IJiraIssueAccountSettings, searchQuery: string): string {
         try {
-            return (new URL(`${account.host}/issues?filter=-4&jql=${searchQuery}`)).toString()
+            return (new URL(`${account.host}/issues/?jql=${searchQuery}`)).toString()
         } catch (e) { return '' }
     },
-
+    
     getTheme(): string {
         switch (SettingsData.colorSchema) {
             case EColorSchema.FOLLOW_OBSIDIAN:
