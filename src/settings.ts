@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     inlineIssueUrlToTag: true,
     inlineIssuePrefix: 'JIRA:',
     showColorBand: true,
+    showJiraLink: true,
     searchColumns: [
         { type: ESearchColumnsTypes.KEY, compact: false },
         { type: ESearchColumnsTypes.SUMMARY, compact: false },
@@ -473,6 +474,16 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .onChange(async value => {
                     SettingsData.showColorBand = value
                     await this.saveSettings()
+                }))
+        
+        new Setting(containerEl)
+            .setName('Show Jira link')
+            .setDesc('Make the result count in jira-search a link to the jira project with the jql from the search.')
+            .addToggle(toggle => toggle
+                .setValue(SettingsData.showJiraLink)
+                .onChange(async value => {
+                    SettingsData.showJiraLink = value
+                    await this.saveSettings()                    
                 }))
     }
 

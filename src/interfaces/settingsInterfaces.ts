@@ -37,7 +37,8 @@ export interface IJiraIssueSettings {
     logRequestsResponses: boolean
     logImagesFetch: boolean
     showColorBand: boolean
-
+    showJiraLink: boolean
+    
     // Legacy credentials
     host?: string
     authenticationType?: EAuthenticationTypes
