@@ -13,6 +13,19 @@ export const JIRA_STATUS_COLOR_MAP: Record<string, string> = {
     'medium-gray': 'is-dark',
 }
 
+export const JIRA_STATUS_COLOR_MAP_BY_NAME: Record<string, string> = {
+    'New': 'is-dark',
+    'Planning': 'is-dark',
+    'To Do': 'is-dark',
+    'In Progress': 'is-info',
+    'Code Review': 'is-info',
+    'Review': 'is-info',
+    'Dev Complete': 'is-info',
+    'Testing': 'is-info',
+    'Release Pending': 'is-success',
+    'Closed': 'is-success'
+}
+
 export default {
     issueUrl(account: IJiraIssueAccountSettings, issueKey: string): string {
         try {
@@ -106,7 +119,9 @@ export default {
         if (!compact) {
             createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
         }
-        const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+        const statusColor = JIRA_STATUS_COLOR_MAP_BY_NAME[issue.fields.status.name] || 
+        JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 
+        'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, attr: { 'data-status': issue.fields.status.name }, parent: tagsRow })
         return tagsRow
     },

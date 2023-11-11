@@ -1,6 +1,6 @@
 import { setIcon, TFile } from "obsidian"
 import { IJiraDevStatus, IJiraIssue } from "../interfaces/issueInterfaces"
-import RC, { JIRA_STATUS_COLOR_MAP } from "./renderingCommon"
+import RC, { JIRA_STATUS_COLOR_MAP, JIRA_STATUS_COLOR_MAP_BY_NAME } from "./renderingCommon"
 import * as jsonpath from 'jsonpath'
 import ObjectsCache from "../objectsCache"
 import JiraClient from "../client/jiraClient"
@@ -150,7 +150,9 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 }
                 break
             case ESearchColumnsTypes.STATUS:
-                const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+                const statusColor = JIRA_STATUS_COLOR_MAP_BY_NAME[issue.fields.status.name] || 
+                JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 
+                'is-light'
                 if (column.compact) {
                     createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, attr: { 'data-status': issue.fields.status.name }, parent: createEl('td', { parent: row }) })
                 } else {
