@@ -38,7 +38,7 @@ export default {
             return (new URL(`${account.host}/issues/?jql=${searchQuery}`)).toString()
         } catch (e) { return '' }
     },
-    
+
     getTheme(): string {
         switch (SettingsData.colorSchema) {
             case EColorSchema.FOLLOW_OBSIDIAN:
@@ -119,9 +119,9 @@ export default {
         if (!compact) {
             createSpan({ cls: `ji-tag ${this.getTheme()} issue-summary`, text: issue.fields.summary, parent: tagsRow })
         }
-        const statusColor = JIRA_STATUS_COLOR_MAP_BY_NAME[issue.fields.status.name] || 
-        JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 
-        'is-light'
+        const statusColor = JIRA_STATUS_COLOR_MAP_BY_NAME[issue.fields.status.name] ||
+            JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] ||
+            'is-light'
         createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, attr: { 'data-status': issue.fields.status.name }, parent: tagsRow })
         return tagsRow
     },
