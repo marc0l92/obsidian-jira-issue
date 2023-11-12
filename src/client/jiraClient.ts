@@ -96,7 +96,14 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
     if (response && response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
         throw new Error(response.json.errorMessages.join('\n'))
     } else if (response && response.status) {
-        throw new Error(`HTTP status ${response.status}`)
+        switch (response.status) {
+            case 400:
+                throw new Error(`The query is not valid`)
+            case 404:
+                throw new Error(`Issue does not exist`)
+            default:
+                throw new Error(`HTTP status ${response.status}`)
+        }
     } else {
         throw new Error(response as any)
     }
