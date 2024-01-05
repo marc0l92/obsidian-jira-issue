@@ -1,8 +1,10 @@
-import { TFile } from "obsidian"
-import { IJiraIssue } from "../client/jiraInterfaces"
-import { JIRA_STATUS_COLOR_MAP, RenderingCommon } from "./renderingCommon"
-import { ESearchColumnsTypes, ISearchColumn } from "../searchView"
+import { setIcon, TFile } from "obsidian"
+import { IJiraDevStatus, IJiraIssue } from "../interfaces/issueInterfaces"
+import RC, { JIRA_STATUS_COLOR_MAP, JIRA_STATUS_COLOR_MAP_BY_NAME } from "./renderingCommon"
 import * as jsonpath from 'jsonpath'
+import ObjectsCache from "../objectsCache"
+import JiraClient from "../client/jiraClient"
+import { AVATAR_RESOLUTION, ESearchColumnsTypes, ISearchColumn } from "../interfaces/settingsInterfaces"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -16,9 +18,9 @@ function dateToStr(fullDate: string): string {
 
 function deltaToStr(delta: number): string {
     if (delta) {
-        const h = Math.floor(delta / 3600);
-        const m = Math.floor(delta % 3600 / 60);
-        const s = Math.floor(delta % 3600 % 60);
+        const h = Math.floor(delta / 3600)
+        const m = Math.floor(delta % 3600 / 60)
+        const s = Math.floor(delta % 3600 % 60)
         let timeStr = ''
         if (h > 0) {
             timeStr += h + 'h'
@@ -34,16 +36,16 @@ function deltaToStr(delta: number): string {
     return ''
 }
 
-export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement, renderingCommon: RenderingCommon): void => {
+export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIssue, row: HTMLTableRowElement): Promise<void> => {
     let markdownNotes: TFile[] = null
     for (const column of columns) {
         switch (column.type) {
             case ESearchColumnsTypes.KEY:
                 createEl('a', {
                     cls: 'no-wrap',
-                    href: renderingCommon.issueUrl(issue.key),
+                    href: RC.issueUrl(issue.account, issue.key),
                     text: column.compact ? '🔗' : issue.key,
-                    title: column.compact ? issue.key : '',
+                    title: column.compact ? issue.key : RC.issueUrl(issue.account, issue.key),
                     parent: createEl('td', { parent: row })
                 })
                 break
@@ -58,14 +60,31 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('td', { text: issue.fields.summary, parent: row })
                 }
                 break
+            case ESearchColumnsTypes.DESCRIPTION:
+                if (column.compact) {
+                    let descriptionCompact = issue.fields.description.substring(0, DESCRIPTION_COMPACT_MAX_LENGTH)
+                    if (issue.fields.description.length > DESCRIPTION_COMPACT_MAX_LENGTH) {
+                        descriptionCompact += '…'
+                    }
+                    createEl('td', { text: descriptionCompact, title: issue.fields.description, parent: row })
+                } else {
+                    createEl('td', { text: issue.fields.description, parent: row })
+                }
+                break
             case ESearchColumnsTypes.TYPE:
                 const typeCell = createEl('td', { parent: row })
-                createEl('img', {
-                    attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
-                    title: column.compact ? issue.fields.issuetype.name : '',
-                    cls: 'letter-height',
-                    parent: typeCell
-                })
+                if (issue.fields.issuetype.iconUrl) {
+                    createEl('img', {
+                        attr: { src: issue.fields.issuetype.iconUrl, alt: issue.fields.issuetype.name },
+                        title: column.compact ? issue.fields.issuetype.name : '',
+                        cls: 'letter-height',
+                        parent: typeCell
+                    })
+                } else {
+                    if (column.compact) {
+                        createSpan({ text: issue.fields.issuetype.name[0].toUpperCase(), title: issue.fields.issuetype.name, parent: typeCell })
+                    }
+                }
                 if (!column.compact) {
                     createSpan({ text: ' ' + issue.fields.issuetype.name, parent: typeCell })
                 }
@@ -86,9 +105,9 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 break
             case ESearchColumnsTypes.REPORTER:
                 const reporterName = issue.fields.reporter.displayName || ''
-                if (column.compact && reporterName) {
+                if (column.compact && reporterName && issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION]) {
                     createEl('img', {
-                        attr: { src: issue.fields.reporter.avatarUrls['16x16'], alt: reporterName },
+                        attr: { src: issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION], alt: reporterName },
                         title: reporterName,
                         cls: 'avatar-image',
                         parent: createEl('td', { parent: row })
@@ -99,9 +118,9 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 break
             case ESearchColumnsTypes.ASSIGNEE:
                 const assigneeName = issue.fields.assignee.displayName || ''
-                if (column.compact && assigneeName) {
+                if (column.compact && assigneeName && issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION]) {
                     createEl('img', {
-                        attr: { src: issue.fields.assignee.avatarUrls['16x16'], alt: assigneeName },
+                        attr: { src: issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION], alt: assigneeName },
                         title: assigneeName,
                         cls: 'avatar-image',
                         parent: createEl('td', { parent: row })
@@ -112,22 +131,32 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 break
             case ESearchColumnsTypes.PRIORITY:
                 const priorityCell = createEl('td', { parent: row })
-                createEl('img', {
-                    attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
-                    title: column.compact ? issue.fields.priority.name : '',
-                    cls: 'letter-height',
-                    parent: priorityCell
-                })
-                if (!column.compact) {
-                    createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
+                if (issue.fields.priority && issue.fields.priority.name) {
+                    if (issue.fields.priority.iconUrl) {
+                        createEl('img', {
+                            attr: { src: issue.fields.priority.iconUrl, alt: issue.fields.priority.name },
+                            title: column.compact ? issue.fields.priority.name : '',
+                            cls: 'letter-height',
+                            parent: priorityCell
+                        })
+                    } else if (column.compact) {
+                        createSpan({ text: issue.fields.priority.name[0].toUpperCase(), title: issue.fields.priority.name, parent: priorityCell })
+                    }
+                    if (!column.compact) {
+                        createSpan({ text: ' ' + issue.fields.priority.name, parent: priorityCell })
+                    }
+                } else {
+                    priorityCell.setText('-')
                 }
                 break
             case ESearchColumnsTypes.STATUS:
-                const statusColor = JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 'is-light'
+                const statusColor = JIRA_STATUS_COLOR_MAP_BY_NAME[issue.fields.status.name] || 
+                JIRA_STATUS_COLOR_MAP[issue.fields.status.statusCategory.colorName] || 
+                'is-light'
                 if (column.compact) {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name[0].toUpperCase(), title: issue.fields.status.name, attr: { 'data-status': issue.fields.status.name }, parent: createEl('td', { parent: row }) })
                 } else {
-                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, parent: createEl('td', { parent: row }) })
+                    createSpan({ cls: `ji-tag no-wrap ${statusColor}`, text: issue.fields.status.name, title: issue.fields.status.description, attr: { 'data-status': issue.fields.status.name }, parent: createEl('td', { parent: row }) })
                 }
                 break
             case ESearchColumnsTypes.DUE_DATE:
@@ -214,24 +243,25 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                 createEl('td', { text: issue.fields.progress.percent.toString() + '%', parent: row })
                 break
             case ESearchColumnsTypes.CUSTOM_FIELD:
-                createEl('td', { text: issue.fields[`customfield_${column.extra}`].toString(), parent: row })
+                createEl('td', { text: renderCustomField(issue, column.extra), parent: row })
                 break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
-                    markdownNotes = renderingCommon.getNotes()
+                    markdownNotes = RC.getNotes()
                 }
                 const noteCell = createEl('td', { parent: row })
-                const connectedNotes = markdownNotes.filter(n => n.name.startsWith(issue.key))
+                const noteRegex = new RegExp('^' + issue.key + '[^0-9]')
+                const connectedNotes = markdownNotes.filter(n => n.name.match(noteRegex))
                 if (connectedNotes.length > 0) {
                     for (const note of connectedNotes) {
                         if (column.extra) {
-                            renderNoteFrontMatter(column, note, noteCell, renderingCommon)
+                            renderNoteFrontMatter(column, note, noteCell)
                         } else {
                             renderNoteFile(column, note, noteCell)
                         }
                     }
                 } else {
-                    createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link', parent: noteCell })
+                    createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link icon-link', parent: noteCell })
                 }
                 break
             case ESearchColumnsTypes.LAST_VIEWED:
@@ -239,6 +269,38 @@ export const renderTableColumn = (columns: ISearchColumn[], issue: IJiraIssue, r
                     createEl('td', { text: '🕑', title: dateToStr(issue.fields.lastViewed), parent: row })
                 } else {
                     createEl('td', { text: dateToStr(issue.fields.lastViewed), parent: row })
+                }
+                break
+            case ESearchColumnsTypes.DEV_STATUS:
+                const cacheKey = 'dev-status-' + issue.id
+                let devStatus: IJiraDevStatus = null
+                const devStatusCacheItem = ObjectsCache.get(cacheKey)
+                if (devStatusCacheItem) {
+                    devStatus = devStatusCacheItem.data as IJiraDevStatus
+                } else {
+                    devStatus = await JiraClient.getDevStatus(issue.id, { account: issue.account })
+                    ObjectsCache.add(cacheKey, devStatus)
+                }
+                const cell = createEl('td', { parent: row })
+                const prDetails = devStatus.summary.pullrequest.overall.details
+                if (prDetails.openCount + prDetails.mergedCount + prDetails.declinedCount > 0) {
+                    if (prDetails.openCount > 0) {
+                        const prOpen = createSpan({ parent: cell, cls: `pull-request-tag pull-request-open ${RC.getTheme()}`, title: 'Open pull-request' })
+                        setIcon(prOpen, 'git-pull-request')
+                        prOpen.appendText(`${prDetails.openCount}`)
+                    }
+                    if (prDetails.mergedCount > 0) {
+                        const prMerged = createSpan({ parent: cell, cls: `pull-request-tag pull-request-merged ${RC.getTheme()}`, title: 'Merged pull-request' })
+                        setIcon(prMerged, 'git-merge')
+                        prMerged.appendText(`${prDetails.mergedCount}`)
+                    }
+                    if (prDetails.declinedCount > 0) {
+                        const prDeclined = createSpan({ parent: cell, cls: `pull-request-tag pull-request-delete ${RC.getTheme()}`, title: 'Declined pull-request' })
+                        setIcon(prDeclined, 'git-delete')
+                        prDeclined.appendText(`${prDetails.declinedCount}`)
+                    }
+                } else {
+                    createSpan({ parent: cell, title: 'No data available', text: '-' })
                 }
                 break
         }
@@ -249,19 +311,30 @@ function renderNoteFile(column: ISearchColumn, note: TFile, noteCell: HTMLTableC
     if (column.compact) {
         createEl('a', { text: '📝', title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
     } else {
-        let noteNameWithoutExtension = note.name.split('.')
+        const noteNameWithoutExtension = note.name.split('.')
         noteNameWithoutExtension.pop()
         createEl('a', { text: noteNameWithoutExtension.join('.'), title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
         createEl('br', { parent: noteCell })
     }
 }
 
-function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement, renderingCommon: RenderingCommon) {
-    const frontMatter = renderingCommon.getFrontMatter(note)
+function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTMLTableCellElement) {
+    const frontMatter = RC.getFrontMatter(note)
     const values = jsonpath.query(frontMatter, '$.' + column.extra)
     for (let value of values) {
         value = typeof value === 'object' ? JSON.stringify(value) : value.toString()
         createEl('a', { text: value, title: note.path, href: note.path, cls: 'internal-link', parent: noteCell })
         createEl('br', { parent: noteCell })
     }
+}
+
+function renderCustomField(issue: IJiraIssue, customField: string): string {
+    if (!Number(customField)) {
+        customField = issue.account.cache.customFieldsNameToId[customField]
+    }
+    const value = issue.fields[`customfield_${customField}`]
+    if (typeof value === 'string' || typeof value === 'number') {
+        return value.toString()
+    }
+    return JSON.stringify(value)
 }

@@ -1,49 +1,51 @@
-import { IJiraIssueSettings } from "./settings"
+import { SettingsData } from "./settings"
+
 const ms = require('ms')
 const moment = require('moment')
 
 interface CacheItem {
     updateTime: number,
-    data: any,
+    data: unknown,
     isError: boolean,
 }
 interface Cache {
     [key: string]: CacheItem
 }
 
-export class ObjectsCache {
-    private _settings: IJiraIssueSettings
-    private _cache: Cache
+let cache: Cache = {}
 
-    constructor(settings: IJiraIssueSettings) {
-        this._settings = settings
-        this._cache = {}
-    }
+export default {
 
-    add<T>(key: string, object: T, isError: boolean = false): CacheItem {
-        this._cache[key] = {
+    add<T>(key: string, object: T, isError = false): CacheItem {
+        cache[key] = {
             updateTime: Date.now(),
             data: object,
             isError: isError,
         }
-        return this._cache[key]
-    }
+        return cache[key]
+    },
 
-    get(key: string) {
-        if (key in this._cache && this._cache[key].updateTime + ms(this._settings.cacheTime) > Date.now()) {
-            return this._cache[key]
+    get(key: string): CacheItem {
+        if (key in cache && cache[key].updateTime + ms(SettingsData.cacheTime) > Date.now()) {
+            return cache[key]
         }
         return null
-    }
+    },
 
-    getTime(key: string) {
-        if (key in this._cache) {
-            return moment(this._cache[key].updateTime).format('llll')
+    getTime(key: string): string {
+        if (key in cache) {
+            return moment(cache[key].updateTime).format('llll')
         }
         return null
-    }
+    },
 
-    clear() {
-        this._cache = {}
-    }
+    delete(key: string): void {
+        if (key in cache) {
+            delete cache[key]
+        }
+    },
+
+    clear(): void {
+        cache = {}
+    },
 }

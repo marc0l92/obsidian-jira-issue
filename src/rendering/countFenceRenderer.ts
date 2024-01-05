@@ -1,45 +1,38 @@
 import { MarkdownPostProcessorContext } from "obsidian"
-import { IJiraSearchResults } from "../client/jiraInterfaces"
-import { JiraClient } from "../client/jiraClient"
-import { ObjectsCache } from "../objectsCache"
-import { RenderingCommon } from "./renderingCommon"
+import { IJiraSearchResults } from "../interfaces/issueInterfaces"
+import JiraClient from "../client/jiraClient"
+import ObjectsCache from "../objectsCache"
+import RC from "./renderingCommon"
+import { SearchView } from "../searchView"
 
-export class CountFenceRenderer {
-    private _rc: RenderingCommon
-    private _client: JiraClient
-    private _cache: ObjectsCache
-
-    constructor(renderingCommon: RenderingCommon, client: JiraClient, cache: ObjectsCache) {
-        this._rc = renderingCommon
-        this._client = client
-        this._cache = cache
+function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, searchView: SearchView): void {
+    const tagsRow = createDiv('ji-tags has-addons')
+    RC.renderAccountColorBand(searchResults.account, tagsRow)
+    if (searchView.label !== '') {
+        createSpan({ cls: `ji-tag is-link ${RC.getTheme()}`, text: searchView.label || `Count`, title: searchView.query, parent: tagsRow })
     }
+    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: searchResults.total.toString(), title: searchView.query, parent: tagsRow })
+    el.replaceChildren(RC.renderContainer([tagsRow]))
+}
 
-    async render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
-        // console.log(`Search query: ${source}`)
-        const cachedSearchResults = this._cache.get(source)
-        if (cachedSearchResults) {
-            if (cachedSearchResults.isError) {
-                this._rc.renderSearchError(el, source, cachedSearchResults.data)
-            } else {
-                this.renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults).total, source)
-            }
+export const CountFenceRenderer = async (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> => {
+    // console.log(`Search query: ${source}`)
+    const searchView = SearchView.fromString(source)
+    const cachedSearchResults = ObjectsCache.get(searchView.getCacheKey())
+    if (cachedSearchResults) {
+        if (cachedSearchResults.isError) {
+            RC.renderSearchError(el, cachedSearchResults.data as string, searchView)
         } else {
-            this._rc.renderLoadingItem('View in browser', this._rc.searchUrl(source))
-            this._client.getSearchResults(source, -1).then(newSearchResults => {
-                const searchResults: IJiraSearchResults = this._cache.add(source, newSearchResults).data
-                this.renderSearchCount(el, searchResults.total, source)
-            }).catch(err => {
-                this._cache.add(source, err, true)
-                this._rc.renderSearchError(el, source, err)
-            })
+            renderSearchCount(el, (cachedSearchResults.data as IJiraSearchResults), searchView)
         }
-    }
-
-    private renderSearchCount(el: HTMLElement, searchResultsCount: number, query: string): void {
-        const tagsRow = createDiv('ji-tags has-addons')
-        createSpan({ cls: `ji-tag is-link ${this._rc.getTheme()}`, text: `Count`, title: query, parent: tagsRow })
-        createSpan({ cls: `ji-tag ${this._rc.getTheme()}`, text: searchResultsCount.toString(), title: query, parent: tagsRow })
-        el.replaceChildren(this._rc.renderContainer([tagsRow]))
+    } else {
+        RC.renderLoadingItem('Loading...')
+        JiraClient.getSearchResults(searchView.query, { limit: 1 }).then(newSearchResults => {
+            const searchResults = ObjectsCache.add(searchView.getCacheKey(), newSearchResults).data as IJiraSearchResults
+            renderSearchCount(el, searchResults, searchView)
+        }).catch(err => {
+            ObjectsCache.add(searchView.getCacheKey(), err, true)
+            RC.renderSearchError(el, err, searchView)
+        })
     }
 }

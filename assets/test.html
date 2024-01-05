@@ -10,6 +10,7 @@
     <style>
         .container {
             padding: 10px;
+            width: 700px;
         }
 
         body {
@@ -166,11 +167,92 @@
         .jira-issue-custom-field {
             color: red;
         }
+
+        .tags.with-children {
+            flex-direction: column;
+            display: flex;
+            flex-wrap: nowrap;
+            align-content: flex-start;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .tags.with-children .tags,
+        .tags.with-children .tag {
+            margin-bottom: 0;
+        }
+
+        /* .tags.with-children .children {
+            margin-left: 5px
+        } */
+
+        .tags.children:first-child::before {
+            content: "├";
+        }
+        .tags.children::before(:last-child){
+            content: "└";
+        }
     </style>
 </head>
 
 <body class="jira-issue-container">
     <section class="section">
+        <div class="container">
+            <div class="tags with-children">
+                <div class="tags has-addons">
+                    <span class="tag is-light"><img
+                            src="https://issues.apache.org/jira/secure/viewavatar?size=xsmall&avatarId=21148&avatarType=issuetype" /></span>
+                    <a class="tag is-link is-light">OPEN-222</a>
+                    <span class="tag is-light">Support for SL SLAPP/SLURLs not present or not working</span>
+                    <span class="tag is-success">CLOSED</span>
+                </div>
+                <div class="tags children has-addons">
+                    <span class="tag is-light"><img
+                            src="https://jira.secondlife.com/secure/viewavatar?size=xsmall&avatarId=13926&avatarType=issuetype" /></span>
+                    <a class="tag is-link is-light">OPEN-222</a>
+                    <span class="tag is-light">DEV - Implementation</span>
+                    <span class="tag is-success">CLOSED</span>
+                </div>
+                <div class="tags children has-addons">
+                    <span class="tag is-light"><img
+                            src="https://jira.secondlife.com/secure/viewavatar?size=xsmall&avatarId=13926&avatarType=issuetype" /></span>
+                    <a class="tag is-link is-light">OPEN-222</a>
+                    <span class="tag is-light">QA - Validation</span>
+                    <span class="tag is-success">CLOSED</span>
+                </div>
+            </div>
+            <div class="tags has-addons">
+                <span class="tag is-light"><img
+                        src="https://jira.secondlife.com/secure/viewavatar?size=xsmall&avatarId=13913&avatarType=issuetype" /></span>
+                <a class="tag is-link is-light">OPEN-302</a>
+                <span class="tag is-light">TPV Havok stub for Linux fails to link</span>
+                <span class="tag is-info">OPEN</span>
+            </div>
+            <div class="tags has-addons">
+                <span class="tag is-light"><span class="spinner"></span></span>
+                <a class="tag is-link is-light">OPEN-302</a>
+                <span class="tag is-light">Loading ...</span>
+            </div>
+            <div class="tags has-addons">
+                <span class="tag is-dark"><img
+                        src="https://jira.secondlife.com/secure/viewavatar?size=xsmall&avatarId=13913&avatarType=issuetype" /></span>
+                <a class="tag is-link is-dark">OPEN-302</a>
+                <span class="tag is-dark">TPV Havok stub for Linux fails to link</span>
+                <span class="tag is-info">OPEN</span>
+            </div>
+            <div class="tags has-addons">
+                <span class="tag is-dark"><span class="spinner"></span></span>
+                <a class="tag is-link is-dark">OPEN-302</a>
+                <span class="tag is-dark">Loading ...</span>
+            </div>
+            <div class="tags has-addons">
+                <a class="tag is-danger is-light">JiraIssue</a>
+                <span class="tag is-danger">No valid issues found</span>
+            </div>
+            <div class="tags has-addons">
+                <span class="tag is-light">39</span>
+            </div>
+        </div>
         <div class="container">
             <div class="tags has-addons">
                 <span class="tag is-light"><img

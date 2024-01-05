@@ -1,0 +1,55 @@
+name: Create new release on new tag
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_run:
+    workflows: ["Manually create release"]
+    types:
+      - completed
+
+env:
+  PLUGIN_NAME: obsidian-jira-issue
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Build
+        id: build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+          mkdir ${{ env.PLUGIN_NAME }}
+          cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
+          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+          echo "tag_name=$(git tag --sort version:refname | tail -n 1)" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./${{ env.PLUGIN_NAME }}.zip
+            ./main.js
+            ./manifest.json
+            ./styles.css
+          tag_name: ${{ github.ref }}
+          # name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: true

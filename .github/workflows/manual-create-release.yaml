@@ -1,0 +1,53 @@
+name: Manually create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Name of the tag to use for the next release
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: 'master'
+          fetch-depth: 0
+
+      - name: Check that the last commit is not tagged
+        run: |
+          if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]]; then
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Update version
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run version ${{ inputs.tag }}
+
+      - name: Configure git credentials
+        run: |
+          git config --global user.name 'Github Action'
+          git config --global user.email 'marc0l92@users.noreply.github.com'
+
+      - name: Commit and push changes
+        run: |
+          git status
+          git add .
+          git commit -m "Update release version to ${{ inputs.tag }}"
+          git push
+          git tag ${{ inputs.tag }}
+          git push --tags

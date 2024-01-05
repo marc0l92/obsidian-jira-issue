@@ -1,0 +1,18 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+
+  categories:
+    - title: New Features 🎉
+      labels:
+        - feature
+    - title: Bug Fixes 🐞
+      labels:
+        - bug
+    - title: Documentation updates 📖
+      labels:
+        - documentation
+    - title: Other Changes
+      labels:
+        - "*"
