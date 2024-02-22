@@ -48,4 +48,14 @@ export default {
     clear(): void {
         cache = {}
     },
+
+    dumpKeysAndSummaries(): { [key: string]: string } {
+        const keysAndSummaries: any = {}
+        // Simple assumption: JIRA ticket key includes '-' at position > 0
+        const filteredKeys = Object.keys(cache).filter((key) => key.indexOf('-') > 0)
+        for (let key of filteredKeys) {
+            keysAndSummaries[key] = (cache[key]?.data as any)?.fields?.summary
+        }
+        return keysAndSummaries
+    }
 }
