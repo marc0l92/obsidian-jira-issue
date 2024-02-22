@@ -78,7 +78,7 @@ export default class JiraIssuePlugin extends Plugin {
                 const JIRA_DUMP_FILENAME = 'jira-keys-and-summaries.md'
                 let theFile= ObsidianApp.vault.getRoot().children.find((file) => file.name === JIRA_DUMP_FILENAME)
                 if (theFile && theFile instanceof TFile) {
-                    const updateInventory = updateStaticInventoryFromCache(ObsidianApp)
+                    const updateInventory = updateStaticInventoryFromCache()
                     ObsidianApp.vault.process(theFile as TFile, updateInventory).then(() => {
                         new Notice(`JiraIssue: jira tickets inventory updated in ${JIRA_DUMP_FILENAME}`)
                     })

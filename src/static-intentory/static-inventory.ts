@@ -1,5 +1,4 @@
 import ObjectsCache from "../objectsCache";
-import {App} from "obsidian";
 
 /*
 
@@ -22,7 +21,7 @@ Storing can be done on demand via Obsidian command, the inventory is read from t
 const escapeUnescapedPipe = (s: string) => s.replace(/(?<!\\)\|/g, '\\|')
 const convertNewLinesToMDTableFormat = (s: string) => s.replace(/\n/g, '<br>')
 
-export const updateStaticInventoryFromCache = (ObsidianApp: App) => {
+export const updateStaticInventoryFromCache = () => {
     const keysAndSummaries = ObjectsCache.dumpKeysAndSummaries()
     return (originalContent: string): string => {
         const DISCLAIMER_LINE = '=== DO NOT MODIFY BELOW THIS LINE - IT WILL BE OVERWRITTEN ==='
