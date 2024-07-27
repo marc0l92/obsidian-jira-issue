@@ -517,12 +517,12 @@ th {
     text-decoration: none;
 }
 
-svg.svg-icon.visible {
+svg.svg-icon.jira-issue-visible {
     stroke: none;
     fill: currentColor;
 }
 
-svg.svg-icon.hidden {
+svg.svg-icon.jira-issue-hidden {
     stroke: none;
     fill: currentColor;
 }
