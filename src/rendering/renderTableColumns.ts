@@ -286,17 +286,17 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 if (prDetails.openCount + prDetails.mergedCount + prDetails.declinedCount > 0) {
                     if (prDetails.openCount > 0) {
                         const prOpen = createSpan({ parent: cell, cls: `pull-request-tag pull-request-open ${RC.getTheme()}`, title: 'Open pull-request' })
-                        setIcon(prOpen, 'git-pull-request')
+                        setIcon(prOpen, 'jira-issue-git-pull-request')
                         prOpen.appendText(`${prDetails.openCount}`)
                     }
                     if (prDetails.mergedCount > 0) {
                         const prMerged = createSpan({ parent: cell, cls: `pull-request-tag pull-request-merged ${RC.getTheme()}`, title: 'Merged pull-request' })
-                        setIcon(prMerged, 'git-merge')
+                        setIcon(prMerged, 'jira-issue-git-merge')
                         prMerged.appendText(`${prDetails.mergedCount}`)
                     }
                     if (prDetails.declinedCount > 0) {
                         const prDeclined = createSpan({ parent: cell, cls: `pull-request-tag pull-request-delete ${RC.getTheme()}`, title: 'Declined pull-request' })
-                        setIcon(prDeclined, 'git-delete')
+                        setIcon(prDeclined, 'jira-issue-git-delete')
                         prDeclined.appendText(`${prDetails.declinedCount}`)
                     }
                 } else {
