@@ -178,8 +178,8 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         const buyMeACoffee = containerEl.createEl('a', { href: 'https://ko-fi.com/marc0l92' })
         buyMeACoffee.appendChild(createEl('img', {
             attr: {
-                src: 'https://camo.githubusercontent.com/3c7d0ccc8f3d2f6071fbb1aae2dd2f755212d10bc37cd57cf7b3f53862a89d85/68747470733a2f2f617a3734333730322e766f2e6d7365636e642e6e65742f63646e2f6b6f6669332e706e67',
-                height: '50',
+                src: 'https://ko-fi.com/img/githubbutton_sm.svg',
+                height: '30',
             }
         }))
     }
@@ -475,7 +475,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     SettingsData.showColorBand = value
                     await this.saveSettings()
                 }))
-        
+
         new Setting(containerEl)
             .setName('Show Jira link')
             .setDesc('Make the result count in jira-search a link to the jira project with the jql from the search.')
@@ -483,7 +483,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                 .setValue(SettingsData.showJiraLink)
                 .onChange(async value => {
                     SettingsData.showJiraLink = value
-                    await this.saveSettings()                    
+                    await this.saveSettings()
                 }))
     }
 
