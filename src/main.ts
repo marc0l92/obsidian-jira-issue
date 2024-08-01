@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Notice, Plugin } from 'obsidian'
+import {App, DataWriteOptions, Editor, MarkdownView, Notice, Plugin, TAbstractFile, TFile, Vault} from 'obsidian'
 import { JiraIssueSettingTab } from './settings'
 import JiraClient from './client/jiraClient'
 import ObjectsCache from './objectsCache'
@@ -12,6 +12,7 @@ import { ViewPluginManager } from './rendering/inlineIssueViewPlugin'
 import { QuerySuggest } from './suggestions/querySuggest'
 import { setupIcons } from './icons/icons'
 import API from './api/api'
+import {updateStaticInventoryFromCache} from "./static-intentory/static-inventory";
 
 // TODO: text on mobile and implement horizontal scrolling
 
@@ -68,6 +69,22 @@ export default class JiraIssuePlugin extends Plugin {
                 ObjectsCache.clear()
                 JiraClient.updateCustomFieldsCache()
                 new Notice('JiraIssue: Cache cleaned')
+            }
+        })
+        this.addCommand({
+            id: 'obsidian-jira-issue-dump-keys-and-summaries',
+            name: 'Dump keys and summaries to file',
+            callback: () => {
+                const JIRA_DUMP_FILENAME = 'jira-keys-and-summaries.md'
+                let theFile= ObsidianApp.vault.getRoot().children.find((file) => file.name === JIRA_DUMP_FILENAME)
+                if (theFile && theFile instanceof TFile) {
+                    const updateInventory = updateStaticInventoryFromCache()
+                    ObsidianApp.vault.process(theFile as TFile, updateInventory).then(() => {
+                        new Notice(`JiraIssue: jira tickets inventory updated in ${JIRA_DUMP_FILENAME}`)
+                    })
+                } else {
+                    console.log(`JiraIssue: not found the ${JIRA_DUMP_FILENAME} at the root level of the vault. Nothing done.`)
+                }
             }
         })
         this.addCommand({
