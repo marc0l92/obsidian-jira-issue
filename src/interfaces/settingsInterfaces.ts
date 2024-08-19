@@ -154,4 +154,5 @@ export interface ISearchColumn {
     type: ESearchColumnsTypes
     compact: boolean
     extra?: string
+    dataPath?: string
 }

@@ -243,7 +243,7 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                 createEl('td', { text: issue.fields.progress.percent.toString() + '%', parent: row })
                 break
             case ESearchColumnsTypes.CUSTOM_FIELD:
-                createEl('td', { text: renderCustomField(issue, column.extra), parent: row })
+                createEl('td', { text: renderCustomField(issue, column.extra, column.dataPath), parent: row })
                 break
             case ESearchColumnsTypes.NOTES:
                 if (!markdownNotes) {
@@ -328,11 +328,22 @@ function renderNoteFrontMatter(column: ISearchColumn, note: TFile, noteCell: HTM
     }
 }
 
-function renderCustomField(issue: IJiraIssue, customField: string): string {
+function renderCustomField(issue: IJiraIssue, customField: string, dataPath: string | null): string {
     if (!Number(customField)) {
         customField = issue.account.cache.customFieldsNameToId[customField]
     }
-    const value = issue.fields[`customfield_${customField}`]
+    let value = issue.fields[`customfield_${customField}`]
+
+    if (dataPath && typeof value == 'object') {
+        const result = jsonpath.query(value , '$' + dataPath)
+        
+        if (Array.isArray(result) && result.some(item => typeof item == 'object')) {
+            value = result
+        } else {
+            value = result.join(', ')
+        }
+    }
+
     if (typeof value === 'string' || typeof value === 'number') {
         return value.toString()
     }
