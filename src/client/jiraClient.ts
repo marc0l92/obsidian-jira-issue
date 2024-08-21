@@ -162,7 +162,7 @@ async function fetchIssueImages(issue: IJiraIssue) {
     if (issue.fields) {
         if (issue.fields.issuetype && issue.fields.issuetype.iconUrl) {
             if (disableImages) {
-                issue.fields.issuetype.iconUrl = JIRA_ISSUE_TYPE_ICON_MAP[issue.fields.issuetype.name.toLowerCase()] || JIRA_DEFAULT_ISSUE_ICON
+                issue.fields.issuetype.iconUrl = JIRA_ISSUE_TYPE_ICON_MAP[issue.fields.issuetype.name.toLowerCase()] || (issue.fields.issuetype.name.toLowerCase().startsWith("sub-") && JIRA_ISSUE_TYPE_ICON_MAP["subtask"]) || JIRA_DEFAULT_ISSUE_ICON
             } else {
                 issue.fields.issuetype.iconUrl = await preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
             }
