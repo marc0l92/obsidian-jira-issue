@@ -56,6 +56,7 @@ export interface IJiraIssueAccountSettings {
     bareToken?: string
     priority: number
     color: string
+    disableImageFetch: boolean
     cache: {
         statusColor: Record<string, string>
         customFieldsIdToName: Record<string, string>
