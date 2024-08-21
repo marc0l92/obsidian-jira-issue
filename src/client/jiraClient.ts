@@ -2,6 +2,7 @@ import { Platform, requestUrl, RequestUrlParam, RequestUrlResponse } from 'obsid
 import { AVATAR_RESOLUTION, EAuthenticationTypes, IJiraIssueAccountSettings } from '../interfaces/settingsInterfaces'
 import { ESprintState, IJiraAutocompleteField, IJiraBoard, IJiraDevStatus, IJiraField, IJiraIssue, IJiraSearchResults, IJiraSprint, IJiraStatus, IJiraUser } from '../interfaces/issueInterfaces'
 import { SettingsData } from "../settings"
+import { JIRA_ISSUE_TYPE_ICON_MAP, JIRA_DEFAULT_ISSUE_ICON, JIRA_DEFAULT_PRIORITY_ICON, JIRA_PRIORITY_ICON_MAP} from 'src/rendering/renderingCommon'
 
 interface RequestOptions {
     method: string
@@ -157,18 +158,35 @@ async function preFetchImage(account: IJiraIssueAccountSettings, url: string): P
 }
 
 async function fetchIssueImages(issue: IJiraIssue) {
+    const disableImages = issue.account.disableImageFetch;
     if (issue.fields) {
         if (issue.fields.issuetype && issue.fields.issuetype.iconUrl) {
-            issue.fields.issuetype.iconUrl = await preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
+            if (disableImages) {
+                issue.fields.issuetype.iconUrl = JIRA_ISSUE_TYPE_ICON_MAP[issue.fields.issuetype.name.toLowerCase()] || JIRA_DEFAULT_ISSUE_ICON
+            } else {
+                issue.fields.issuetype.iconUrl = await preFetchImage(issue.account, issue.fields.issuetype.iconUrl)
+            }
         }
         if (issue.fields.reporter) {
-            issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION])
+            if (disableImages) {
+                issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION] = ""
+            } else {
+                issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.reporter.avatarUrls[AVATAR_RESOLUTION])
+            }
         }
         if (issue.fields.assignee && issue.fields.assignee.avatarUrls && issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION]) {
-            issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION])
+            if (disableImages) {
+                issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION] = ""
+            } else {
+                issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION] = await preFetchImage(issue.account, issue.fields.assignee.avatarUrls[AVATAR_RESOLUTION])
+            }
         }
         if (issue.fields.priority && issue.fields.priority.iconUrl) {
-            issue.fields.priority.iconUrl = await preFetchImage(issue.account, issue.fields.priority.iconUrl)
+            if (disableImages) {
+                issue.fields.priority.iconUrl = JIRA_PRIORITY_ICON_MAP[issue.fields.priority.name.toLowerCase()] || JIRA_DEFAULT_PRIORITY_ICON
+            } else {
+                issue.fields.priority.iconUrl = await preFetchImage(issue.account, issue.fields.priority.iconUrl)
+            }
         }
     }
 }

@@ -46,6 +46,7 @@ export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
     password: '',
     priority: 1,
     color: '#000000',
+    disableImageFetch: false,
     cache: {
         statusColor: {},
         customFieldsIdToName: {},
@@ -92,6 +93,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                         username: SettingsData.username,
                         password: SettingsData.password,
                         bareToken: SettingsData.bareToken,
+                        disableImageFetch: DEFAULT_ACCOUNT.disableImageFetch,
                         alias: DEFAULT_ACCOUNT.alias,
                         color: DEFAULT_ACCOUNT.color,
                         cache: DEFAULT_ACCOUNT.cache,
@@ -261,6 +263,15 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     // Force refresh
                     this.displayModifyAccountPage(prevAccount, newAccount)
                 }))
+        new Setting(containerEl)
+                .setName('Disable Icon fetching')
+                .setDesc('Disable fetching of icons (e.g. issue type, priority) from this Jira server and instead use official icons from Atlassian.')
+                .addToggle(toggle => toggle
+                    .setValue(newAccount.disableImageFetch)
+                    .onChange(async value => {
+                        newAccount.disableImageFetch = value
+                        this.displayModifyAccountPage(prevAccount, newAccount)
+                    }))
         if (newAccount.authenticationType === EAuthenticationTypes.BASIC) {
             new Setting(containerEl)
                 .setName('Username')
