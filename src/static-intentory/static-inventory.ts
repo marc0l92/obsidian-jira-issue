@@ -85,6 +85,8 @@ export const updateStaticInventoryFromCache = () => {
                     const key = match[1].trim()
                     const summary = match[2].trim()
                     if (/^.+-\d+/.test(key) && !keysAndSummaries[key]) {
+                        // TODO: when the summary fetching from JIRA fails, the inventory is overridden with blank summary text,
+                        //       need to fix this - retain prior summary
                         keysAndSummaries[key] = escapeUnescapedPipe(summary)
                     }
                 }
@@ -123,7 +125,8 @@ export const updateStaticInventoryFromCache = () => {
 
         const dumpTickets = (keys: string[]) => {
             for (let ticketKey of keys) {
-                const escapedSummary = escapeUnescapedPipe(keysAndSummaries[ticketKey]) || ''
+                const rawSummary = keysAndSummaries[ticketKey] || ''
+                const escapedSummary = escapeUnescapedPipe(rawSummary) || ''
                 const summaryWithFlattenedNewLines = convertNewLinesToMDTableFormat(escapedSummary)
                 ticketKey = keysAsPlainText ? ticketKey : `JIRA:-${ticketKey}`
                 updatedFormattedInventoryWithRetainedTopContent.push(`|${ticketKey}| ${summaryWithFlattenedNewLines} |`)
