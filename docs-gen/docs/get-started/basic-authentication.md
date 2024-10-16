@@ -24,7 +24,7 @@ The authentication type depends on the type of Jira you use:
 If you choose `Basic Authentication`, you need to provide the username and password to authenticate with the server.
 
 - **Jira Server**: Use your regular username and password.
-- **Jira Cloud**: Use your **email address** as the username, and an **API token** as the password. Note: Jira Cloud does **not** accept your regular password for API access.
+- **Jira Cloud**: Use your **email address** as the username, and an **API token** as the password. Note: Jira Cloud does **not** accept your regular password for API access. If you use your regular password instead of an API token, the connection may appear to work, but it will not return data as expected.
 
 To create a new API token in Jira Cloud, navigate to `Account Settings > Security > Create and manage API tokens`. You can find more details here: [Official Documentation](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/).
 
