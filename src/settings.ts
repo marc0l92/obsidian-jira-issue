@@ -142,6 +142,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         this.displayHeader()
         this.displayAccountsSettings()
         this.displayRenderingSettings()
+        this.displayNoteTemplateSettings();
         this.displaySearchColumnsSettings(isSearchColumnsDetailsOpen)
         this.displayExtraSettings()
         this.displayFooter()
@@ -418,6 +419,37 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     this.display()
                 }))
     }
+
+    displayNoteTemplateSettings() {
+        const { containerEl } = this;
+        containerEl.createEl("h3", { text: "Note template" });
+    
+        //template picker
+        new Setting(containerEl)
+            .setName('Note Template')
+            .setDesc("Template to use when creating a new note from a Jira issue.")
+            .addText(text => 
+                text
+                .setValue(SettingsData.noteTemplate)
+                .onChange(async (value) => {
+                    SettingsData.noteTemplate = value;
+                    await this.saveSettings();
+                })
+            );
+
+        new Setting(containerEl)
+            .setName('Note Folder')
+            .setDesc("Folder where to save the new note.")
+            .addText(text => 
+                text
+                .setValue(SettingsData.noteFolder)
+                .onChange(async (value) => {
+                  SettingsData.noteFolder = value;
+                  await this.saveSettings();
+                })
+            );
+    
+      }
 
     displayRenderingSettings() {
         const { containerEl } = this

@@ -1,4 +1,4 @@
-import { FrontMatterCache, TFile } from "obsidian"
+import { FrontMatterCache, TFile, TFolder } from "obsidian"
 import { IJiraIssue } from "../interfaces/issueInterfaces"
 import { EColorSchema, IJiraIssueAccountSettings } from "../interfaces/settingsInterfaces"
 import { ObsidianApp } from "../main"
@@ -66,9 +66,25 @@ export default {
     getNotes(): TFile[] {
         return ObsidianApp.vault.getMarkdownFiles()
     },
-
+    
     getFrontMatter(file: TFile): FrontMatterCache {
         return ObsidianApp.metadataCache.getFileCache(file).frontmatter
+    },
+    
+    readNote(file: any): Promise<string> {
+        return ObsidianApp.vault.read(file)
+    },
+
+    createNote(path: string, contents: string): Promise<TFile> {
+        return ObsidianApp.vault.create(path, contents)
+    },
+
+    createFolder(path: string): Promise<TFolder> {
+        return ObsidianApp.vault.createFolder(path);
+    },
+
+    getAbstractFileByPath(path: string){
+        return ObsidianApp.vault.getAbstractFileByPath(path);
     },
 
     renderContainer(children: HTMLElement[]): HTMLElement {

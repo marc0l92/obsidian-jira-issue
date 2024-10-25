@@ -45,6 +45,9 @@ export interface IJiraIssueSettings {
     username?: string
     password?: string
     bareToken?: string
+
+    noteFolder?: string
+    noteTemplate?: string
 }
 
 export interface IJiraIssueAccountSettings {
