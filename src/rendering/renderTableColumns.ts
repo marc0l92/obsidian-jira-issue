@@ -5,6 +5,7 @@ import * as jsonpath from 'jsonpath'
 import ObjectsCache from "../objectsCache"
 import JiraClient from "../client/jiraClient"
 import { AVATAR_RESOLUTION, ESearchColumnsTypes, ISearchColumn } from "../interfaces/settingsInterfaces"
+import { SettingsData } from "../settings"
 
 const DESCRIPTION_COMPACT_MAX_LENGTH = 20
 
@@ -261,7 +262,24 @@ export const renderTableColumn = async (columns: ISearchColumn[], issue: IJiraIs
                         }
                     }
                 } else {
-                    createEl('a', { text: '➕', title: 'Create new note', href: issue.key, cls: 'internal-link icon-link', parent: noteCell })
+                    const folder = SettingsData.noteFolder ?? "";
+                    const fullPath = `${folder}/${issue.key}.md`;
+
+                    let el = createEl('a', { text: '➕', title: 'Create new note', href: `${fullPath}`, cls: 'internal-link icon-link', parent: noteCell })
+
+                    if (SettingsData.noteTemplate && !RC.getAbstractFileByPath(fullPath)) 
+                    {
+                        el.addEventListener("click", async () => {
+                            if(folder && folder.length > 0 && !RC.getAbstractFileByPath(folder)){
+                                await RC.createFolder(folder);
+                            }
+
+                            RC.readNote(RC.getAbstractFileByPath(SettingsData.noteTemplate))
+                            .then((templateContents: any) => RC.createNote(fullPath, templateContents))
+                            .then((newNote: any) => newNote.edit())
+                            .catch((error: any) => console.debug("Error writing template",error))
+                        })
+                    }
                 }
                 break
             case ESearchColumnsTypes.LAST_VIEWED:
