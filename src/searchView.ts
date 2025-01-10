@@ -46,6 +46,7 @@ export class SearchView {
                             .filter(column => column.trim())
                             .map(column => {
                                 let columnExtra = ''
+                                let dataPath = null;
                                 // Compact
                                 const compact = column.trim().startsWith(COMPACT_SYMBOL)
                                 column = column.trim().replace(new RegExp(`^${COMPACT_SYMBOL}`), '')
@@ -57,8 +58,15 @@ export class SearchView {
                                 }
                                 // Custom field
                                 if (column.startsWith('$')) {
-                                    columnExtra = column.slice(1)
+                                    const split = column.split('..')
+
+                                    columnExtra = split[0].slice(1)
                                     column = ESearchColumnsTypes.CUSTOM_FIELD
+                                    
+                                    if (split.length > 1) {
+                                        dataPath = split[1]
+                                    }
+
                                     if (SettingsData.cache.columns.indexOf(columnExtra.toUpperCase()) === -1) {
                                         throw new Error(`Custom field ${columnExtra} not found`)
                                     }
@@ -75,6 +83,7 @@ export class SearchView {
                                     type: column as ESearchColumnsTypes,
                                     compact: compact,
                                     extra: columnExtra,
+                                    dataPath: dataPath
                                 }
                             })
                         break
