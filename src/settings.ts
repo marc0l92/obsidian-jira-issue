@@ -165,13 +165,19 @@ export class JiraIssueSettingTab extends PluginSettingTab {
         settingsToStoreForDataJson.statusColorCache = null;
         
         // Original deletion of old/legacy root properties from data.json
-        delete settingsToStoreForDataJson['darkMode'];
-        delete settingsToStoreForDataJson['host'];
-        delete settingsToStoreForDataJson['authenticationType'];
-        delete settingsToStoreForDataJson['username'];
-        delete settingsToStoreForDataJson['password'];
-        delete settingsToStoreForDataJson['bareToken']; // Added from previous attempt, good to keep for cleanup
-        delete settingsToStoreForDataJson['customFieldsNames'];
+        const legacyKeysToDelete: string[] = [
+            'darkMode',
+            'host',
+            'authenticationType',
+            'username',
+            'password',
+            'bareToken', // Added from previous attempt, good to keep for cleanup
+            'customFieldsNames'
+        ];
+
+        for (const key of legacyKeysToDelete) {
+            delete settingsToStoreForDataJson[key];
+        }
 
         // Save general settings to data.json
         await this._plugin.saveData(settingsToStoreForDataJson);
