@@ -84,13 +84,18 @@ To help identify the Jira account used by each tag, it is possible to associate 
 
 ### Credentials storage
 
-The credentials are stored in clear in the configuration file of this plugin.
-The configuration file is located at:
+The credentials are stored in clear in a dedicated configuration file (`auth.json`) of this plugin.
+The general plugin configuration is located at:
 ```
 <your vault>/.obsidian/plugins/obsidian-jira-issue/data.json
 ```
+And the authentication data is stored at:
+```
+<your vault>/.obsidian/plugins/obsidian-jira-issue/auth.json
+```
 
 Pay attention when you synchronize the notes across devices because the credentials may be copied as well.
+If you are using a Git plugin to version your vault, it is highly recommended to add `auth.json` to your `.gitignore` file to prevent accidentally committing your credentials.
 
 ### API Calls
 
