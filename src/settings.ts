@@ -74,57 +74,127 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     }
 
     async loadSettings(): Promise<void> {
-        // Read plugin data and fill new fields with default values
-        Object.assign(SettingsData, DEFAULT_SETTINGS, await this._plugin.loadData())
-        for (const i in SettingsData.accounts) {
-            SettingsData.accounts[i] = Object.assign({}, DEFAULT_ACCOUNT, SettingsData.accounts[i])
-        }
-        SettingsData.cache = deepCopy(DEFAULT_SETTINGS.cache)
+        // Read plugin data (general settings, potentially legacy accounts)
+        const dataFromDataJson = await this._plugin.loadData() || {};
+        let accountsToUse: IJiraIssueAccountSettings[] | undefined = undefined;
+        let authFileExists = false;
+        let migrationFromDataJsonToAuthJsonNeeded = false;
 
-        if (SettingsData.accounts.length === 0 || SettingsData.accounts[0] === null) {
-            if (SettingsData.host) {
-                // Legacy credentials migration
+        try {
+            const authFileContent = await this.app.vault.adapter.read('.obsidian/plugins/obsidian-jira-issue/auth.json');
+            const parsedAuthFile = JSON.parse(authFileContent);
+            if (parsedAuthFile && Array.isArray(parsedAuthFile.accounts)) {
+                accountsToUse = parsedAuthFile.accounts;
+                authFileExists = true;
+            }
+        } catch (e) {
+            // auth.json doesn't exist or is invalid.
+            // Check if accounts exist in data.json for migration.
+            if (dataFromDataJson.accounts && Array.isArray(dataFromDataJson.accounts) && dataFromDataJson.accounts.length > 0) {
+                accountsToUse = dataFromDataJson.accounts;
+                migrationFromDataJsonToAuthJsonNeeded = true;
+            }
+        }
+
+        // Assign general settings from data.json, excluding accounts if they came from auth.json or will be migrated
+        const generalSettingsFromDataJson = { ...dataFromDataJson };
+        if (authFileExists || migrationFromDataJsonToAuthJsonNeeded) {
+            delete generalSettingsFromDataJson.accounts;
+        }
+        Object.assign(SettingsData, DEFAULT_SETTINGS, generalSettingsFromDataJson);
+
+        // Assign accounts
+        if (accountsToUse) {
+            SettingsData.accounts = accountsToUse;
+        } else {
+            // No accounts from auth.json and no accounts from data.json to migrate
+            SettingsData.accounts = []; // Initialize before potential legacy root migration
+        }
+
+        // Original logic for populating accounts with defaults
+        for (const i in SettingsData.accounts) {
+            SettingsData.accounts[i] = Object.assign({}, DEFAULT_ACCOUNT, SettingsData.accounts[i]);
+        }
+        // Original logic for global cache
+        SettingsData.cache = deepCopy(DEFAULT_SETTINGS.cache);
+
+        let performedLegacyRootOrFirstInstallMigration = false;
+        if (SettingsData.accounts.length === 0 || (SettingsData.accounts.length > 0 && SettingsData.accounts[0] === null)) { // accounts[0] === null is part of original check
+            if (SettingsData.host) { // Legacy root credentials migration
                 SettingsData.accounts = [
                     {
                         priority: 1,
                         host: SettingsData.host,
-                        authenticationType: SettingsData.authenticationType,
+                        authenticationType: SettingsData.authenticationType as EAuthenticationTypes, // Type assertion from previous attempt
                         username: SettingsData.username,
                         password: SettingsData.password,
                         bareToken: SettingsData.bareToken,
                         alias: DEFAULT_ACCOUNT.alias,
                         color: DEFAULT_ACCOUNT.color,
-                        cache: DEFAULT_ACCOUNT.cache,
+                        cache: deepCopy(DEFAULT_ACCOUNT.cache), // Ensure cache is deep copied
                     }
-                ]
-            } else {
+                ];
+                performedLegacyRootOrFirstInstallMigration = true;
+            } else if (!migrationFromDataJsonToAuthJsonNeeded) { // Avoid double-adding default if accounts are pending migration
                 // First installation
-                SettingsData.accounts = [DEFAULT_ACCOUNT]
+                SettingsData.accounts = [deepCopy(DEFAULT_ACCOUNT)]; // Ensure default account is deep copied
+                performedLegacyRootOrFirstInstallMigration = true;
             }
-            this.saveSettings()
         }
-        this.accountsConflictsFix()
+
+        this.accountsConflictsFix(); // Original logic
+
+        // If any migration happened (legacy root, first install, or accounts read from data.json needing move to auth.json)
+        // then save to persist changes (especially to write auth.json and clean data.json).
+        if (performedLegacyRootOrFirstInstallMigration || migrationFromDataJsonToAuthJsonNeeded) {
+            await this.saveSettings();
+        }
     }
 
     async saveSettings() {
-        const settingsToStore: IJiraIssueSettings = Object.assign({}, SettingsData, {
-            // Global cache settings cleanup
-            cache: DEFAULT_SETTINGS.cache, jqlAutocomplete: null, customFieldsIdToName: null, customFieldsNameToId: null, statusColorCache: null
-        })
-        // Account cache settings cleanup
-        settingsToStore.accounts.forEach(account => account.cache = DEFAULT_ACCOUNT.cache)
-        // Delete old properties
-        delete (settingsToStore as any)['darkMode']
-        delete (settingsToStore as any)['host']
-        delete (settingsToStore as any)['authenticationType']
-        delete (settingsToStore as any)['username']
-        delete (settingsToStore as any)['password']
-        delete (settingsToStore as any)['customFieldsNames']
+        // 1. Prepare settings for data.json (general settings, no accounts)
+        const settingsToStoreForDataJson: any = { ...SettingsData };
+        delete settingsToStoreForDataJson.accounts; // Accounts will be saved to auth.json
 
-        await this._plugin.saveData(settingsToStore)
+        // Original global cache settings cleanup for data.json
+        settingsToStoreForDataJson.cache = DEFAULT_SETTINGS.cache;
+        // These null assignments were part of the original saveSettings, ensure they are applied to the object being saved to data.json
+        settingsToStoreForDataJson.jqlAutocomplete = null;
+        settingsToStoreForDataJson.customFieldsIdToName = null;
+        settingsToStoreForDataJson.customFieldsNameToId = null;
+        settingsToStoreForDataJson.statusColorCache = null;
+        
+        // Original deletion of old/legacy root properties from data.json
+        delete settingsToStoreForDataJson['darkMode'];
+        delete settingsToStoreForDataJson['host'];
+        delete settingsToStoreForDataJson['authenticationType'];
+        delete settingsToStoreForDataJson['username'];
+        delete settingsToStoreForDataJson['password'];
+        delete settingsToStoreForDataJson['bareToken']; // Added from previous attempt, good to keep for cleanup
+        delete settingsToStoreForDataJson['customFieldsNames'];
+
+        // Save general settings to data.json
+        await this._plugin.saveData(settingsToStoreForDataJson);
+
+        // 2. Prepare accounts for auth.json
+        // Original account cache settings cleanup, applied before saving to auth.json
+        const accountsToStoreForAuthJson = SettingsData.accounts.map(account => {
+            const accountToSave = { ...account };
+            accountToSave.cache = DEFAULT_ACCOUNT.cache; // Reset cache for each account
+            return accountToSave;
+        });
+        const authDataToStore = { accounts: accountsToStoreForAuthJson };
+
+        // Save accounts to auth.json
+        try {
+            await this.app.vault.adapter.write('.obsidian/plugins/obsidian-jira-issue/auth.json', JSON.stringify(authDataToStore, null, 2));
+        } catch (e) {
+            new Notice('Error saving Jira authentication data to auth.json.');
+            console.error('JiraIssue: Error writing auth.json', e);
+        }
 
         if (this._onChangeListener) {
-            this._onChangeListener()
+            this._onChangeListener();
         }
     }
 
