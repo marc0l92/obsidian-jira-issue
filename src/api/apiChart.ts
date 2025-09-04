@@ -46,7 +46,7 @@ export async function getWorklogPerDay(projectKeyOrId: string, startDate: string
     }
     const usersSeries: IMultiSeries = {}
     for (const worklog of worklogs) {
-        const author = worklog.author.accountId || worklog.author.displayName || worklog.author.name || 'Unknown'
+        const author = worklog.author?.accountId || worklog.author?.displayName || worklog.author?.name || 'Unknown'
         if (!usersSeries[author]) {
             usersSeries[author] = Object.assign({}, emptySeries)
         }

@@ -54,7 +54,7 @@ export async function getWorkLogSeriesByUser(projectKeyOrId: string, startDate: 
     const worklogs = await API.macro.getWorkLogByDates(projectKeyOrId, startDate, endDate)
     const series: ISeries = {}
     for (const worklog of worklogs) {
-        const author = worklog.author.accountId || worklog.author.displayName || worklog.author.name || 'Unknown'
+        const author = worklog.author?.accountId || worklog.author?.displayName || worklog.author?.name || 'Unknown'
         if (!(author in series)) {
             series[author] = 0
         }
