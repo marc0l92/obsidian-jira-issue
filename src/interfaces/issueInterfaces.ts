@@ -94,9 +94,10 @@ export interface IJiraWorklog {
 export interface IJiraUser {
     active: boolean
     displayName: string
-    name: string
-    key: string
-    emailAddress: string
+    accountId: string
+    name?: string
+    key?: string
+    emailAddress?: string
     self: string
     avatarUrls: {
         '16x16': string
@@ -244,6 +245,7 @@ const newEmptyUser = () => {
             "48x48": '',
         },
         displayName: '',
+        accountId: '',
         self: '',
     } as IJiraUser
 }

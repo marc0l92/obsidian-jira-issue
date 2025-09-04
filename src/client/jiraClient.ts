@@ -101,6 +101,8 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
                 throw new Error(`The query is not valid`)
             case 404:
                 throw new Error(`Issue does not exist`)
+            case 410:
+                throw new Error(`API endpoint is no longer available. This may be due to API version changes. Please check your Jira API version compatibility.`)
             default:
                 throw new Error(`HTTP status ${response.status}`)
         }
@@ -197,7 +199,7 @@ export default {
 
     async getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSearchResults> {
         const opt = {
-            fields: options.fields || [],
+            fields: options.fields || ['id', 'key', 'summary', 'status', 'assignee', 'reporter', 'issuetype', 'priority', 'created', 'updated', 'project'],
             offset: options.offset || 0,
             limit: options.limit || 50,
             account: options.account || null,
@@ -211,11 +213,14 @@ export default {
         const searchResults = await sendRequest(
             {
                 method: 'GET',
-                path: `/search`,
+                path: `/search/jql`,
                 queryParameters: queryParameters,
                 account: opt.account,
             }
         ) as IJiraSearchResults
+        
+        // Debug: Log the response structure to help identify v3 API differences
+        SettingsData.logRequestsResponses && console.log('JiraIssue:SearchResults:', searchResults)
         for (const issue of searchResults.issues) {
             issue.account = searchResults.account
             await fetchIssueImages(issue)

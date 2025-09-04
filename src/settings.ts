@@ -13,7 +13,7 @@ const AUTHENTICATION_TYPE_DESCRIPTION = {
 
 export const DEFAULT_SETTINGS: IJiraIssueSettings = {
     accounts: [],
-    apiBasePath: '/rest/api/latest',
+    apiBasePath: '/rest/api/3',
     cacheTime: '15m',
     searchResultsLimit: 10,
     cache: {

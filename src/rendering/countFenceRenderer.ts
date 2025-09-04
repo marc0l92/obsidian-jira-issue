@@ -11,7 +11,8 @@ function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, s
     if (searchView.label !== '') {
         createSpan({ cls: `ji-tag is-link ${RC.getTheme()}`, text: searchView.label || `Count`, title: searchView.query, parent: tagsRow })
     }
-    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: searchResults.total.toString(), title: searchView.query, parent: tagsRow })
+    const total = searchResults.total || 0
+    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: total.toString(), title: searchView.query, parent: tagsRow })
     el.replaceChildren(RC.renderContainer([tagsRow]))
 }
 
