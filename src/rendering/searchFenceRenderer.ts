@@ -82,9 +82,34 @@ function getAccountBandStyle(account: IJiraIssueAccountSettings): string {
 
 function renderSearchFooter(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): HTMLElement {
     const searchFooter = createDiv({ cls: 'search-footer' })
-    const total = searchResults.total || 0
+    
+    // Debug: Log the search results structure to understand the API response
+    SettingsData.logRequestsResponses && console.log('JiraIssue:SearchResults structure:', {
+        total: searchResults.total,
+        maxResults: searchResults.maxResults,
+        startAt: searchResults.startAt,
+        issuesLength: searchResults.issues?.length,
+        isLast: searchResults.isLast,
+        nextPageToken: searchResults.nextPageToken,
+        searchResults: searchResults
+    })
+    
+    // Handle API v3 pagination - no total count available
     const alias = searchResults.account?.alias || 'Unknown'
-    const searchCount = `Total results: ${total.toString()} - ${alias}`
+    let searchCount: string
+    
+    if (searchResults.total !== undefined) {
+        // Legacy API v2 response with total count
+        searchCount = `Total results: ${searchResults.total.toString()} - ${alias}`
+    } else {
+        // API v3 response - show current results and pagination status
+        const currentCount = searchResults.issues?.length || 0
+        if (searchResults.isLast) {
+            searchCount = `Results: ${currentCount.toString()} (all results) - ${alias}`
+        } else {
+            searchCount = `Results: ${currentCount.toString()}+ (more available) - ${alias}`
+        }
+    }
 
     if(SettingsData.showJiraLink) {
         createEl('a', {

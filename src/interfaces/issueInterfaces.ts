@@ -109,10 +109,13 @@ export interface IJiraUser {
 
 export interface IJiraSearchResults {
     issues: IJiraIssue[]
-    maxResults: number
-    startAt: number
-    total: number
+    isLast: boolean
+    nextPageToken?: string
     account: IJiraIssueAccountSettings
+    // Legacy fields for backward compatibility
+    maxResults?: number
+    startAt?: number
+    total?: number
 }
 
 export interface IJiraStatus {
