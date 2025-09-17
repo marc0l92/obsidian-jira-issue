@@ -94,9 +94,10 @@ export interface IJiraWorklog {
 export interface IJiraUser {
     active: boolean
     displayName: string
-    name: string
-    key: string
-    emailAddress: string
+    accountId: string
+    name?: string
+    key?: string
+    emailAddress?: string
     self: string
     avatarUrls: {
         '16x16': string
@@ -108,10 +109,13 @@ export interface IJiraUser {
 
 export interface IJiraSearchResults {
     issues: IJiraIssue[]
-    maxResults: number
-    startAt: number
-    total: number
+    isLast: boolean
+    nextPageToken?: string
     account: IJiraIssueAccountSettings
+    // Legacy fields for backward compatibility
+    maxResults?: number
+    startAt?: number
+    total?: number
 }
 
 export interface IJiraStatus {
@@ -244,6 +248,7 @@ const newEmptyUser = () => {
             "48x48": '',
         },
         displayName: '',
+        accountId: '',
         self: '',
     } as IJiraUser
 }

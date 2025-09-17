@@ -11,7 +11,23 @@ function renderSearchCount(el: HTMLElement, searchResults: IJiraSearchResults, s
     if (searchView.label !== '') {
         createSpan({ cls: `ji-tag is-link ${RC.getTheme()}`, text: searchView.label || `Count`, title: searchView.query, parent: tagsRow })
     }
-    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: searchResults.total.toString(), title: searchView.query, parent: tagsRow })
+    
+    // Handle API v3 pagination - no total count available
+    let countText: string
+    if (searchResults.total !== undefined) {
+        // Legacy API v2 response with total count
+        countText = searchResults.total.toString()
+    } else {
+        // API v3 response - show current results and pagination status
+        const currentCount = searchResults.issues?.length || 0
+        if (searchResults.isLast) {
+            countText = currentCount.toString()
+        } else {
+            countText = `${currentCount}+`
+        }
+    }
+    
+    createSpan({ cls: `ji-tag ${RC.getTheme()}`, text: countText, title: searchView.query, parent: tagsRow })
     el.replaceChildren(RC.renderContainer([tagsRow]))
 }
 
