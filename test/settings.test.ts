@@ -17,6 +17,7 @@ const StoredSettings = {
         color: 'colorVal',
         host: 'hostVal',
         bareToken: 'bareToken',
+        use2025Api: false,
     }],
     apiBasePath: 'apiBasePathVal',
     cache: {

@@ -4,6 +4,7 @@ import { TestAccountOpen } from './testData'
 
 const kIssueKey = 'AAA-123'
 const requestUrlMock = jest.spyOn(obsidian, 'requestUrl')
+const defaultHeaders = { 'content-type': 'application/json' }
 
 describe('JiraClient', () => {
     describe('Positive tests', () => {
@@ -19,11 +20,15 @@ describe('JiraClient', () => {
         // })
 
         test('testConnection', async () => {
-            requestUrlMock.mockReturnValue({ status: 200 } as any)
+            requestUrlMock.mockReturnValue({ status: 200, headers: defaultHeaders, json: { issues: [] } } as any)
             expect(await JiraClient.testConnection(TestAccountOpen)).toEqual(true)
             expect(requestUrlMock.mock.calls[0][0]).toEqual({
                 contentType: 'application/json',
-                headers: {},
+                headers: {
+                    "Accept": "application/json",
+                    "User-Agent": "obsidian-jira-issue-plugin",
+                    "X-Atlassian-Token": "no-check",
+                },
                 method: 'GET',
                 url: 'https://test-company.atlassian.net/rest/api/latest/project',
             })
@@ -33,14 +38,18 @@ describe('JiraClient', () => {
     describe('Negative tests', () => {
         test('testConnection', async () => {
             expect.assertions(2)
-            requestUrlMock.mockReturnValue({ status: 401 } as any)
+            requestUrlMock.mockReturnValue({ status: 401, headers: defaultHeaders } as any)
             try {
                 await JiraClient.testConnection(TestAccountOpen)
             } catch (e) {
-                expect(e).toEqual(new Error(`HTTP status 401`))
+                expect(e).toEqual(new Error(`Unauthorized: Please check your authentication credentials`))
                 expect(requestUrlMock.mock.calls[0][0]).toEqual({
                     contentType: 'application/json',
-                    headers: {},
+                    headers: {
+                        "Accept": "application/json",
+                        "User-Agent": "obsidian-jira-issue-plugin",
+                        "X-Atlassian-Token": "no-check",
+                    },
                     method: 'GET',
                     url: 'https://test-company.atlassian.net/rest/api/latest/project',
                 })

@@ -86,7 +86,11 @@ function buildHeaders(account: IJiraIssueAccountSettings): Record<string, string
 }
 
 function isJsonResponse(response: RequestUrlResponse): boolean {
-    return response.headers['content-type'] && response.headers['content-type'].contains('json') && response.json
+    return response.headers && response.headers['content-type'] && response.headers['content-type'].includes('json') && response.json !== undefined
+}
+
+function isTextResponse(response: RequestUrlResponse): boolean {
+    return response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text') && response.text !== undefined
 }
 
 async function sendRequest(requestOptions: RequestOptions): Promise<any> {
@@ -128,7 +132,7 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
             default:
                 if (isJsonResponse(response) && response.json.message) {
                     errorMsg = response.json.message
-                } else if (response.headers['content-type'] && response.headers['content-type'].contains('text') && response.text.contains('<title>Log in')) {
+                } else if (isTextResponse(response) && response.text.contains('<title>Log in')) {
                     errorMsg = 'Login required'
                 } else {
                     errorMsg = `HTTP ${response.status}`

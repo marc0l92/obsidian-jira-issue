@@ -18,7 +18,8 @@ export const TestAccountOpen = {
     authenticationType: EAuthenticationTypes.OPEN,
     priority: 1,
     color: '#123456',
-    cache: kEmptyAccountCache
+    use2025Api: false,
+    cache: kEmptyAccountCache,
 }
 
 export const TestAccountBasic = {
@@ -29,5 +30,6 @@ export const TestAccountBasic = {
     password: 'password2',
     priority: 2,
     color: '#789012',
-    cache: kEmptyAccountCache
+    use2025Api: false,
+    cache: kEmptyAccountCache,
 }
