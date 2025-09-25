@@ -46,6 +46,7 @@ export const DEFAULT_ACCOUNT: IJiraIssueAccountSettings = {
     password: '',
     priority: 1,
     color: '#000000',
+    use2025Api: false,
     cache: {
         statusColor: {},
         customFieldsIdToName: {},
@@ -66,7 +67,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
     private _plugin: JiraIssuePlugin
     private _onChangeListener: (() => void) | null = null
     private _searchColumnsDetails: HTMLDetailsElement = null
-    private _showPassword: boolean = false
+    private _showPassword = false
 
     constructor(app: App, plugin: JiraIssuePlugin) {
         super(app, plugin)
@@ -95,6 +96,7 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                         alias: DEFAULT_ACCOUNT.alias,
                         color: DEFAULT_ACCOUNT.color,
                         cache: DEFAULT_ACCOUNT.cache,
+                        use2025Api: false,
                     }
                 ]
             } else {
@@ -374,6 +376,16 @@ export class JiraIssueSettingTab extends PluginSettingTab {
                     colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
                 })).controlEl.children[0]
         colorInput.setAttr('style', 'border-left: 5px solid ' + newAccount.color)
+
+        new Setting(containerEl)
+            .setName('Use 2025 search api')
+            .setDesc(`In Aug 2025, Atlassian replaced the search api with a new one. Activate this option if you use Jira Cloud or you get the error 410 when searching issues.`)
+            .addToggle(toggle => toggle
+                .setValue(newAccount.use2025Api)
+                .onChange(async value => {
+                    newAccount.use2025Api = value
+                    await this.saveSettings()
+                }))
 
         new Setting(containerEl)
             .addButton(button => button

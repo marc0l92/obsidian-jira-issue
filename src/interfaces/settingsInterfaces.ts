@@ -38,7 +38,7 @@ export interface IJiraIssueSettings {
     logImagesFetch: boolean
     showColorBand: boolean
     showJiraLink: boolean
-    
+
     // Legacy credentials
     host?: string
     authenticationType?: EAuthenticationTypes
@@ -56,6 +56,7 @@ export interface IJiraIssueAccountSettings {
     bareToken?: string
     priority: number
     color: string
+    use2025Api: boolean
     cache: {
         statusColor: Record<string, string>
         customFieldsIdToName: Record<string, string>

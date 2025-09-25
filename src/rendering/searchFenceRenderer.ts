@@ -82,9 +82,9 @@ function getAccountBandStyle(account: IJiraIssueAccountSettings): string {
 
 function renderSearchFooter(rootEl: HTMLElement, searchView: SearchView, searchResults: IJiraSearchResults): HTMLElement {
     const searchFooter = createDiv({ cls: 'search-footer' })
-    const searchCount = `Total results: ${searchResults.total.toString()} - ${searchResults.account.alias}`
+    const searchCount = `Total results: ${searchResults.total?.toString() || searchResults.issues.length.toString()}${searchResults.isLast === false ? "+" : ""} | ${searchResults.account.alias}`
 
-    if(SettingsData.showJiraLink) {
+    if (SettingsData.showJiraLink) {
         createEl('a', {
             text: searchCount,
             href: RC.searchUrl(searchView.account, searchView.query),

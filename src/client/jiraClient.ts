@@ -6,14 +6,16 @@ import { SettingsData } from "../settings"
 interface RequestOptions {
     method: string
     path: string
+    path2025?: string
     queryParameters?: URLSearchParams
+    queryParameters2025?: URLSearchParams
     account?: IJiraIssueAccountSettings
     noBasePath?: boolean
 }
 
 function getMimeType(imageBuffer: ArrayBuffer): string {
     const imageBufferUint8 = new Uint8Array(imageBuffer.slice(0, 4))
-    let bytes: string[] = []
+    const bytes: string[] = []
     imageBufferUint8.forEach((byte) => {
         bytes.push(byte.toString(16))
     })
@@ -53,17 +55,28 @@ function base64Encode(s: string) {
     }
 }
 
-function buildUrl(host: string, requestOptions: RequestOptions): string {
+function buildUrl(host: string, requestOptions: RequestOptions, use2025Api: boolean): string {
     const basePath = requestOptions.noBasePath ? '' : SettingsData.apiBasePath
-    const url = new URL(`${host}${basePath}${requestOptions.path}`)
-    if (requestOptions.queryParameters) {
-        url.search = requestOptions.queryParameters.toString()
+    // Normalize URL parts to prevent double slashes
+    const normalizedHost = host.endsWith('/') ? host.slice(0, -1) : host
+    const normalizedBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : ''
+    const path = (use2025Api && requestOptions.path2025) ? requestOptions.path2025 : requestOptions.path
+    const normalizedPath = path.startsWith('/') ? path : '/' + path
+
+    const url = new URL(`${normalizedHost}${normalizedBasePath}${normalizedPath}`)
+    const queryParameters = use2025Api ? requestOptions.queryParameters2025 : requestOptions.queryParameters
+    if (queryParameters) {
+        url.search = queryParameters.toString()
     }
     return url.toString()
 }
 
 function buildHeaders(account: IJiraIssueAccountSettings): Record<string, string> {
-    const requestHeaders: Record<string, string> = {}
+    const requestHeaders: Record<string, string> = {
+        'User-Agent': 'obsidian-jira-issue-plugin',
+        'X-Atlassian-Token': 'no-check',
+        'Accept': 'application/json',
+    }
     if (account.authenticationType === EAuthenticationTypes.BASIC || account.authenticationType === EAuthenticationTypes.CLOUD) {
         requestHeaders['Authorization'] = 'Basic ' + base64Encode(`${account.username}:${account.password}`)
     } else if (account.authenticationType === EAuthenticationTypes.BEARER_TOKEN) {
@@ -72,12 +85,16 @@ function buildHeaders(account: IJiraIssueAccountSettings): Record<string, string
     return requestHeaders
 }
 
+function isJsonResponse(response: RequestUrlResponse): boolean {
+    return response.headers['content-type'] && response.headers['content-type'].contains('json') && response.json
+}
+
 async function sendRequest(requestOptions: RequestOptions): Promise<any> {
     let response: RequestUrlResponse
     if (requestOptions.account) {
         response = await sendRequestWithAccount(requestOptions.account, requestOptions)
 
-        if (response.status === 200) {
+        if (response.status === 200 && isJsonResponse(response)) {
             return { ...response.json, account: requestOptions.account }
         }
     } else {
@@ -85,7 +102,7 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
             const account = SettingsData.accounts[i]
             response = await sendRequestWithAccount(account, requestOptions)
 
-            if (response.status === 200) {
+            if (response.status === 200 && isJsonResponse(response)) {
                 return { ...response.json, account: account }
             } else if (Math.floor(response.status / 100) !== 4) {
                 break
@@ -93,16 +110,30 @@ async function sendRequest(requestOptions: RequestOptions): Promise<any> {
         }
     }
 
-    if (response && response.headers && response.headers['content-type'].contains('json') && response.json && response.json.errorMessages) {
+    if (response && response.headers && isJsonResponse(response) && response.json.errorMessages) {
         throw new Error(response.json.errorMessages.join('\n'))
     } else if (response && response.status) {
+        let errorMsg
         switch (response.status) {
             case 400:
-                throw new Error(`The query is not valid`)
+                throw new Error(`Bad Request: The query is not valid`)
+            case 401:
+                throw new Error(`Unauthorized: Please check your authentication credentials`)
+            case 403:
+                throw new Error(`Forbidden: You don't have permission to access this resource. Check your API token permissions and Jira project access.`)
             case 404:
-                throw new Error(`Issue does not exist`)
+                throw new Error(`Not Found: Issue does not exist`)
+            case 410:
+                throw new Error(`Missing API: Activate the 2025 search api in the Jira Issue account settings`)
             default:
-                throw new Error(`HTTP status ${response.status}`)
+                if (isJsonResponse(response) && response.json.message) {
+                    errorMsg = response.json.message
+                } else if (response.headers['content-type'] && response.headers['content-type'].contains('text') && response.text.contains('<title>Log in')) {
+                    errorMsg = 'Login required'
+                } else {
+                    errorMsg = `HTTP ${response.status}`
+                }
+                throw new Error(`Jira API ${response.status} Error: ${errorMsg}`)
         }
     } else {
         throw new Error(response as any)
@@ -113,7 +144,7 @@ async function sendRequestWithAccount(account: IJiraIssueAccountSettings, reques
     let response
     const requestUrlParam: RequestUrlParam = {
         method: requestOptions.method,
-        url: buildUrl(account.host, requestOptions),
+        url: buildUrl(account.host, requestOptions, account.use2025Api),
         headers: buildHeaders(account),
         contentType: 'application/json',
     }
@@ -197,7 +228,7 @@ export default {
 
     async getSearchResults(query: string, options: { limit?: number, offset?: number, fields?: string[], account?: IJiraIssueAccountSettings } = {}): Promise<IJiraSearchResults> {
         const opt = {
-            fields: options.fields || [],
+            fields: options.fields || ['*all'],
             offset: options.offset || 0,
             limit: options.limit || 50,
             account: options.account || null,
@@ -208,11 +239,19 @@ export default {
             startAt: opt.offset > 0 ? opt.offset.toString() : '',
             maxResults: opt.limit > 0 ? opt.limit.toString() : '',
         })
+        const queryParameters2025 = new URLSearchParams({
+            jql: query,
+            fields: opt.fields.join(','),
+            nextPageToken: opt.offset > 0 ? opt.offset.toString() : '',
+            maxResults: opt.limit > 0 ? opt.limit.toString() : '',
+        })
         const searchResults = await sendRequest(
             {
                 method: 'GET',
-                path: `/search`,
+                path: '/search',
+                path2025: '/search/jql',
                 queryParameters: queryParameters,
+                queryParameters2025: queryParameters2025,
                 account: opt.account,
             }
         ) as IJiraSearchResults
@@ -250,7 +289,7 @@ export default {
                 account.cache.customFieldsIdToName = {}
                 account.cache.customFieldsNameToId = {}
                 account.cache.customFieldsType = {}
-                for (let i in response) {
+                for (const i in response) {
                     const field = response[i]
                     if (field.custom && field.schema && field.schema.customId) {
                         account.cache.customFieldsIdToName[field.schema.customId] = field.name
